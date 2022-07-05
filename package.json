@@ -1,0 +1,27 @@
+{
+  "name": "deliverble-backend",
+  "version": "1.0.0",
+  "description": "deliverble-backend",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/DeliverBle/deliverble-backend.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/DeliverBle/deliverble-backend/issues"
+  },
+  "homepage": "https://github.com/DeliverBle/deliverble-backend#readme",
+  "dependencies": {
+    "@types/dotenv": "^8.2.0",
+    "dotenv": "^16.0.1",
+    "mysql2": "^2.3.3",
+    "sequelize": "^6.21.2",
+    "sequelize-cli": "^6.4.1",
+    "typescript": "^4.7.4"
+  }
+}
