@@ -7,11 +7,20 @@ import { Gender } from './shared/common/Gender';
 import { Time } from './vo/Time';
 import { Suitability } from './shared/common/Suitability';
 import { Tag } from './entity/Tag';
+import routes from './routes'
+
 const app = express();
 
 app.get('/api/hello', (req, res) => {
   res.send('hello world');
 });
+
+// Request body를 parsing 하기 위한 미들웨어 사용
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+// routes 폴더로 분기
+app.use(routes);
 
 let jeongbuTag1 = new Tag();
 jeongbuTag1.name = '정부';
