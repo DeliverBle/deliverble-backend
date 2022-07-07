@@ -16,3 +16,11 @@ export interface NewsInfo {
   isEmbeddable: boolean;
   reportDate: Date;
 }
+
+export interface SearchCondition {
+  channel: string[];
+  category: string[];
+  speaker: string[];
+  currentPage: number;
+  listSize: number;
+}

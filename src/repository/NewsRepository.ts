@@ -2,7 +2,13 @@
 
 import { EntityRepository, Repository } from 'typeorm';
 import { News } from '../entity/News';
-import { NewsInfo } from '../types';
+
 
 @EntityRepository(News)
-export class NewsRepository extends Repository<News> {}
+export class NewsRepository extends Repository<News> {
+    findById(id: number) {
+        return this.createQueryBuilder("news")
+            .where("news.id = :id", { id })
+            .getOne();
+    }
+}
