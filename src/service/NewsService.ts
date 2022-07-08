@@ -3,19 +3,27 @@ import { News } from "../entity/News";
 import { NewsRepository } from "../repository/NewsRepository";
 import { NewsInfo, SearchCondition } from "../types"
 
-const searchNews = async (searchCondition: SearchCondition): Promise<NewsInfo> => {
+const searchNews = async (searchCondition: SearchCondition): Promise<NewsInfo[]> => {
     try {
 
-        // News 전체 조회
-        // const newsRepository = News.getRepository();
-        // const data = newsRepository.find();
+        // channel이 searchCondition 속하는 모든 News 조회
+        // const connection = getConnection();
+        // const newsRepository = connection.getCustomRepository(NewsRepository);
+        // const data = await newsRepository.findByChannels(searchCondition.channels);
+        // return data;
 
-        // id 일치하는 뉴스 1개 조회 (repository로 db 접근 로직 분리)
+        // category가 searchCondition에 속하는 모든 News 조회
+        // const connection = getConnection();
+        // const newsRepository = connection.getCustomRepository(NewsRepository);
+        // const data = await newsRepository.findByCategories(searchCondition.categories);
+        // return data;
+
+        // announcerGender가 searchCondition에 속하는 모든 News 조회
         const connection = getConnection();
         const newsRepository = connection.getCustomRepository(NewsRepository);
-        const data = await newsRepository.findById(5);
-
+        const data = await newsRepository.findByAnnouncerGender(searchCondition.announcerGender);
         return data;
+
     } catch (error) {
         console.log(error);
         throw error;

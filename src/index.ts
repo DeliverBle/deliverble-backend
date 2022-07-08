@@ -8,6 +8,7 @@ import { Time } from './vo/Time';
 import { Suitability } from './shared/common/Suitability';
 import { Tag } from './entity/Tag';
 import routes from './routes'
+import { Channel } from './shared/common/Channel';
 
 
 const app = express();
@@ -38,9 +39,10 @@ createConnection().then(async (connection) => {
 
   const newsInfo = {
     title: '정부, 감염자 격리 의무 한 달 연장',
-    category: Category.HEALTH,
+    category: Category.SOCIETY,
     tags: [tag1, tag2],
-    announcerGender: Gender.MEN,
+    announcerGender: Gender.WOMEN,
+    channel: Channel.MBC,
     link: 'https://www.youtube.com/watch?v=ah6nDLl4_oA&t=1391s',
     time: new Time(23, 28),
     runningTime: new Time(0, 24),

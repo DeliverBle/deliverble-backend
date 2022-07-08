@@ -15,6 +15,7 @@ import { Time } from '../vo/Time';
 import { Suitability } from '../shared/common/Suitability';
 import { Tag } from './Tag';
 import { NewsInfo } from '../types';
+import { Channel } from '../shared/common/Channel';
 
 @Entity()
 export class News extends BaseEntity {
@@ -44,6 +45,14 @@ export class News extends BaseEntity {
     default: Gender.UNSPECIFIED,
   })
   announcerGender: Gender;
+
+  @Column({
+    type: 'enum',
+    name: 'channel',
+    enum: Channel,
+    default: Channel.UNSPECIFIED,
+  })
+  channel: Channel;
 
   @Column({ type: 'varchar', length: 1000 })
   link: string;
