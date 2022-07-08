@@ -1,5 +1,4 @@
 import { getConnection, getCustomRepository } from "typeorm";
-import { News } from "../entity/News";
 import { NewsRepository } from "../repository/NewsRepository";
 import { NewsInfo, SearchCondition } from "../types"
 
