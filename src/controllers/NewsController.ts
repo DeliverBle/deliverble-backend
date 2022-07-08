@@ -3,6 +3,7 @@ import NewsService from "../service/NewsService";
 import statusCode from "../modules/statusCode";
 import message from "../modules/responseMessage";
 import util from "../modules/util";
+import { SearchCondition } from "../types";
 
 /**
  * @route get /search
@@ -10,13 +11,9 @@ import util from "../modules/util";
  * @access Public
  */
 const searchNews = async (req: Request, res: Response): Promise<void | Response> => {
-    const searchCondition = req.body;
+    const searchCondition: SearchCondition = req.body;
     
     try {
-        console.log(Object.keys(req));
-        console.log(req.body)
-        console.log(typeof req.body.channel)
-        console.log(req.body.channel[0])
         const data = await NewsService.searchNews(searchCondition);
         res.status(statusCode.OK).send(util.success(statusCode.OK, message.SEARCH_NEWS_SUCCESS, data));
     } catch (error) {

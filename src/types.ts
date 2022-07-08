@@ -3,12 +3,14 @@ import { Gender } from './shared/common/Gender';
 import { Time } from './vo/Time';
 import { Suitability } from './shared/common/Suitability';
 import { Tag } from './entity/Tag';
+import { Channel } from './shared/common/Channel';
 
 export interface NewsInfo {
   title: string;
   category: Category;
   tags: Tag[];
   announcerGender: Gender;
+  channel: Channel;
   link: string;
   time: Time;
   runningTime: Time;
@@ -18,9 +20,9 @@ export interface NewsInfo {
 }
 
 export interface SearchCondition {
-  channel: string[];
-  category: string[];
-  speaker: string[];
+  channels: string[];
+  categories: string[];
+  announcerGender: string;
   currentPage: number;
   listSize: number;
 }
