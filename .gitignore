@@ -105,5 +105,5 @@ dist
 # TernJS port file
 .tern-port
 
-.gitignore
-.ormconfig.json
+# env 환경 변수
+.env
