@@ -6,19 +6,19 @@ import { NewsInfo, SearchCondition } from "../types"
 const searchNews = async (searchCondition: SearchCondition): Promise<NewsInfo[]> => {
     try {
 
-        // channel이 searchCondition 속하는 모든 News 조회
+        // 1. channel이 searchCondition 속하는 모든 News 조회
         // const connection = getConnection();
         // const newsRepository = connection.getCustomRepository(NewsRepository);
         // const data = await newsRepository.findByChannels(searchCondition.channels);
         // return data;
 
-        // category가 searchCondition에 속하는 모든 News 조회
+        // 2. category가 searchCondition에 속하는 모든 News 조회
         // const connection = getConnection();
         // const newsRepository = connection.getCustomRepository(NewsRepository);
         // const data = await newsRepository.findByCategories(searchCondition.categories);
         // return data;
 
-        // announcerGender가 searchCondition에 속하는 모든 News 조회
+        // 3. announcerGender가 searchCondition에 속하는 모든 News 조회
         const connection = getConnection();
         const newsRepository = connection.getCustomRepository(NewsRepository);
         const data = await newsRepository.findByAnnouncerGender(searchCondition.announcerGender);
