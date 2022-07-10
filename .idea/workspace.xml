@@ -2,8 +2,38 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="488ce2f7-f5bc-4c8d-bf33-98e70696bdd5" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.prettierrc.js" beforeDir="false" afterPath="$PROJECT_DIR$/.prettierrc.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/.eslintrc.js" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/.gitignore" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/.prettierrc" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/README.md" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/admin/src/admin.controller.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/admin/src/admin.controller.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/admin/src/admin.module.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/admin/src/admin.service.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/admin/src/main.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/admin/test/app.e2e-spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/admin/test/jest-e2e.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/admin/tsconfig.app.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/api/src/api.controller.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/api/src/api.controller.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/api/src/api.module.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/api/src/api.service.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/api/src/main.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/api/test/app.e2e-spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/api/test/jest-e2e.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/apps/api/tsconfig.app.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/libs/entity/src/entity.module.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/libs/entity/src/entity.service.spec.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/libs/entity/src/entity.service.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/libs/entity/src/index.ts" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/libs/entity/tsconfig.lib.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/nest-cli.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/package.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/tsconfig.build.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/monorepo-nestjs-typeorm/tsconfig.json" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/service/NewsService.ts" beforeDir="false" afterPath="$PROJECT_DIR$/src/service/NewsService.ts" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -31,33 +61,74 @@
     <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectId" id="2BX5rkpBmG9v41flcxRI9khlcdf" />
-  <component name="ProjectLevelVcsManager">
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <ConfirmationsSetting value="2" id="Add" />
   </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">
-    <property name="ASKED_ADD_EXTERNAL_FILES" value="true" />
-    <property name="DatabaseDriversLRU" value="mongo&#10;mysql" />
-    <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
-    <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
-    <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="go.formatter.settings.were.checked" value="true" />
-    <property name="go.import.settings.migrated" value="true" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
-    <property name="nodejs_package_manager_path" value="npm" />
-    <property name="prettierjs.PrettierConfiguration.Package" value="$PROJECT_DIR$/node_modules/prettier" />
-    <property name="settings.editor.selected.configurable" value="settings.javascript.prettier" />
-    <property name="ts.external.directory.path" value="$PROJECT_DIR$/node_modules/typescript/lib" />
-  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.go.format.on.save.advertiser.fired&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.formatter.settings.were.checked&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.go.migrated.go.modules.settings&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;go.import.settings.migrated&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/sigridjin.eth/Documents/github/deliverble-backend/monorepo-nestjs-typeorm/libs/entity&quot;,
+    &quot;nodejs.jest.jest_package&quot;: &quot;/Users/sigridjin.eth/Documents/github/deliverble-backend/monorepo-nestjs-typeorm/node_modules/jest&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;prettierjs.PrettierConfiguration.Package&quot;: &quot;/Users/sigridjin.eth/Documents/github/deliverble-backend/node_modules/prettier&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
+    &quot;show.migrate.to.gradle.popup&quot;: &quot;false&quot;,
+    &quot;ts.external.directory.path&quot;: &quot;/Users/sigridjin.eth/Documents/github/deliverble-backend/node_modules/typescript/lib&quot;
+  }
+}</component>
   <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="$PROJECT_DIR$/monorepo-nestjs-typeorm/libs/entity" />
+    </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="$PROJECT_DIR$/src/vo" />
       <recent name="$PROJECT_DIR$/src/shared/common" />
       <recent name="$PROJECT_DIR$/models" />
     </key>
+  </component>
+  <component name="RunManager" selected="Jest.UserQueryRepository">
+    <configuration name="UserQueryRepository" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/monorepo-nestjs-typeorm/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/monorepo-nestjs-typeorm" />
+      <envs />
+      <scope-kind value="SUITE" />
+      <test-file value="$PROJECT_DIR$/monorepo-nestjs-typeorm/libs/entity/test/UserRepository.spec.ts" />
+      <test-names>
+        <test-name value="UserQueryRepository" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <configuration name="UserQueryRepository.save" type="JavaScriptTestRunnerJest" temporary="true" nameIsGenerated="true">
+      <node-interpreter value="project" />
+      <node-options value="" />
+      <jest-package value="$PROJECT_DIR$/monorepo-nestjs-typeorm/node_modules/jest" />
+      <working-dir value="$PROJECT_DIR$/monorepo-nestjs-typeorm" />
+      <envs />
+      <scope-kind value="TEST" />
+      <test-file value="$PROJECT_DIR$/monorepo-nestjs-typeorm/libs/entity/test/UserRepository.spec.ts" />
+      <test-names>
+        <test-name value="UserQueryRepository" />
+        <test-name value="save" />
+      </test-names>
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Jest.UserQueryRepository" />
+        <item itemvalue="Jest.UserQueryRepository.save" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -69,6 +140,8 @@
       <updated>1657039789604</updated>
       <workItem from="1657039791188" duration="4171000" />
       <workItem from="1657044104197" duration="18314000" />
+      <workItem from="1657458841732" duration="5990000" />
+      <workItem from="1657464856194" duration="3416000" />
     </task>
     <servers />
   </component>
@@ -90,7 +163,20 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
   </component>
   <component name="VgoProject">
-    <integration-enabled>true</integration-enabled>
+    <settings-migrated>true</settings-migrated>
+  </component>
+  <component name="XDebuggerManager">
+    <watches-manager>
+      <configuration name="JavaScriptTestRunnerJest">
+        <watch expression="userQueryRepository.find()" language="TypeScript" />
+        <watch expression="userRepository.find()" language="TypeScript" />
+        <watch expression="userRepository" language="TypeScript" />
+        <watch expression="userQueryRepository" language="TypeScript" />
+        <watch expression="savedUser.id" language="TypeScript" />
+        <watch expression="expect(savedUser.id).toBeGreaterThanOrEqual(1)" language="TypeScript" />
+        <watch expression="savedUser.id === 1" language="TypeScript" />
+      </configuration>
+    </watches-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

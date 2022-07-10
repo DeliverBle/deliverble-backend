@@ -12,12 +12,23 @@ import { SearchCondition } from '../types';
  */
 const searchNews = async (req: Request, res: Response): Promise<void | Response> => {
   const searchCondition: SearchCondition = req.body;
+  let data;
 
   try {
-    const data = await NewsService.searchNews(searchCondition);
+    if (searchCondition.channels !== undefined) {
+      // input your logic here
+    }
+    if (searchCondition.categories !== undefined) {
+      // input your logic here
+    }
+    if (searchCondition.announcerGender !== undefined) {
+      // input your logic here
+    }
+
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.SEARCH_NEWS_SUCCESS, data));
   } catch (error) {
     console.log(error);
+
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
