@@ -1,6 +1,4 @@
-import NewsController from "./NewsController"
+import NewsController from './NewsController';
 
 // controller index file
-export {
-    NewsController,
-}
+export { NewsController };

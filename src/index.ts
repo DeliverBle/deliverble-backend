@@ -7,9 +7,8 @@ import { Gender } from './shared/common/Gender';
 import { Time } from './vo/Time';
 import { Suitability } from './shared/common/Suitability';
 import { Tag } from './entity/Tag';
-import routes from './routes'
+import routes from './routes';
 import { Channel } from './shared/common/Channel';
-
 
 const app = express();
 
@@ -22,6 +21,6 @@ app.use(routes);
 
 createConnection().then(async (connection) => {
   app.listen(8080, () => {
-  console.log('server is listening 8080');
+    console.log('server is listening 8080');
   });
 });
