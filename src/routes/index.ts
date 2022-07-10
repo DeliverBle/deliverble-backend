@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import NewsRouter from "./NewsRouter";
+import NewsRouter from './NewsRouter';
 
 const router: Router = Router();
 
