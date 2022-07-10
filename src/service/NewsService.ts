@@ -1,26 +1,24 @@
-import { getConnection, getCustomRepository } from 'typeorm';
+import { getConnection } from 'typeorm';
 import { NewsRepository } from '../repository/NewsRepository';
 import { NewsInfo, SearchCondition } from '../types';
 
-const searchNews = async (searchCondition: SearchCondition): Promise<NewsInfo[]> => {
+const searchByChannel = async (searchCondition: SearchCondition) => {
+  const connection = getConnection();
+  const newsRepository = connection.getCustomRepository(NewsRepository);
+  return await newsRepository.findByChannels(searchCondition.channels);
+};
+
+const searchByCategory = async (searchCondition: SearchCondition) => {
+  const connection = getConnection();
+  const newsRepository = connection.getCustomRepository(NewsRepository);
+  return await newsRepository.findByCategories(searchCondition.categories);
+};
+
+const searchByGender = async (searchCondition: SearchCondition): Promise<NewsInfo[]> => {
   try {
-    // 1. channel이 searchCondition 속하는 모든 News 조회
-    // const connection = getConnection();
-    // const newsRepository = connection.getCustomRepository(NewsRepository);
-    // const data = await newsRepository.findByChannels(searchCondition.channels);
-    // return data;
-
-    // 2. category가 searchCondition에 속하는 모든 News 조회
-    // const connection = getConnection();
-    // const newsRepository = connection.getCustomRepository(NewsRepository);
-    // const data = await newsRepository.findByCategories(searchCondition.categories);
-    // return data;
-
-    // 3. announcerGender가 searchCondition에 속하는 모든 News 조회
     const connection = getConnection();
     const newsRepository = connection.getCustomRepository(NewsRepository);
-    const data = await newsRepository.findByAnnouncerGender(searchCondition.announcerGender);
-    return data;
+    return await newsRepository.findByAnnouncerGender(searchCondition.announcerGender);
   } catch (error) {
     console.log(error);
     throw error;
@@ -28,5 +26,7 @@ const searchNews = async (searchCondition: SearchCondition): Promise<NewsInfo[]>
 };
 
 export default {
-  searchNews,
+  searchByCategory,
+  searchByChannel,
+  searchByGender,
 };
