@@ -40,11 +40,12 @@ const sortByDateAndTitle = (newsData) => {
   return newsData;
 };
 
-const validateConditions = (searchCondition: SearchCondition): ConditionList | boolean => {
+const validateConditions = (searchCondition: SearchCondition): ConditionList => {
   let conditionList: ConditionList = {
     channels: false,
     categories: false,
     announcerGender: false,
+    findAll: false,
   };
   if (searchCondition.channels !== undefined) {
     conditionList['channels'] = true;
@@ -61,7 +62,7 @@ const validateConditions = (searchCondition: SearchCondition): ConditionList | b
   if (
     !(conditionList['channels'] || conditionList['categories'] || conditionList['announcerGender'])
   ) {
-    return false;
+    conditionList['findAll'] = true;
   }
 
   return conditionList;
