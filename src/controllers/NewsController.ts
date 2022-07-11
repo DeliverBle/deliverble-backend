@@ -16,7 +16,7 @@ import { NewsRepository } from '../repository/NewsRepository';
 const searchNews = async (req: Request, res: Response): Promise<void | Response> => {
   const searchCondition: SearchCondition = req.body;
   let data;
-  let conditionList: ConditionList | boolean = validateConditions(searchCondition);
+  let conditionList: ConditionList = validateConditions(searchCondition);
   console.log(conditionList);
 
   try {
