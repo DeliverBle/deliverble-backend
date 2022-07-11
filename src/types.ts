@@ -5,6 +5,12 @@ import { Suitability } from './shared/common/Suitability';
 import { Tag } from './entity/Tag';
 import { Channel } from './shared/common/Channel';
 
+export interface ConditionList {
+  channels: boolean;
+  categories: boolean;
+  announcerGender: boolean;
+}
+
 export interface NewsInfo {
   title: string;
   category: Category;

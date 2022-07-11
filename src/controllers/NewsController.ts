@@ -3,8 +3,10 @@ import NewsService from '../service/NewsService';
 import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
-import { SearchCondition } from '../types';
-import { validateConditions } from '../shared/common/utils'
+import { ConditionList, SearchCondition } from '../types';
+import { validateConditions } from '../shared/common/utils';
+import { getConnection } from 'typeorm';
+import { NewsRepository } from '../repository/NewsRepository';
 
 /**
  * @route get /search
@@ -14,13 +16,12 @@ import { validateConditions } from '../shared/common/utils'
 const searchNews = async (req: Request, res: Response): Promise<void | Response> => {
   const searchCondition: SearchCondition = req.body;
   let data;
-  let conditionList = validateConditions(searchCondition);
+  let conditionList: ConditionList | boolean = validateConditions(searchCondition);
   console.log(conditionList);
 
   try {
-    if(conditionList) {
-      data = await NewsService.searchByConditions(conditionList, searchCondition)
-
+    if (conditionList) {
+      data = await NewsService.searchByConditions(conditionList, searchCondition);
     } else {
       data = await NewsService.searchAllNews();
     }
@@ -28,7 +29,9 @@ const searchNews = async (req: Request, res: Response): Promise<void | Response>
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.SEARCH_NEWS_SUCCESS, data));
   } catch (error) {
     console.log(error);
-    res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   }
 };
 
