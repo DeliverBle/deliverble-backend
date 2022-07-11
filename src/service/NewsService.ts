@@ -1,5 +1,6 @@
 import { getConnection } from 'typeorm';
 import { NewsRepository } from '../repository/NewsRepository';
+import { sortNewsData } from '../shared/common/utils';
 import { NewsInfo, SearchCondition } from '../types';
 
 
@@ -60,28 +61,17 @@ const searchByConditions = async (conditionList: object | boolean, searchConditi
       }
     })
   }
-  console.log(newsData);
+  // console.log(newsData);
 
+  // newsData.sort((prev, next) => {
+  //   return (+ new Date(next.reportDate)) - (+ new Date(prev.reportDate));
+  // })
+
+  newsData = sortNewsData(newsData);
+
+  
   return newsData;
 }
-
-  // console.log("healthNewsList", healthNewsList);
-  
-  // let result: NewsInfo[];
-  // for (let i in newsData) {
-    
-  //   console.log(`console in for : ${newsData[i]}`);
-  //   if (!(searchCondition.categories.indexOf(newsData[i].category) < 0)) {
-  //     console.log(searchCondition.categories.indexOf(newsData[i].category));
-  //     console.log(typeof newsData[i]);
-  //     // result.push(newsData[i]);  object Object
-  //   }
-  // }
-// 
-//   return newsData;
-// 
-// };
-
 
 export default {
   searchAllNews,

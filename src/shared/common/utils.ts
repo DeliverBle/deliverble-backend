@@ -1,5 +1,17 @@
 import { SearchCondition } from "../../types";
 
+export const sortNewsData = (newsData) => {
+    newsData.sort((prev, next) => {
+        // if ((+ new Date(next.reportDate)) - (+ new Date(prev.reportDate)) == 0) {
+        //     return (+ new Date(next.reportDate)) - (+ new Date(prev.reportDate));
+        // }
+        return (+ new Date(next.reportDate)) - (+ new Date(prev.reportDate));
+      })
+    return newsData;
+}
+
+
+
 
 
 export const validateConditions = (searchCondition: SearchCondition): object | boolean => {
@@ -10,21 +22,15 @@ export const validateConditions = (searchCondition: SearchCondition): object | b
     };
     if (searchCondition.channels !== undefined) {
         conditionList['channels'] = true;
-    } else {
-        conditionList['channels'] = false;
-    }
+    } 
 
     if (searchCondition.categories !== undefined) {
         conditionList['categories'] = true;
-    } else {
-        conditionList['categories'] = false;
-    }
+    } 
 
     if (searchCondition.announcerGender !== undefined) {
         conditionList['announcerGender'] = true;
-    } else {
-        conditionList['announcerGender'] = false;
-    }
+    } 
 
     if (!(conditionList['channels'] | conditionList['categories'] | conditionList['announcerGender'])) {
         return false;
