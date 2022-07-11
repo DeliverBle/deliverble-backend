@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm';
 import { NewsRepository } from '../repository/NewsRepository';
-import { sortByDate, sortByDateAndTitle, sortByTitle } from '../shared/common/utils';
+import { sortByDateAndTitle } from '../shared/common/utils';
 import { ConditionList, hasChannels, hasFindAll, NewsInfo, SearchCondition } from '../types';
 import { CHANNEL } from '../shared/common/Name';
 import { News } from '../entity/News';
