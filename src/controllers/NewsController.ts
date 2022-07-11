@@ -18,26 +18,17 @@ const searchNews = async (req: Request, res: Response): Promise<void | Response>
   console.log(conditionList);
 
   try {
-    // console.log(conditionList);
     if(conditionList) {
-      // console.log('Controller searchByConditions');
       data = await NewsService.searchByConditions(conditionList, searchCondition)
 
     } else {
-      // console.log('Controller searchAllNews');
       data = await NewsService.searchAllNews();
     }
 
-    
-      
-    // console.log(conditionList);
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.SEARCH_NEWS_SUCCESS, data));
   } catch (error) {
-    // console.log(error);
-
-    res
-      .status(statusCode.INTERNAL_SERVER_ERROR)
-      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+    console.log(error);
+    res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   }
 };
 

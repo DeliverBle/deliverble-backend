@@ -1,6 +1,6 @@
 import { getConnection } from 'typeorm';
 import { NewsRepository } from '../repository/NewsRepository';
-import { sortNewsData } from '../shared/common/utils';
+import { sortByDate, sortByDateAndTitle, sortByTitle } from '../shared/common/utils';
 import { NewsInfo, SearchCondition } from '../types';
 
 
@@ -42,17 +42,14 @@ const searchByConditions = async (conditionList: object | boolean, searchConditi
   } else {
     newsData = await newsRepository.findAllNews();
   }
-  // console.log(newsData);
-
   
-   if (conditionList['categories']) {
+  if (conditionList['categories']) {
     newsData = newsData.filter((news) => {
       if (searchCondition.categories.includes(news.category)) {
         return news;
       }
     })
   }
-  // console.log(newsData);
 
   if (conditionList['announcerGender']) {
     newsData = newsData.filter((news) => {
@@ -61,15 +58,9 @@ const searchByConditions = async (conditionList: object | boolean, searchConditi
       }
     })
   }
-  // console.log(newsData);
 
-  // newsData.sort((prev, next) => {
-  //   return (+ new Date(next.reportDate)) - (+ new Date(prev.reportDate));
-  // })
+  newsData = sortByDateAndTitle(newsData);
 
-  newsData = sortNewsData(newsData);
-
-  
   return newsData;
 }
 
