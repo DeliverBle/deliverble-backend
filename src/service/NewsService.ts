@@ -1,8 +1,9 @@
 import { getConnection } from 'typeorm';
 import { NewsRepository } from '../repository/NewsRepository';
 import { sortByDate, sortByDateAndTitle, sortByTitle } from '../shared/common/utils';
-import { NewsInfo, SearchCondition } from '../types';
+import { ConditionList, hasChannels, hasFindAll, NewsInfo, SearchCondition } from '../types';
 import { CHANNEL } from '../shared/common/Name';
+import { News } from '../entity/News';
 
 const connection = getConnection();
 const newsRepository = connection.getCustomRepository(NewsRepository);
@@ -28,16 +29,29 @@ const searchByGender = async (searchCondition: SearchCondition): Promise<NewsInf
   }
 };
 
+const fetchByChannel = async (
+  conditionList: ConditionList,
+  searchCondition: SearchCondition,
+): Promise<News[]> => {
+  if (hasFindAll(conditionList)) {
+    return await newsRepository.findAllNews();
+  }
+  if (hasChannels(conditionList)) {
+    return await newsRepository.findByChannels(searchCondition.channels);
+  }
+  return await newsRepository.findAllNews();
+};
+
 const searchByConditions = async (
-  conditionList: object | boolean,
+  conditionList: ConditionList,
   searchCondition: SearchCondition,
 ): Promise<NewsInfo[]> | null => {
-  let newsData;
-  if (conditionList['channels']) {
-    newsData = await newsRepository.findByChannels(searchCondition.channels);
-  } else {
-    newsData = await newsRepository.findAllNews();
-  }
+  let newsData = await fetchByChannel(conditionList, searchCondition);
+  // if (conditionList['channels']) {
+  //   newsData = await newsRepository.findByChannels(searchCondition.channels);
+  // } else {
+  //   newsData = await newsRepository.findAllNews();
+  // }
 
   if (conditionList['categories']) {
     newsData = newsData.filter((news) => {
