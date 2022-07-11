@@ -7,7 +7,15 @@ import { News } from '../entity/News';
 export class NewsRepository extends Repository<News> {
   // id로 1개의 News 조회
   findById(id: number) {
-    return this.createQueryBuilder('news').where('news.id = :id', { id }).getOne();
+    return this.createQueryBuilder('news')
+    .where('news.id = :id', { id })
+    .getOne();
+  }
+
+  // 모든 News 조회
+  findAllNews() {
+    return this.createQueryBuilder('news')
+    .getMany();
   }
 
   // channel이 channels에 속하는 모든 News 조회

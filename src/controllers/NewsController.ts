@@ -4,6 +4,7 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { SearchCondition } from '../types';
+import { validateConditions } from '../shared/common/utils'
 
 /**
  * @route get /search
@@ -13,21 +14,26 @@ import { SearchCondition } from '../types';
 const searchNews = async (req: Request, res: Response): Promise<void | Response> => {
   const searchCondition: SearchCondition = req.body;
   let data;
+  let conditionList = validateConditions(searchCondition);
+  console.log(conditionList);
 
   try {
-    if (searchCondition.channels !== undefined) {
-      // input your logic here
-    }
-    if (searchCondition.categories !== undefined) {
-      // input your logic here
-    }
-    if (searchCondition.announcerGender !== undefined) {
-      // input your logic here
+    // console.log(conditionList);
+    if(conditionList) {
+      // console.log('Controller searchByConditions');
+      data = await NewsService.searchByConditions(conditionList, searchCondition)
+
+    } else {
+      // console.log('Controller searchAllNews');
+      data = await NewsService.searchAllNews();
     }
 
+    
+      
+    // console.log(conditionList);
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.SEARCH_NEWS_SUCCESS, data));
   } catch (error) {
-    console.log(error);
+    // console.log(error);
 
     res
       .status(statusCode.INTERNAL_SERVER_ERROR)
