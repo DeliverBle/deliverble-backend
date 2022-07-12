@@ -35,6 +35,7 @@ export class News extends BaseEntity {
 
   @OneToMany(() => Tag, (tag) => tag.news, {
     cascade: true,
+    onDelete: "CASCADE"
   })
   tags: Tag[];
 
@@ -58,10 +59,10 @@ export class News extends BaseEntity {
   link: string;
 
   @Column(() => Time)
-  time: Time;
+  startTime: Time;
 
   @Column(() => Time)
-  runningTime: Time;
+  endTime: Time;
 
   @Column({
     type: 'enum',
