@@ -17,7 +17,9 @@ export class Tag extends BaseEntity {
   @Column()
   name!: string;
 
-  @ManyToOne((type) => News)
+  @ManyToOne((type) => News, {
+    onDelete: "CASCADE"
+  })
   @JoinColumn({ name: 'news_id', referencedColumnName: 'id' })
   news!: News;
 }
