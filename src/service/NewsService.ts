@@ -5,22 +5,29 @@ import { ConditionList, hasChannels, hasFindAll, NewsInfo, SearchCondition } fro
 import { CHANNEL } from '../shared/common/Name';
 import { News } from '../entity/News';
 
-const connection = getConnection();
-const newsRepository = connection.getCustomRepository(NewsRepository);
-
+const getConnectionToMySql = async() => {
+  const connection = getConnection();
+  const newsRepository = connection.getCustomRepository(NewsRepository);
+  return newsRepository;
+}
 const searchAllNews = async () => {
+  const newsRepository = await getConnectionToMySql();
   return await newsRepository.find();
 };
 
 const searchByChannel = async (searchCondition: SearchCondition) => {
+  const newsRepository = await getConnectionToMySql();
   return await newsRepository.findByChannels(searchCondition.channels);
 };
 
 const searchByCategory = async (searchCondition: SearchCondition) => {
+  const newsRepository = await getConnectionToMySql();
   return await newsRepository.findByCategories(searchCondition.categories);
 };
 
 const searchByGender = async (searchCondition: SearchCondition): Promise<NewsInfo[]> => {
+  const newsRepository = await getConnectionToMySql();
+
   try {
     return await newsRepository.findByAnnouncerGender(searchCondition.announcerGender);
   } catch (error) {
@@ -33,6 +40,8 @@ const fetchByChannel = async (
   conditionList: ConditionList,
   searchCondition: SearchCondition,
 ): Promise<News[]> => {
+  const newsRepository = await getConnectionToMySql();
+
   if (hasFindAll(conditionList)) {
     return await newsRepository.findAllNews();
   }
