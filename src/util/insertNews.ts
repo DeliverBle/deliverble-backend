@@ -31,7 +31,8 @@ export const insertNewsData = async () => {
     tagRepository.save(tag2);
     tagRepository.save(tag2);
 
-    const newsInfo = {
+    const newsInfo = [
+        {
         title: '북, 최근 임진강 상류 황강댐 수문 개방',
         category: Category.SOCIETY,
         tags: [tag1, tag2, tag3],
@@ -43,7 +44,7 @@ export const insertNewsData = async () => {
         suitability: Suitability.HIGH,
         isEmbeddable: true,
         reportDate: new Date('2022-06-30'),
-    };
+        }];
     const news = newsRepository.create(newsInfo);
     const news2 = await newsRepository.save(news);
     const news3 = await newsRepository.find({
@@ -53,6 +54,6 @@ export const insertNewsData = async () => {
         },
     });
     console.log('>>>>>>>>>', news3);
-    
     });
 };
+// insertNewsData();

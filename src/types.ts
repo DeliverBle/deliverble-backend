@@ -35,6 +35,7 @@ export interface NewsInfo {
   announcerGender: Gender;
   channel: Channel;
   link: string;
+  thumbnail: string;
   startTime: Time;
   endTime: Time;
   suitability: Suitability;
