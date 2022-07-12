@@ -35,8 +35,8 @@ export interface NewsInfo {
   announcerGender: Gender;
   channel: Channel;
   link: string;
-  time: Time;
-  runningTime: Time;
+  startTime: Time;
+  endTime: Time;
   suitability: Suitability;
   isEmbeddable: boolean;
   reportDate: Date;
