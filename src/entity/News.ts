@@ -58,6 +58,9 @@ export class News extends BaseEntity {
   @Column({ type: 'varchar', length: 1000 })
   link: string;
 
+  @Column({ type: 'varchar', length: 1000 })
+  thumbnail: string;
+
   @Column(() => Time)
   startTime: Time;
 

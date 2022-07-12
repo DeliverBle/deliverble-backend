@@ -31,19 +31,21 @@ export const insertNewsData = async () => {
     tagRepository.save(tag2);
     tagRepository.save(tag2);
 
-    const newsInfo = {
+    const newsInfo = [
+        {
         title: '북, 최근 임진강 상류 황강댐 수문 개방',
         category: Category.SOCIETY,
         tags: [tag1, tag2, tag3],
         announcerGender: Gender.MEN,
         channel: Channel.KBS,
-        link: 'https://youtu.be/ee-0DeY21rU',
+        link: 'ee-0DeY21rU',
+        thumbnail: 'https://img.youtube.com/vi/ee-0DeY21rU/hqdefault.jpg',
         startTime: new Time(0, 0),
         endTime: new Time(36, 0),
         suitability: Suitability.HIGH,
         isEmbeddable: true,
         reportDate: new Date('2022-06-30'),
-    };
+        }];
     const news = newsRepository.create(newsInfo);
     const news2 = await newsRepository.save(news);
     const news3 = await newsRepository.find({
@@ -53,6 +55,6 @@ export const insertNewsData = async () => {
         },
     });
     console.log('>>>>>>>>>', news3);
-    
     });
 };
+// insertNewsData();
