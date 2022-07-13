@@ -156,7 +156,7 @@ e.g) woojin/issue-14
 
 ## API 명세서
 
-* [Mock API 명세서](https://www.notion.so/Mock-API-8c64a502f6e34b868fa002cf4587ec02) 구현 완료
-* [API v1 명세서](https://www.notion.so/v1-16120d6874b84ab5813fde13eae7982e) 구현 완료
+* [Mock API 명세서](https://airy-fang-202.notion.site/Mock-API-8c64a502f6e34b868fa002cf4587ec02) 구현 완료
+* [API v1 명세서](https://airy-fang-202.notion.site/v1-16120d6874b84ab5813fde13eae7982e) 구현 완료
 * API v2 명세서: TBD
   * 카카오 로그인 작업 중
