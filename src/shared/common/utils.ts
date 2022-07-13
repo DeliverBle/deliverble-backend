@@ -1,7 +1,9 @@
 import { ConditionList, SearchCondition } from '../../types';
 
 const sortByDateAndTitle = (newsData) => {
-  newsData.sort((prev, next) => {
+  console.log(">>>>>>>> newsData", newsData[0])
+  let nowFilteringNewsData = newsData[0]
+  nowFilteringNewsData.sort((prev, next) => {
     if (+new Date(prev.reportDate) == +new Date(next.reportDate)) {
       const condition = '[]{}*!@_.()#^&%-=+01234567989abcdefghijklmnopqrstuvwxyz';
       let prev_condition = condition.indexOf(prev.title[0]);
@@ -15,8 +17,9 @@ const sortByDateAndTitle = (newsData) => {
 
     return +new Date(next.reportDate) - +new Date(prev.reportDate);
   });
+  console.log(">>>>>>>>>>  Yes After newsData", nowFilteringNewsData)
 
-  return newsData;
+  return nowFilteringNewsData;
 };
 
 const validateConditions = (searchCondition: SearchCondition): ConditionList => {

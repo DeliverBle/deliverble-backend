@@ -91,7 +91,7 @@ const paginateWithOffsetAndLimit = (searchCondition: SearchCondition, newsData: 
   const offset = searchCondition.getOffset();
   const limit = searchCondition.getLimit();
   const endIndex = offset + limit;
-  console.log("newsData in paginate method", newsData);
+  
   validateNewsDataLength(offset, newsData);
   return newsData.slice(offset, endIndex);
 }
@@ -103,14 +103,8 @@ const searchByConditions = async (
 ): Promise<any> => {
   let totalCount;
   let newsData = await fetchByChannel(conditionList, searchCondition);
-  console.log("newsData", newsData);
-  // console.log("totalCOunt", totalCount)
-
-  console.log(">>>>>>>>>", hasCategories(conditionList))
-
   if (hasCategories(conditionList)) {
     const filteredNewsData = await filterNewsDataByCategory(newsData, searchCondition);
-    console.log(">>>>>>>>>>>>>>>>>>>> filterNewsData[0]", filteredNewsData)
     newsData = filteredNewsData[0];
   }
 
@@ -120,13 +114,10 @@ const searchByConditions = async (
   }
 
   newsData = sortByDateAndTitle([newsData]);
-  totalCount = newsData[0].length;
+  totalCount = newsData.length;
 
   newsData = paginateWithOffsetAndLimit(searchCondition, newsData)
 
-  console.log("newsData >>>>>>>>", newsData);
-
-  // return newsData;
   return [newsData, totalCount];
 };
 
