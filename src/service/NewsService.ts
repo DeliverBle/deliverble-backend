@@ -47,7 +47,7 @@ const fetchByChannel = async (
   conditionList: ConditionList,
   searchCondition: SearchCondition,
   // TODO: The return value type `[News[], number]` to be wrapped with first collection
-) => {
+): Promise<any> => {
   const newsRepository = await getConnectionToMySql();
 
   if (hasFindAll(conditionList)) {
@@ -77,6 +77,13 @@ const filterNewsDataByAnnouncerGender = (newsData: any, searchCondition: SearchC
   return [filteredNewsData, filteredNewsData.length]
 };
 
+const paginateWithOffsetAndLimit = (searchCondition: SearchCondition, newsData: News[]) => {
+  const offset = searchCondition.getOffset();
+  const limit = searchCondition.getLimit();
+  const endIndex = offset + limit;
+  return newsData.slice(offset, endIndex);
+}
+
 const searchByConditions = async (
   conditionList: ConditionList,
   searchCondition: SearchCondition,
@@ -99,6 +106,8 @@ const searchByConditions = async (
   }
 
   newsData = sortByDateAndTitle(newsData);
+
+  newsData = paginateWithOffsetAndLimit(searchCondition, newsData)
 
   // return newsData;
   return [newsData, totalCount];
