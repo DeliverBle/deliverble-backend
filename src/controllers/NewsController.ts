@@ -19,20 +19,31 @@ const searchNews = async (req: Request, res: Response): Promise<void | Response>
   const listSize = req.body.listSize;
   const searchCondition: SearchCondition = new SearchCondition(channels, categories, announcerGender, currentPage, listSize)
 
-  let data;
   let conditionList = validateConditions(searchCondition);
   console.log(conditionList);
 
+  let data;
+  let totalCount;
+
   try {
     if (conditionList) {
-      data = await NewsService.searchByConditions(conditionList, searchCondition)
+      [data, totalCount] = await NewsService.searchByConditions(conditionList, searchCondition)
+      console.log(" IIII DATA ", totalCount)
     } else {
       data = await NewsService.searchAllNews();
     }
 
-    res.status(statusCode.OK).send(util.success(statusCode.OK, message.SEARCH_NEWS_SUCCESS, data));
+    res.status(statusCode.OK).send(util.success(statusCode.OK, message.SEARCH_NEWS_SUCCESS, data, totalCount));
   } catch (error) {
     console.log(error);
+    if (error.message === message.EXCEED_PAGE_INDEX) {
+      res.status(statusCode.NOT_FOUND).send(
+        util.fail(
+          statusCode.NOT_FOUND,
+          message.EXCEED_PAGE_INDEX
+        )
+      )
+    }
     res.status(statusCode.INTERNAL_SERVER_ERROR).send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   }
 };
