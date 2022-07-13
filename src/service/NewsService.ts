@@ -1,7 +1,15 @@
 import { getConnection } from 'typeorm';
 import { NewsQueryRepository } from '../repository/NewsRepository';
 import { sortByDateAndTitle } from '../shared/common/utils';
-import { ConditionList, hasChannels, hasFindAll, NewsInfo, SearchCondition } from '../types';
+import {
+  ConditionList,
+  hasAnnouncerGender,
+  hasCategories,
+  hasChannels,
+  hasFindAll,
+  NewsInfo,
+  SearchCondition,
+} from '../types';
 import { News } from '../entity/News';
 
 const getConnectionToMySql = async () => {
@@ -51,26 +59,34 @@ const fetchByChannel = async (
   return await newsRepository.findAllNews(searchCondition);
 };
 
+const filterNewsDataByCategory = (newsData: News[], searchCondition: SearchCondition) => {
+  return newsData.filter((news) => {
+    if (searchCondition.categories.includes(news.category)) {
+      return news;
+    }
+  });
+};
+
+const filterNewsDataByAnnouncerGender = (newsData: News[], searchCondition: SearchCondition) => {
+  return newsData.filter((news) => {
+    if (news.announcerGender === searchCondition.announcerGender) {
+      return news;
+    }
+  });
+};
+
 const searchByConditions = async (
   conditionList: ConditionList,
   searchCondition: SearchCondition,
 ): Promise<[NewsInfo[], number]> | null => {
   let [newsData, pageSize] = await fetchByChannel(conditionList, searchCondition);
 
-  if (conditionList['categories']) {
-    newsData = newsData.filter((news) => {
-      if (searchCondition.categories.includes(news.category)) {
-        return news;
-      }
-    });
+  if (hasCategories(conditionList)) {
+    newsData = filterNewsDataByCategory(newsData, searchCondition);
   }
 
-  if (conditionList['announcerGender']) {
-    newsData = newsData.filter((news) => {
-      if (news.announcerGender === searchCondition.announcerGender) {
-        return news;
-      }
-    });
+  if (hasAnnouncerGender(conditionList)) {
+    newsData = filterNewsDataByAnnouncerGender(newsData, searchCondition);
   }
 
   newsData = sortByDateAndTitle(newsData);
