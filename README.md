@@ -21,7 +21,7 @@
 
 ## A simple ERD
 
-![image-20220713132355959](![image](https://user-images.githubusercontent.com/41055141/178675118-fe04dab6-f92f-491b-a887-53baae832877.png))
+![image-20220713132355959](https://user-images.githubusercontent.com/41055141/178675060-59f99dde-f84c-49e4-b791-59e1250a48ac.png)
 
 ## Coding Convention
 
