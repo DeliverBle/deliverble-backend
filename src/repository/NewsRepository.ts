@@ -19,7 +19,7 @@ export class NewsQueryRepository extends Repository<News> {
       // .offset(searchCondition.getOffset())
       // .disableEscaping()
       .getMany();
-    return [totalNews, totalCount];
+    return totalNews;
   }
 
   // channel이 channels에 속하는 모든 News 조회
@@ -33,7 +33,7 @@ export class NewsQueryRepository extends Repository<News> {
       // .offset(searchCondition.getOffset())
       // .disableEscaping()
       .getMany();
-    return [totalNews, totalCount];
+    return totalNews;
   }
 
   // category가 categories에 속하는 모든 News 조회
