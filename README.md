@@ -7,6 +7,7 @@
 * TypeORM & MySQL 8.0
 * Local Profile: Docker/Docker Compose (MySQL container)
 * Production Profile: AWS EC2/RDS (MySQL)/Subnet/Elastic IP/PM2/nginx
+* CI/CD Tool: GitHub Action, AWS Codedeploy
 
 ![image](https://user-images.githubusercontent.com/41055141/178650150-32602a4e-c9b0-43c3-a801-73f6c86ddd81.png)
 
@@ -26,6 +27,35 @@
 ## Coding Convention
 
 * Prettier를 사용한다.
+* Commit Convention
+  * `feat`: (new feature for the user, not a new feature for build script)
+  * `fix`: (bug fix for the user, not a fix to a build script)
+  * `docs`: (changes to the documentation)
+  * `style`: (formatting, missing semi colons, etc; no production code change)
+  * `refactor`: (refactoring production code, eg. renaming a variable)
+  * `test`: (adding missing tests, refactoring tests; no production code change)
+  * `chore`: (updating grunt tasks etc; no production code change)
+
+
+```
+feat: add hat wobble
+^--^  ^------------^
+|     |
+|     +-> Summary in present tense.
+|
++-------> Type: chore, docs, feat, fix, refactor, style, or test.
+```
+
+## Branch Strategy
+
+* 모든 작업은 GitHub 이슈를 만들고 해당 이슈를 기준으로 작업한다.
+* Pull Request를 요청할 때, 제목에 이슈 번호를 명시하여 어떤 이슈를 해결했는지 작성한다.
+* 브랜치는 작성자 이름을 기준으로 이슈번호를 병기한다.
+* 별도의 develop 브랜치는 없으며, 모든 production 브랜치는 main을 기준으로 작업한다. (CI/CD 기준 main)
+
+```
+e.g) woojin/issue-14
+```
 
 ## 프로젝트 폴더 구조
 
