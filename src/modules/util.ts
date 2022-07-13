@@ -4,8 +4,9 @@ const util = {
       status,
       success: true,
       message,
-      data,
-      totalCount: data.length
+      // TODO: change naming of data to newsData or other appropriate name
+      data: data[0],
+      totalCount: data[1]
     };
   },
   fail: (status: number, message: string, data?: any) => {
