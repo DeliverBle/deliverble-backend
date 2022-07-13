@@ -60,19 +60,21 @@ const fetchByChannel = async (
 };
 
 const filterNewsDataByCategory = (newsData: any, searchCondition: SearchCondition) => {
-  return newsData.filter((news) => {
+  const filteredNewsData = newsData.filter((news) => {
     if (searchCondition.categories.includes(news.category)) {
       return news;
     }
   });
+  return [filteredNewsData, filteredNewsData.length]
 };
 
 const filterNewsDataByAnnouncerGender = (newsData: any, searchCondition: SearchCondition) => {
-  return newsData.filter((news) => {
+  const filteredNewsData = newsData.filter((news) => {
     if (news.announcerGender === searchCondition.announcerGender) {
       return news;
     }
   });
+  return [filteredNewsData, filteredNewsData.length]
 };
 
 const searchByConditions = async (
@@ -80,18 +82,20 @@ const searchByConditions = async (
   searchCondition: SearchCondition,
   // TODO: using any type is evil! change appropriate data type
 ): Promise<any> => {
-  console.log("checking here", await fetchByChannel(conditionList, searchCondition));
-
   let [newsData, totalCount] = await fetchByChannel(conditionList, searchCondition);
   console.log("newsData", newsData);
-  console.log("totalCOunt", totalCount)
+  // console.log("totalCOunt", totalCount)
 
   if (hasCategories(conditionList)) {
-    newsData = filterNewsDataByCategory(newsData, searchCondition);
+    const filteredNewsData = filterNewsDataByCategory(newsData, searchCondition);
+    newsData = filteredNewsData[0];
+    totalCount = filteredNewsData[1];
   }
 
   if (hasAnnouncerGender(conditionList)) {
-    newsData = filterNewsDataByAnnouncerGender(newsData, searchCondition);
+    const filteredNewsData = filterNewsDataByAnnouncerGender(newsData, searchCondition);
+    newsData = filteredNewsData[0];
+    totalCount = filteredNewsData[1];
   }
 
   newsData = sortByDateAndTitle(newsData);

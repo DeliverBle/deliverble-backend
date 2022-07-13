@@ -15,9 +15,9 @@ export class NewsQueryRepository extends Repository<News> {
   findAllNews = async (searchCondition: SearchCondition) => {
     const totalCount = await this.createQueryBuilder('news').getCount();
     const totalNews = await this.createQueryBuilder('news')
-      .limit(searchCondition.getLimit())
-      .offset(searchCondition.getOffset())
-      .disableEscaping()
+      // .limit(searchCondition.getLimit())
+      // .offset(searchCondition.getOffset())
+      // .disableEscaping()
       .getMany();
     return [totalNews, totalCount];
   }
@@ -29,9 +29,9 @@ export class NewsQueryRepository extends Repository<News> {
       .where('news.channel IN (:...channels)', { channels }).getCount();
     const totalNews = this.createQueryBuilder('news')
       .where('news.channel IN (:...channels)', { channels })
-      .limit(searchCondition.getLimit())
-      .offset(searchCondition.getOffset())
-      .disableEscaping()
+      // .limit(searchCondition.getLimit())
+      // .offset(searchCondition.getOffset())
+      // .disableEscaping()
       .getMany();
     return [totalNews, totalCount];
   }
