@@ -21,7 +21,7 @@
 
 ## A simple ERD
 
-![image-20220713132355959](/Users/sigridjin.eth/Library/Application Support/typora-user-images/image-20220713132355959.png)
+![image-20220713132355959](![image](https://user-images.githubusercontent.com/41055141/178675118-fe04dab6-f92f-491b-a887-53baae832877.png))
 
 ## Coding Convention
 
