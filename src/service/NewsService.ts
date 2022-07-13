@@ -1,15 +1,14 @@
 import { getConnection } from 'typeorm';
-import { NewsRepository } from '../repository/NewsRepository';
+import { NewsQueryRepository } from '../repository/NewsRepository';
 import { sortByDateAndTitle } from '../shared/common/utils';
 import { ConditionList, hasChannels, hasFindAll, NewsInfo, SearchCondition } from '../types';
-import { CHANNEL } from '../shared/common/Name';
 import { News } from '../entity/News';
 
-const getConnectionToMySql = async() => {
+const getConnectionToMySql = async () => {
   const connection = getConnection();
-  const newsRepository = connection.getCustomRepository(NewsRepository);
-  return newsRepository;
-}
+  return connection.getCustomRepository(NewsQueryRepository);
+};
+
 const searchAllNews = async () => {
   const newsRepository = await getConnectionToMySql();
   return await newsRepository.find();
@@ -17,7 +16,7 @@ const searchAllNews = async () => {
 
 const searchByChannel = async (searchCondition: SearchCondition) => {
   const newsRepository = await getConnectionToMySql();
-  return await newsRepository.findByChannels(searchCondition.channels);
+  return await newsRepository.findByChannels(searchCondition);
 };
 
 const searchByCategory = async (searchCondition: SearchCondition) => {
@@ -39,28 +38,24 @@ const searchByGender = async (searchCondition: SearchCondition): Promise<NewsInf
 const fetchByChannel = async (
   conditionList: ConditionList,
   searchCondition: SearchCondition,
-): Promise<News[]> => {
+  // TODO: The return value type `[News[], number]` to be wrapped with first collection
+): Promise<[News[], number]> => {
   const newsRepository = await getConnectionToMySql();
 
   if (hasFindAll(conditionList)) {
-    return await newsRepository.findAllNews();
+    return await newsRepository.findAllNews(searchCondition);
   }
   if (hasChannels(conditionList)) {
-    return await newsRepository.findByChannels(searchCondition.channels);
+    return await newsRepository.findByChannels(searchCondition);
   }
-  return await newsRepository.findAllNews();
+  return await newsRepository.findAllNews(searchCondition);
 };
 
 const searchByConditions = async (
   conditionList: ConditionList,
   searchCondition: SearchCondition,
-): Promise<NewsInfo[]> | null => {
-  let newsData = await fetchByChannel(conditionList, searchCondition);
-  // if (conditionList['channels']) {
-  //   newsData = await newsRepository.findByChannels(searchCondition.channels);
-  // } else {
-  //   newsData = await newsRepository.findAllNews();
-  // }
+): Promise<[NewsInfo[], number]> | null => {
+  let [newsData, pageSize] = await fetchByChannel(conditionList, searchCondition);
 
   if (conditionList['categories']) {
     newsData = newsData.filter((news) => {
@@ -80,7 +75,7 @@ const searchByConditions = async (
 
   newsData = sortByDateAndTitle(newsData);
 
-  return newsData;
+  return [newsData, pageSize];
 };
 
 export default {
