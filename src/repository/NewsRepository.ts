@@ -2,31 +2,42 @@
 
 import { EntityRepository, Repository } from 'typeorm';
 import { News } from '../entity/News';
+import { SearchCondition } from '../types';
 
 @EntityRepository(News)
-export class NewsRepository extends Repository<News> {
+export class NewsQueryRepository extends Repository<News> {
   // id로 1개의 News 조회
   findById(id: number) {
-    return this.createQueryBuilder('news')
-    .where('news.id = :id', { id })
-    .getOne();
+    return this.createQueryBuilder('news').where('news.id = :id', { id }).getOne();
   }
 
   // 모든 News 조회
-  findAllNews() {
-    return this.createQueryBuilder('news')
-    .getMany();
+  findAllNews = async (searchCondition: SearchCondition) => {
+    const totalCount = await this.createQueryBuilder('news').getCount();
+    const totalNews = await this.createQueryBuilder('news')
+      // .limit(searchCondition.getLimit())
+      // .offset(searchCondition.getOffset())
+      // .disableEscaping()
+      .getMany();
+    return totalNews;
   }
 
   // channel이 channels에 속하는 모든 News 조회
-  findByChannels(channels: object) {
-    return this.createQueryBuilder('news')
+  findByChannels = async (searchCondition: SearchCondition) => {
+    const channels = searchCondition.channels;
+    const totalCount = this.createQueryBuilder('news')
+      .where('news.channel IN (:...channels)', { channels }).getCount();
+    const totalNews = this.createQueryBuilder('news')
       .where('news.channel IN (:...channels)', { channels })
+      // .limit(searchCondition.getLimit())
+      // .offset(searchCondition.getOffset())
+      // .disableEscaping()
       .getMany();
+    return totalNews;
   }
 
   // category가 categories에 속하는 모든 News 조회
-  findByCategories(categories: object) {
+  findByCategories = async (categories: object) => {
     return this.createQueryBuilder('news')
       .where('news.category IN (:...categories)', { categories })
       .getMany();

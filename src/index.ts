@@ -20,10 +20,8 @@ app.use(express.urlencoded({ extended: true }));
 // routes 폴더로 분기
 app.use(routes);
 
-// 뉴스 객체 생성
-// insertNewsData();
-
 createConnection().then(async (connection) => {
+  // await insertNewsData(connection);
   app.listen(8080, () => {
     console.log('server is listening 8080');
   });
