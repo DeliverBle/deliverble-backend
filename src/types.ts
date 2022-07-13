@@ -43,10 +43,22 @@ export interface NewsInfo {
   reportDate: Date;
 }
 
-export interface SearchCondition {
+export abstract class SearchCondition {
   channels: string[];
   categories: string[];
   announcerGender: string;
-  currentPage: number;
-  listSize: number;
+  currentPage: number | 1;
+  listSize: number | 12;
+
+  getChannels(): string[] {
+    return this.channels;
+  }
+
+  getOffset(): number {
+    return this.currentPage - 1 * this.listSize;
+  }
+
+  getLimit(): number {
+    return this.listSize;
+  }
 }
