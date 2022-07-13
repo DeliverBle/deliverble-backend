@@ -2,27 +2,32 @@
 
 import { EntityRepository, Repository } from 'typeorm';
 import { News } from '../entity/News';
+import { SearchCondition } from '../types';
 
 @EntityRepository(News)
-export class NewsRepository extends Repository<News> {
+export class NewsQueryRepository extends Repository<News> {
   // id로 1개의 News 조회
   findById(id: number) {
-    return this.createQueryBuilder('news')
-    .where('news.id = :id', { id })
-    .getOne();
+    return this.createQueryBuilder('news').where('news.id = :id', { id }).getOne();
   }
 
   // 모든 News 조회
-  findAllNews() {
+  findAllNews(searchCondition: SearchCondition) {
     return this.createQueryBuilder('news')
-    .getMany();
+      .from(News, 'news')
+      .limit(searchCondition.getLimit())
+      .offset(searchCondition.getOffset())
+      .disableEscaping()
+      .getManyAndCount();
   }
 
   // channel이 channels에 속하는 모든 News 조회
-  findByChannels(channels: object) {
+  findByChannels(searchCondition: SearchCondition) {
+    const channels = searchCondition.getChannels();
     return this.createQueryBuilder('news')
       .where('news.channel IN (:...channels)', { channels })
-      .getMany();
+      .disableEscaping()
+      .getManyAndCount();
   }
 
   // category가 categories에 속하는 모든 News 조회
