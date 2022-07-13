@@ -12,7 +12,13 @@ import { validateConditions } from '../shared/common/utils'
  * @access Public
  */
 const searchNews = async (req: Request, res: Response): Promise<void | Response> => {
-  const searchCondition: SearchCondition = req.body;
+  const channels = req.body.channels;
+  const categories = req.body.categories;
+  const announcerGender = req.body.announcerGender;
+  const currentPage = req.body.currentPage;
+  const listSize = req.body.listSize;
+  const searchCondition: SearchCondition = new SearchCondition(channels, categories, announcerGender, currentPage, listSize)
+
   let data;
   let conditionList = validateConditions(searchCondition);
   console.log(conditionList);
@@ -20,7 +26,6 @@ const searchNews = async (req: Request, res: Response): Promise<void | Response>
   try {
     if (conditionList) {
       data = await NewsService.searchByConditions(conditionList, searchCondition)
-
     } else {
       data = await NewsService.searchAllNews();
     }
