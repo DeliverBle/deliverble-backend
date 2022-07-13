@@ -5,7 +5,7 @@ const util = {
       success: true,
       message,
       // TODO: change naming of data to newsData or other appropriate name
-      data: data[0],
+      data: data,
       totalCount
     };
   },
