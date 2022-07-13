@@ -47,7 +47,7 @@ const fetchByChannel = async (
   conditionList: ConditionList,
   searchCondition: SearchCondition,
   // TODO: The return value type `[News[], number]` to be wrapped with first collection
-): Promise<[News[], number]> => {
+) => {
   const newsRepository = await getConnectionToMySql();
 
   if (hasFindAll(conditionList)) {
@@ -59,7 +59,7 @@ const fetchByChannel = async (
   return await newsRepository.findAllNews(searchCondition);
 };
 
-const filterNewsDataByCategory = (newsData: News[], searchCondition: SearchCondition) => {
+const filterNewsDataByCategory = (newsData: any, searchCondition: SearchCondition) => {
   return newsData.filter((news) => {
     if (searchCondition.categories.includes(news.category)) {
       return news;
@@ -67,7 +67,7 @@ const filterNewsDataByCategory = (newsData: News[], searchCondition: SearchCondi
   });
 };
 
-const filterNewsDataByAnnouncerGender = (newsData: News[], searchCondition: SearchCondition) => {
+const filterNewsDataByAnnouncerGender = (newsData: any, searchCondition: SearchCondition) => {
   return newsData.filter((news) => {
     if (news.announcerGender === searchCondition.announcerGender) {
       return news;
@@ -78,8 +78,13 @@ const filterNewsDataByAnnouncerGender = (newsData: News[], searchCondition: Sear
 const searchByConditions = async (
   conditionList: ConditionList,
   searchCondition: SearchCondition,
-): Promise<[NewsInfo[], number]> | null => {
-  let [newsData, pageSize] = await fetchByChannel(conditionList, searchCondition);
+  // TODO: using any type is evil! change appropriate data type
+): Promise<any> => {
+  console.log("checking here", await fetchByChannel(conditionList, searchCondition));
+
+  let [newsData, totalCount] = await fetchByChannel(conditionList, searchCondition);
+  console.log("newsData", newsData);
+  console.log("totalCOunt", totalCount)
 
   if (hasCategories(conditionList)) {
     newsData = filterNewsDataByCategory(newsData, searchCondition);
@@ -91,7 +96,8 @@ const searchByConditions = async (
 
   newsData = sortByDateAndTitle(newsData);
 
-  return [newsData, pageSize];
+  // return newsData;
+  return [newsData, totalCount];
 };
 
 export default {

@@ -12,26 +12,32 @@ export class NewsQueryRepository extends Repository<News> {
   }
 
   // 모든 News 조회
-  findAllNews(searchCondition: SearchCondition) {
-    return this.createQueryBuilder('news')
-      .from(News, 'news')
+  findAllNews = async (searchCondition: SearchCondition) => {
+    const totalCount = await this.createQueryBuilder('news').getCount();
+    const totalNews = await this.createQueryBuilder('news')
       .limit(searchCondition.getLimit())
       .offset(searchCondition.getOffset())
       .disableEscaping()
-      .getManyAndCount();
+      .getMany();
+    return [totalNews, totalCount];
   }
 
   // channel이 channels에 속하는 모든 News 조회
-  findByChannels(searchCondition: SearchCondition) {
-    const channels = searchCondition.getChannels();
-    return this.createQueryBuilder('news')
+  findByChannels = async (searchCondition: SearchCondition) => {
+    const channels = searchCondition.channels;
+    const totalCount = this.createQueryBuilder('news')
+      .where('news.channel IN (:...channels)', { channels }).getCount();
+    const totalNews = this.createQueryBuilder('news')
       .where('news.channel IN (:...channels)', { channels })
+      .limit(searchCondition.getLimit())
+      .offset(searchCondition.getOffset())
       .disableEscaping()
-      .getManyAndCount();
+      .getMany();
+    return [totalNews, totalCount];
   }
 
   // category가 categories에 속하는 모든 News 조회
-  findByCategories(categories: object) {
+  findByCategories = async (categories: object) => {
     return this.createQueryBuilder('news')
       .where('news.category IN (:...categories)', { categories })
       .getMany();
