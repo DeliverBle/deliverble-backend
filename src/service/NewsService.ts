@@ -51,7 +51,7 @@ const fetchByChannel = async (
 ): Promise<any> => {
   const newsRepository = await getConnectionToMySql();
 
-  console.log("hasFindAll >>>>>>> ", hasFindAll(conditionList))
+  console.log('hasFindAll >>>>>>> ', hasFindAll(conditionList));
 
   if (hasFindAll(conditionList)) {
     return await newsRepository.findAllNews(searchCondition);
@@ -68,7 +68,8 @@ const filterNewsDataByCategory = (newsData: any, searchCondition: SearchConditio
       return news;
     }
   });
-  return [filteredNewsData, filteredNewsData.length]
+  // TODO: wrapping newsData with first collection so that avoiding any mistakes
+  return [filteredNewsData, filteredNewsData.length];
 };
 
 const filterNewsDataByAnnouncerGender = (newsData: any, searchCondition: SearchCondition) => {
@@ -77,24 +78,25 @@ const filterNewsDataByAnnouncerGender = (newsData: any, searchCondition: SearchC
       return news;
     }
   });
-  console.log("filterNewsDataByAnnouncerGender", filteredNewsData)
-  return [filteredNewsData]
+  console.log('filterNewsDataByAnnouncerGender', filteredNewsData);
+  // TODO: wrapping newsData with first collection so that avoiding any mistakes
+  return [filteredNewsData];
 };
 
 const validateNewsDataLength = (offset: number, newsData: News[]) => {
   if (offset > newsData.length) {
     throw new Error(message.EXCEED_PAGE_INDEX);
   }
-}
+};
 
 const paginateWithOffsetAndLimit = (searchCondition: SearchCondition, newsData: News[]) => {
   const offset = searchCondition.getOffset();
   const limit = searchCondition.getLimit();
   const endIndex = offset + limit;
-  console.log("newsData in paginate method", newsData);
+  console.log('newsData in paginate method', newsData);
   validateNewsDataLength(offset, newsData);
   return newsData.slice(offset, endIndex);
-}
+};
 
 const searchByConditions = async (
   conditionList: ConditionList,
@@ -103,30 +105,24 @@ const searchByConditions = async (
 ): Promise<any> => {
   let totalCount;
   let newsData = await fetchByChannel(conditionList, searchCondition);
-  console.log("newsData", newsData);
-  // console.log("totalCOunt", totalCount)
-
-  console.log(">>>>>>>>>", hasCategories(conditionList))
-
   if (hasCategories(conditionList)) {
     const filteredNewsData = await filterNewsDataByCategory(newsData, searchCondition);
-    console.log(">>>>>>>>>>>>>>>>>>>> filterNewsData[0]", filteredNewsData)
+    console.log('>>>>>>>>>>>>>>>>>>>> filterNewsData[0]', filteredNewsData);
+    // TODO: wrapping newsData with first collection so that avoiding any mistakes
     newsData = filteredNewsData[0];
   }
 
   if (hasAnnouncerGender(conditionList)) {
     const filteredNewsData = filterNewsDataByAnnouncerGender(newsData, searchCondition);
+    // TODO: wrapping newsData with first collection so that avoiding any mistakes
     newsData = filteredNewsData[0];
   }
 
+  // TODO: wrapping newsData with first collection so that avoiding any mistakes
   newsData = sortByDateAndTitle([newsData]);
   totalCount = newsData[0].length;
 
-  newsData = paginateWithOffsetAndLimit(searchCondition, newsData)
-
-  console.log("newsData >>>>>>>>", newsData);
-
-  // return newsData;
+  newsData = paginateWithOffsetAndLimit(searchCondition, newsData);
   return [newsData, totalCount];
 };
 
