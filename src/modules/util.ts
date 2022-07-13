@@ -5,6 +5,7 @@ const util = {
       success: true,
       message,
       data,
+      totalCount: data.length
     };
   },
   fail: (status: number, message: string, data?: any) => {
