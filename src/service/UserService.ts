@@ -1,8 +1,10 @@
 import { User } from '../entity/User';
 import { getConnection } from 'typeorm';
 import { UserQueryRepository } from '../repository/UserQueryRepository';
-import { isNotFoundUser, NotFoundUser } from '../entity/NotFoundUser';
+import { isFoundUser, NotFoundUser } from '../entity/NotFoundUser';
 import { UserCommandRepository } from '../repository/UserCommandRepository';
+import UserNotFoundError from '../error/UserNotFoundError';
+import { KakaoRawInfo } from '../types';
 
 // TODO: DI to be implemented
 const getConnectionToUserQueryRepository = async () => {
@@ -25,12 +27,10 @@ export const findUserByEmail = async (email: string): Promise<User> => {
   }
 };
 
-export const loginUserWithKakao = async (email: string): Promise<User> => {
-  const user = await findUserByEmail(email);
-  if (isNotFoundUser(user)) {
-    console.log('Not Found User >>>>>>>>>>>>>>> ', user);
-    return null;
+export const loginUserWithKakao = async (kakaoRawInfo: KakaoRawInfo): Promise<User> => {
+  const user = await findUserByEmail(kakaoRawInfo.email);
+  if (isFoundUser(user)) {
+    return user;
   }
-  console.log(user);
-  return null;
+  throw new UserNotFoundError();
 };
