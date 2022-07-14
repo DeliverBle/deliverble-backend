@@ -77,12 +77,12 @@ const recommendNews = async (req: Request, res: Response): Promise<void | Respon
   }
 };
 
-const newstDetail = async (req: Request, res: Response): Promise<void | Response> => {
-  
+const newsDetail = async (req: Request, res: Response): Promise<void | Response> => {
+  let newsId = Number(req.params.newsId);
   let data;
 
   try {
-    data = await NewsService.findNewsDetail();
+    data = await NewsService.findNewsDetail(newsId);
         res
           .status(statusCode.OK)
           .send(util.success(statusCode.OK, message.DETAIL_NEWS_SUCCESS, data));
@@ -98,5 +98,5 @@ const newstDetail = async (req: Request, res: Response): Promise<void | Response
 export default {
   searchNews,
   recommendNews,
-  newstDetail,
+  newsDetail,
 };
