@@ -1,4 +1,12 @@
-import { BaseEntity, Column, Entity, JoinTable, ManyToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  AfterLoad,
+  BaseEntity,
+  Column,
+  Entity,
+  JoinTable,
+  ManyToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { determineGenderByGivenString, Gender } from '../shared/common/Gender';
 import { News } from './News';
 
@@ -36,4 +44,17 @@ export class User extends BaseEntity {
     },
   })
   favoriteNews: News[];
+
+  @AfterLoad()
+  async nullChecks() {
+    if (!this.favoriteNews) {
+      this.favoriteNews = [];
+    }
+  }
+
+  public favoriteFreshNews = (news: News) => {
+    console.log('>>> favoriteNews ', this.favoriteNews);
+    this.favoriteNews.push(news);
+    return this;
+  };
 }
