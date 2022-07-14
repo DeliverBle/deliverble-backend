@@ -31,7 +31,18 @@ const getConnectionToUserCommandRepository = async () => {
   return connection.getCustomRepository(UserCommandRepository);
 };
 
-// TODO: implement Null Object Pattern
+export const findUserByKakaoId = async (kakaoId: string): Promise<User> => {
+  const userQueryRepository = await getConnectionToUserQueryRepository();
+  try {
+    const foundUser = await userQueryRepository.findByKakaoId(kakaoId);
+    log.debug(' >>>>>>>>> foundUser using kakaoId', foundUser);
+    return foundUser
+  } catch (error) {
+    log.debug(' >>>>>>>>>>>> NotFoundUser using kakaoId')
+    return new NotFoundUser();
+  }
+};
+
 export const findUserByEmail = async (email: string): Promise<User> => {
   const userRepository = await getConnectionToUserQueryRepository();
   try {
@@ -70,7 +81,7 @@ const checkAccessTokenExpirySeconds = async (accessToken: string) => {
 };
 
 export const updateAccessTokenByRefreshToken = async (
-  userId: number,
+  userId: string,
   refreshToken: string,
 ): Promise<object> => {
   const payload = new URLSearchParams();
@@ -112,7 +123,7 @@ export const updateAccessTokenByRefreshToken = async (
 };
 
 const updateRefreshTokenAtRedisWithUserId = async (
-  userId: number,
+  userId: string,
   updatedAccessTokenDTO: UpdatedAccessTokenDTO,
 ): Promise<void> => {
   // const kakaoRawInfo = await getKakaoRawInfo(updatedAccessTokenDTO.access_token);
@@ -141,21 +152,21 @@ export const getKakaoRawInfo = async (_accessToken: string): Promise<KakaoRawInf
 };
 
 export const loginUserWithKakao = async (
-  accessToken: string,
-  refreshToken: string,
+  accessToken: string
 ): Promise<User> => {
   if (await doesAccessTokenExpire(accessToken)) {
     throw new AccessTokenExpiredError();
   }
   const kakaoRawInfo = await getKakaoRawInfo(accessToken);
   // TODO: 카카오에서 넘겨주는 user_id로 중복성 체크
-  const user = await findUserByEmail(kakaoRawInfo.email);
-  log.debug(" findUserByEmail USER >>>> ", user);
+  // const user = await findUserByEmail(kakaoRawInfo.email);
+  const user = await findUserByKakaoId(kakaoRawInfo.kakaoId);
+  log.debug(' findUserByKakaoId USER >>>> ', user);
+  log.debug(' isNotFoundUser ', isNotFoundUser(user));
   if (isNotFoundUser(user)) {
     log.warn('NOT FOUND USER ', user);
     throw new UserNotFoundError();
   }
-  await saveRefreshTokenAtRedisMappedByUserId(user.id, refreshToken);
   return user;
 };
 
@@ -170,7 +181,7 @@ export const signUpUserWithKakao = async (accessToken) => {
 };
 
 const saveRefreshTokenAtRedisMappedByUserId = async (
-  userId: number,
+  userId: string,
   refreshToken: string,
 ): Promise<void> => {
   promisify(redisClient.get).bind(redisClient);
@@ -185,5 +196,6 @@ export default {
   getKakaoRawInfo,
   doesAccessTokenExpire,
   checkAccessTokenExpirySeconds,
+  saveRefreshTokenAtRedisMappedByUserId,
   updateAccessTokenByRefreshToken,
 };
