@@ -22,8 +22,10 @@ router.get(
   },
 );
 
-router.get('/kakao/access-token/refresh', errorHandler(UserController.refreshAccessToken));
+router.post('/kakao/access-token/refresh', errorHandler(UserController.refreshAccessToken));
 
 router.post('/login', errorHandler(UserController.loginUserWithKakao));
+
+router.post('/signup', errorHandler(UserController.signUpUserWithKakao));
 
 export default router;
