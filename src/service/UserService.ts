@@ -6,7 +6,6 @@ import { UserCommandRepository } from '../repository/UserCommandRepository';
 import UserNotFoundError from '../error/UserNotFoundError';
 import { KakaoRawInfo } from '../types';
 import axios from 'axios';
-import qs from 'qs';
 import { ACCESS_TOKEN_INFO, CONTENT_TYPE, OAUTH_TOKEN, REQUEST_RAW_LINK } from '../shared/AuthLink';
 
 // TODO: DI to be implemented
@@ -100,3 +99,8 @@ export const loginUserWithKakao = async (kakaoRawInfo: KakaoRawInfo): Promise<Us
   }
   throw new UserNotFoundError();
 };
+
+export default {
+    loginUserWithKakao,
+    findUserByEmail,
+}
