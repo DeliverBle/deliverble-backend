@@ -6,6 +6,10 @@ import util from '../modules/util';
 import { SearchCondition } from '../types';
 import { validateConditions } from '../shared/common/utils';
 
+export const callbackKakao = async (req: Request, res: Response): Promise<void | Response> => {
+  res.redirect('/');
+};
+
 /**
  * @route get /search
  * @description Search for news based on conditions
@@ -56,4 +60,5 @@ const searchNews = async (req: Request, res: Response): Promise<void | Response>
 
 export default {
   searchNews,
+  callbackKakao,
 };
