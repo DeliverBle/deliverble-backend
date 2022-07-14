@@ -4,5 +4,6 @@ import NewsController from '../controllers/NewsController';
 const router: express.Router = Router();
 
 router.post('/search', NewsController.searchNews);
+router.get('/recommend', NewsController.recommendNews);
 
 export default router;

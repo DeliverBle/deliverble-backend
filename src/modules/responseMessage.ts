@@ -8,6 +8,7 @@ const message = {
 
   // 뉴스
   SEARCH_NEWS_SUCCESS: '영상 검색 결과 조회 성공',
+  RECOMMEND_NEWS_SUCCESS: '추천 영상 조회 성공',
 };
 
 export default message;
