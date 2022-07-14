@@ -150,7 +150,8 @@ export const loginUserWithKakao = async (
   const kakaoRawInfo = await getKakaoRawInfo(accessToken);
   // TODO: 카카오에서 넘겨주는 user_id로 중복성 체크
   const user = await findUserByEmail(kakaoRawInfo.email);
-  if (!isNotFoundUser(user)) {
+  log.debug(" findUserByEmail USER >>>> ", user);
+  if (isNotFoundUser(user)) {
     log.warn('NOT FOUND USER ', user);
     throw new UserNotFoundError();
   }
