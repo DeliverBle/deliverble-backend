@@ -10,11 +10,15 @@ import {
 import { determineGenderByGivenString, Gender } from '../shared/common/Gender';
 import { News } from './News';
 import {KakaoRawInfo} from "../types";
+import {Logger} from "tslog";
+
+const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 @Entity()
 export class User extends BaseEntity {
-  constructor(_nickname: string, _email: string, _gender: string) {
+  constructor(_kakaoId: string, _nickname: string, _email: string, _gender: string) {
     super();
+    this.kakaoId = _kakaoId;
     this.nickname = _nickname;
     this.email = _email;
     this.gender = determineGenderByGivenString(_gender);
@@ -23,10 +27,18 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @Column({
+    type: 'bigint',
+    unique: true
+  })
+  kakaoId: string;
+
   @Column()
   nickname: string;
 
-  @Column()
+  @Column({
+    unique: true
+  })
   email: string;
 
   @Column()
@@ -48,8 +60,13 @@ export class User extends BaseEntity {
 
   @AfterLoad()
   async nullChecks() {
+    const NO_EMAIL = "NO_EMAIL";
     if (!this.favoriteNews) {
       this.favoriteNews = [];
+    }
+    if (!this.email) {
+      log.info("User denied to provide email information")
+      this.email = NO_EMAIL
     }
   }
 
@@ -60,6 +77,6 @@ export class User extends BaseEntity {
   };
 
   static fromKakaoRawInfo(kakaoRawInfo: KakaoRawInfo): User {
-    return new User(kakaoRawInfo.nickname, kakaoRawInfo.email, Gender.UNSPECIFIED);
+    return new User(kakaoRawInfo.kakaoId, kakaoRawInfo.nickname, kakaoRawInfo.email, Gender.UNSPECIFIED);
   }
 }
