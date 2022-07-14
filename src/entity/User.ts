@@ -9,6 +9,7 @@ import {
 } from 'typeorm';
 import { determineGenderByGivenString, Gender } from '../shared/common/Gender';
 import { News } from './News';
+import {KakaoRawInfo} from "../types";
 
 @Entity()
 export class User extends BaseEntity {
@@ -57,4 +58,8 @@ export class User extends BaseEntity {
     this.favoriteNews.push(news);
     return this;
   };
+
+  static fromKakaoRawInfo(kakaoRawInfo: KakaoRawInfo): User {
+    return new User(kakaoRawInfo.nickname, kakaoRawInfo.email, Gender.UNSPECIFIED);
+  }
 }
