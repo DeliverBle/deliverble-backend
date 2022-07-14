@@ -128,7 +128,7 @@ const searchRecommendNews = async () => {
   const newsRepository = await getConnectionToMySql();
   let newsData = await newsRepository.findRecommendNews();
   newsData = sortByDateAndTitle([newsData]);
-  return newsData
+  return newsData.slice(0,8)
 };
 
 export default {
