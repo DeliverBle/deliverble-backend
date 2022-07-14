@@ -60,10 +60,10 @@ const recommendNews = async (req: Request, res: Response): Promise<void | Respon
   let data;
 
   try {
-    data = await NewsService.searchAllNews();
+    data = await NewsService.searchRecommendNews();
         res
           .status(statusCode.OK)
-          .send(util.success(statusCode.OK, message.SEARCH_NEWS_SUCCESS, data));
+          .send(util.success(statusCode.OK, message.RECOMMEND_NEWS_SUCCESS, data));
     }
   catch (error) {
     console.log(error);
