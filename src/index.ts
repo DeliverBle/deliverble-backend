@@ -11,6 +11,8 @@ import routes from './routes';
 import { Channel } from './shared/common/Channel';
 import { insertNewsData } from './util/insertNews';
 import { MockUserToFavorite } from './util/MockUserToFavorite';
+import { insertScriptData } from './util/insertScript';
+// import { insertScriptData } from './util/insertScript';
 
 const app = express();
 
@@ -22,7 +24,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(routes);
 
 createConnection().then(async (connection) => {
-  // await insertNewsData(connection);
+  await insertNewsData(connection);
+  await insertScriptData(connection);
   // const user = await MockUserToFavorite(connection);
   app.listen(8080, () => {
     console.log('server is listening 8080');

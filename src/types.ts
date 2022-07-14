@@ -66,3 +66,9 @@ export class SearchCondition {
     return this.listSize;
   }
 }
+export interface Script {
+  scriptId: number;
+  startTime: Time;
+  endTime: Time;
+  text: string;
+}
