@@ -3,7 +3,7 @@ import { User } from '../entity/User';
 
 @EntityRepository(User)
 export class UserCommandRepository extends Repository<User> {
-  registerNewUser(user: User) {
-    return this.save(user);
+  async registerNewUser(user: User): Promise<User> {
+    return await this.save(user);
   }
 }
