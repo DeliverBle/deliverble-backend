@@ -11,7 +11,7 @@ import routes from './routes';
 import { Channel } from './shared/common/Channel';
 import { insertNewsData } from './util/insertNews';
 import { MockUserToFavorite } from './util/MockUserToFavorite';
-import errorHandler from './error/ErrorHandler';
+import {errorHandler} from './error/ErrorHandler';
 const session = require('express-session')
 const connectRedis = require('connect-redis')
 import redis from "redis";
