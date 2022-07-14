@@ -5,6 +5,7 @@ import { isFoundUser, NotFoundUser } from '../entity/NotFoundUser';
 import { UserCommandRepository } from '../repository/UserCommandRepository';
 import UserNotFoundError from '../error/UserNotFoundError';
 import { KakaoRawInfo } from '../types';
+import axios from "axios";
 
 // TODO: DI to be implemented
 const getConnectionToUserQueryRepository = async () => {
@@ -26,6 +27,20 @@ export const findUserByEmail = async (email: string): Promise<User> => {
     return new NotFoundUser();
   }
 };
+
+export const getKakaoRawInfo = async (accessToken: string, refreshToken: string): Promise<any> => {
+  const { data: userInfo } = await axios
+      .get('https://kapi.kakao.com/v2/user/me', {
+        headers: {
+          Authorization: 'Bearer ' + accessToken,
+          'Content-Type': 'application/x-www-form-urlencoded;charset=utf-8',
+        },
+      })
+      .then((res) => {
+        return res;
+      });
+  return userInfo;
+}
 
 export const loginUserWithKakao = async (kakaoRawInfo: KakaoRawInfo): Promise<User> => {
   const user = await findUserByEmail(kakaoRawInfo.email);
