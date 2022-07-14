@@ -6,6 +6,16 @@ import message from "../modules/responseMessage";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
+const getTokensParsedFromBody = async (body: string) => {
+  log.info("body", body)
+  const accessToken = body['access_token'];
+  const refreshToken = body['refresh_token'];
+  return {
+    accessToken,
+    refreshToken,
+  }
+}
+
 const getTokensAndUserIdParsedFromBody = async (body: string) => {
   log.info("body", body)
   const accessToken = body['access_token'];
@@ -85,6 +95,29 @@ const loginUserWithKakao = async (req: Request, res: Response) => {
   }
 };
 
+const logOutUserWithKakao = async (req: Request, res: Response) => {
+  const accessToken = (await (getTokensParsedFromBody(req.body))).accessToken;
+  try {
+    const userId = await UserService.logOutUserWithKakao(accessToken);
+    res.status(StatusCode.OK).send({
+      status: StatusCode.OK,
+      message: {
+        refresh: 'success',
+        userId
+      },
+    });
+  } catch (err) {
+    log.error(err.code);
+    res.status(err.code).send({
+      status: err.code,
+      message: {
+        refresh: 'fail',
+        message: err.message,
+      },
+    });
+  }
+}
+
 const signUpUserWithKakao = async (req: Request, res: Response) => {
   const tokensAndUserId = await (getTokensAndUserIdParsedFromBody(req.body));
   const accessToken = tokensAndUserId.accessToken;
@@ -141,6 +174,7 @@ const refreshAccessToken = async (req: Request, res: Response) => {
 export default {
   loginUserWithKakao,
   signUpUserWithKakao,
+  logOutUserWithKakao,
   callbackKakao,
   refreshAccessToken,
 };
