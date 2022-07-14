@@ -1,8 +1,7 @@
 import { Request, Response } from 'express';
 import UserService from '../service/UserService';
-import AccessTokenNotExpiredError from '../error/AccessTokenNotExpiredError';
 import { Logger } from 'tslog';
-import StatusCode from "../modules/statusCode";
+import StatusCode from '../modules/statusCode';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -50,8 +49,7 @@ const signUpUserWithKakao = async (req: Request, res: Response) => {
   const refreshToken = req.body.refreshToken!;
   try {
     await UserService.signUpUserWithKakao(accessToken, refreshToken);
-    res.status(StatusCode.OK)
-        .send({
+    res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: {
         signup: 'success',
