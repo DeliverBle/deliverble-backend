@@ -12,9 +12,10 @@ router.get('/kakao', passport.authenticate('kakao-login'));
 router.get(
   '/kakao/oauth',
   passport.authenticate('kakao-login', {
-    failureRedirect: '/',
+    failureRedirect: '/', session: false
   }),
   (req, res) => {
+    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> YE');
     NewsController.callbackKakao(req, res).then((v) => console.log('kakao login succeeded'));
   },
 );
