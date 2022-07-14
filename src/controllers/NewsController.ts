@@ -7,7 +7,19 @@ import { SearchCondition } from '../types';
 import { validateConditions } from '../shared/common/utils';
 
 export const callbackKakao = async (req: Request, res: Response): Promise<void | Response> => {
-  res.redirect('/');
+  console.log(">>>>>>>> req", req['user'])
+  const accessToken = req['user'][0];
+  const refreshToken = req['user'][1];
+  res.send(
+      {
+        "status": 200,
+        "message": {
+          "accessToken": accessToken,
+          "refreshToken": refreshToken
+        }
+      }
+  )
+  // res.send('v')
 };
 
 /**

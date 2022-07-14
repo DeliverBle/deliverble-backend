@@ -12,15 +12,18 @@ export default function kakaoLoginStrategy() {
         callbackURL: process.env.KAKAO_CALLBACK_URL,
       },
       async (accessToken, refreshToken, profile, done) => {
-        const kakaoRawInfo = KakaoRawInfo.toKakaoRawInfo(profile._json);
-        console.log(' >>>>>>>>>>>> kakaoRawinfo', kakaoRawInfo);
-        try {
-          await loginUserWithKakao(kakaoRawInfo);
-          done(null);
-        } catch (err) {
-          console.log(err);
-          done(err);
-        }
+        // const kakaoRawInfo = KakaoRawInfo.toKakaoRawInfo(profile._json);
+          console.log("accessToken: ", accessToken)
+          console.log("refreshToken: ", refreshToken)
+        // console.log(' >>>>>>>>>>>> kakaoRawinfo', kakaoRawInfo);
+        done(null, [accessToken, refreshToken]);
+        // try {
+        //   // await loginUserWithKakao(kakaoRawInfo);
+        //   done(null);
+        // } catch (err) {
+        //   console.log(err);
+        //   done(err);
+        // }
       },
     ),
   );
