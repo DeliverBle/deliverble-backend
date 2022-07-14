@@ -28,7 +28,7 @@ export const findUserByEmail = async (email: string): Promise<User> => {
   }
 };
 
-export const getKakaoRawInfo = async (accessToken: string, refreshToken: string): Promise<any> => {
+export const getKakaoRawInfo = async (accessToken: string, refreshToken: string): Promise<KakaoRawInfo> => {
   const { data: userInfo } = await axios
       .get('https://kapi.kakao.com/v2/user/me', {
         headers: {
