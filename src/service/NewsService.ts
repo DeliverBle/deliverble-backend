@@ -126,7 +126,9 @@ const searchByConditions = async (
 
 const searchRecommendNews = async () => {
   const newsRepository = await getConnectionToMySql();
-  return await newsRepository.findRecommendNews();
+  let newsData = await newsRepository.findRecommendNews();
+  newsData = sortByDateAndTitle([newsData]);
+  return newsData
 };
 
 export default {
