@@ -12,11 +12,13 @@ import {
   DEFAULT_EXPIRATION_SECONDS,
   OAUTH_TOKEN,
   REQUEST_RAW_LINK,
+  USER_LOGOUT_LINK,
 } from '../shared/AuthLink';
 import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
 import { promisify } from 'util';
 const redisClient = require('../util/redis');
 import { Logger } from 'tslog';
+import AlreadyLoggedOutError from '../error/AlreadyLoggedOutError';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -36,9 +38,9 @@ export const findUserByKakaoId = async (kakaoId: string): Promise<User> => {
   try {
     const foundUser = await userQueryRepository.findByKakaoId(kakaoId);
     log.debug(' >>>>>>>>> foundUser using kakaoId', foundUser);
-    return foundUser
+    return foundUser;
   } catch (error) {
-    log.debug(' >>>>>>>>>>>> NotFoundUser using kakaoId')
+    log.debug(' >>>>>>>>>>>> NotFoundUser using kakaoId');
     return new NotFoundUser();
   }
 };
@@ -56,28 +58,31 @@ export const findUserByEmail = async (email: string): Promise<User> => {
 
 // TODO: refactor by splitting to AuthService from UserService
 export const doesAccessTokenExpire = async (accessToken: string): Promise<boolean> => {
-  const expire_in = await checkAccessTokenExpirySeconds(accessToken);
+  log.debug(' before expiry seconds validation ', accessToken);
+  const expire_in: number = await checkAccessTokenExpirySeconds(accessToken);
+  // TODO : 에러 핸들러가 안먹혀서 지금 임시 방편으로 이렇게 해놓음
+  if (expire_in['code'] !== undefined) {
+    return true;
+  }
+  log.debug(' >>>>>>>>>>>>>>>>>> exprire_in < 0', expire_in < 0);
   return expire_in < 0;
 };
 
-const checkAccessTokenExpirySeconds = async (accessToken: string) => {
+const checkAccessTokenExpirySeconds = async (accessToken: string): Promise<number> => {
   log.info(' >>>>>>>> accessToken ', accessToken);
-  const { data: expireInfo } = await axios
-    .get(ACCESS_TOKEN_INFO, {
+  try {
+    const { data: expireInfo } = await axios.get(ACCESS_TOKEN_INFO, {
       headers: {
         Authorization: 'Bearer ' + accessToken,
         'Content-Type': CONTENT_TYPE,
       },
-    })
-    .then((res) => {
-      return res;
-    })
-    .catch((err) => {
-      log.error(err.status);
-      return err;
     });
-
-  return expireInfo.expires_in;
+    return expireInfo.expires_in;
+  } catch (err) {
+    // TODO: 여기도 에러 핸들러가 안먹는데...
+    log.error(err.response.data);
+    return err.response.data;
+  }
 };
 
 export const updateAccessTokenByRefreshToken = async (
@@ -126,15 +131,15 @@ const updateRefreshTokenAtRedisWithUserId = async (
   userId: string,
   updatedAccessTokenDTO: UpdatedAccessTokenDTO,
 ): Promise<void> => {
-  // const kakaoRawInfo = await getKakaoRawInfo(updatedAccessTokenDTO.access_token);
-  // const userId = kakaoRawInfo.id;
   await saveRefreshTokenAtRedisMappedByUserId(userId, updatedAccessTokenDTO.refresh_token);
 };
 
 export const getKakaoRawInfo = async (_accessToken: string): Promise<KakaoRawInfo> => {
   log.info(' >>>>> ____accessToken ', _accessToken);
   const accessToken = await doesAccessTokenExpire(_accessToken);
-  log.info('accessToken >>>> ', accessToken);
+  if (accessToken) {
+    throw new AccessTokenExpiredError();
+  }
   const { data: userInfo } = await axios
     .get(REQUEST_RAW_LINK, {
       headers: {
@@ -151,9 +156,7 @@ export const getKakaoRawInfo = async (_accessToken: string): Promise<KakaoRawInf
   return kakaoRawInfo;
 };
 
-export const loginUserWithKakao = async (
-  accessToken: string
-): Promise<User> => {
+export const loginUserWithKakao = async (accessToken: string): Promise<User> => {
   if (await doesAccessTokenExpire(accessToken)) {
     throw new AccessTokenExpiredError();
   }
@@ -180,6 +183,36 @@ export const signUpUserWithKakao = async (accessToken) => {
   return await userCommandRepository.registerNewUser(newUser);
 };
 
+// TODO: refactor by splitting to AuthService from UserService
+export const doesAccessTokenExists = async (accessToken: string): Promise<boolean> => {
+  log.debug(' before expiry seconds validation ', accessToken);
+  const expire_in: number = await checkAccessTokenExpirySeconds(accessToken);
+  // TODO : 에러 핸들러가 안먹혀서 지금 임시 방편으로 이렇게 해놓음
+  if (expire_in['code'] !== undefined) {
+    return true;
+  }
+  log.debug(' >>>>>>>>>>>>>>>>>> exprire_in < 0', expire_in < 0);
+  return expire_in < 0;
+};
+
+export const logOutUserWithKakao = async (_accessToken): Promise<string> => {
+  log.debug('HELLO >>>>>>>>>>>>>>>>>>>>>> ');
+  if (await doesAccessTokenExists(_accessToken)) {
+    throw new AlreadyLoggedOutError();
+  }
+  const { data: id } = await axios
+    .get(USER_LOGOUT_LINK, {
+      headers: {
+        Authorization: 'Bearer ' + _accessToken,
+        'Content-Type': CONTENT_TYPE,
+      },
+    })
+    .then((res) => {
+      return res;
+    });
+  return id;
+};
+
 const saveRefreshTokenAtRedisMappedByUserId = async (
   userId: string,
   refreshToken: string,
@@ -192,6 +225,7 @@ const saveRefreshTokenAtRedisMappedByUserId = async (
 export default {
   loginUserWithKakao,
   signUpUserWithKakao,
+  logOutUserWithKakao,
   findUserByEmail,
   getKakaoRawInfo,
   doesAccessTokenExpire,
