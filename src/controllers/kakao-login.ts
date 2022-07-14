@@ -15,7 +15,7 @@ export default function kakaoLoginStrategy() {
         const kakaoRawInfo = KakaoRawInfo.toKakaoRawInfo(profile._json);
         console.log(' >>>>>>>>>>>> kakaoRawinfo', kakaoRawInfo);
         try {
-          // await loginUserWithKakao(email);
+          await loginUserWithKakao(kakaoRawInfo);
           done(null);
         } catch (err) {
           console.log(err);

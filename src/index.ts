@@ -11,6 +11,7 @@ import routes from './routes';
 import { Channel } from './shared/common/Channel';
 import { insertNewsData } from './util/insertNews';
 import { MockUserToFavorite } from './util/MockUserToFavorite';
+import errorHandler from './error/ErrorHandler';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(express.urlencoded({ extended: true }));
 
 // routes 폴더로 분기
 app.use(routes);
+app.use(errorHandler);
 
 createConnection().then(async (connection) => {
   // await insertNewsData(connection);
