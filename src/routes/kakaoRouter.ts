@@ -28,4 +28,6 @@ router.post('/login', errorHandler(UserController.loginUserWithKakao));
 
 router.post('/signup', errorHandler(UserController.signUpUserWithKakao));
 
+router.post('/logout', errorHandler(UserController.logOutUserWithKakao));
+
 export default router;
