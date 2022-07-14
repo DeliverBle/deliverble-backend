@@ -6,6 +6,7 @@ import AccessTokenNotExpiredError from "../error/AccessTokenNotExpiredError";
 export const callbackKakao = async (req: Request, res: Response): Promise<void | Response> => {
     const accessToken = req['user'][0];
     const refreshToken = req['user'][1];
+    const accessTokenExpiresIn = await UserService.checkAccessTokenExpirySeconds(accessToken)
     res.send(
         {
             "status": 200,
@@ -13,8 +14,7 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
                 "accessToken": accessToken,
                 "refreshToken": refreshToken,
                 "expired_in": {
-                    "accessToken": "12 hours",
-                    "refreshToken": "30 days"
+                    "accessTokenInSeconds": accessTokenExpiresIn,
                 }
             }
         }
