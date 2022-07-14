@@ -30,8 +30,8 @@ const getTokensAndIdCallbackFromKakao = async (req: Request) => {
   }
 }
 
-const getUserIdParsedFromBody = (body: string): number => {
-  return body['user_id'];
+const getUserIdParsedFromBody = (body: string): string => {
+  return body['user_id'].toString();
 }
 
 export const callbackKakao = async (req: Request, res: Response): Promise<void | Response> => {
@@ -41,6 +41,7 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
   const refreshToken = tokensAndUserId.refreshToken;
   const userId = tokensAndUserId.userId;
   const accessTokenExpiresIn = await UserService.checkAccessTokenExpirySeconds(accessToken);
+  await UserService.saveRefreshTokenAtRedisMappedByUserId(userId, refreshToken);
   log.debug(accessToken, refreshToken, accessTokenExpiresIn, userId);
   res.status(StatusCode.OK).send({
     status: StatusCode.OK,
@@ -58,18 +59,18 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
 const loginUserWithKakao = async (req: Request, res: Response) => {
   const tokensAndUserId = await (getTokensAndUserIdParsedFromBody(req.body));
   const accessToken = tokensAndUserId.accessToken;
-  const refreshToken = tokensAndUserId.refreshToken;
+  // const refreshToken = tokensAndUserId.refreshToken;
   const userId = tokensAndUserId.userId;
-  log.debug(accessToken, refreshToken);
+  log.debug(accessToken);
   try {
     log.debug(" I HAVE ", accessToken)
-    const user = await UserService.loginUserWithKakao(accessToken, refreshToken);
+    const user = await UserService.loginUserWithKakao(accessToken);
     log.debug("HEY ~ ", user);
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: {
         logged: 'success',
-        userId
+        user
       },
     });
   } catch (err) {
