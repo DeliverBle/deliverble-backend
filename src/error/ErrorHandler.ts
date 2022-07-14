@@ -1,9 +1,11 @@
 import CustomError from './CustomError';
 
-export default (err, req, res, next) => {
-  if (err instanceof CustomError) {
-    return res.status(err.code).json(err);
-  }
-  console.log(err);
-  return res.status(err.code).json(err);
+export const errorHandler = (fn) => (req, res, next) => {
+  Promise.resolve(fn(req, res, next)).catch((err) => {
+    if (err instanceof CustomError) {
+      res.status(err.code).send({
+        msg: err.message
+      });
+    }
+  });
 };
