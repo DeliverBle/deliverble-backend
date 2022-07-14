@@ -1,5 +1,6 @@
 import {Request, Response} from "express";
 import {getKakaoRawInfo} from "../service/UserService";
+import UserService from "../service/UserService";
 
 export const callbackKakao = async (req: Request, res: Response): Promise<void | Response> => {
     console.log(">>>>>>>> req", req['user'])
@@ -23,7 +24,8 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
 const loginUserWithKakao = async (req: Request, res: Response) => {
     const accessToken = req.body.accessToken!;
     const refreshToken = req.body.refreshToken!;
-    res.send(await getKakaoRawInfo(accessToken, refreshToken));
+    const kakaoRawInfo = await getKakaoRawInfo(accessToken, refreshToken);
+    return UserService.loginUserWithKakao(kakaoRawInfo);
 }
 
 export default {
