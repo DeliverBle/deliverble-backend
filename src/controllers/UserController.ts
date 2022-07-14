@@ -5,6 +5,15 @@ import StatusCode from '../modules/statusCode';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
+const getTokensParsedFromBody = async (body: string) => {
+  const accessToken = body['access_token'];
+  const refreshToken = body['refresh_token'];
+  return {
+    accessToken,
+    refreshToken,
+  }
+}
+
 export const callbackKakao = async (req: Request, res: Response): Promise<void | Response> => {
   const accessToken = req['user'][0];
   const refreshToken = req['user'][1];
@@ -22,8 +31,8 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
 };
 
 const loginUserWithKakao = async (req: Request, res: Response) => {
-  const accessToken = req.body.accessToken!;
-  const refreshToken = req.body.refreshToken!;
+  const accessToken = req.body['access_token'];
+  const refreshToken = req.body['refresh_token'];
   try {
     await UserService.loginUserWithKakao(accessToken, refreshToken);
     res.status(StatusCode.OK).send({
@@ -45,8 +54,8 @@ const loginUserWithKakao = async (req: Request, res: Response) => {
 };
 
 const signUpUserWithKakao = async (req: Request, res: Response) => {
-  const accessToken = req.body.accessToken!;
-  const refreshToken = req.body.refreshToken!;
+  const accessToken = req.body['access_token'];
+  const refreshToken = req.body['refresh_token'];
   try {
     await UserService.signUpUserWithKakao(accessToken, refreshToken);
     res.status(StatusCode.OK).send({
@@ -68,7 +77,7 @@ const signUpUserWithKakao = async (req: Request, res: Response) => {
 };
 
 const refreshAccessToken = async (req: Request, res: Response) => {
-  const refreshToken = req.body.refreshToken!;
+  const refreshToken = (await getTokensParsedFromBody(req.body)).refreshToken;
   try {
     const retrievedRefreshToken = await UserService.updateAccessTokenByRefreshToken(refreshToken);
     res.status(StatusCode.OK).send({
