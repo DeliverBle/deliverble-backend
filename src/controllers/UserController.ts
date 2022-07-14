@@ -103,7 +103,8 @@ const signUpUserWithKakao = async (req: Request, res: Response) => {
     log.error(err);
     // TODO: 동적으로 MySQL의 오류를 잡아 처리하는 CustomError 작성
     res.status(StatusCode.CONFLICT).send({
-      status: err.code,
+      // TODO: Error Handler가 정상적으로 동작하지 않는 것 같은데 서팟장에게 물어보도록 하자.
+      status: StatusCode.CONFLICT,
       message: {
         signup: 'fail',
         message: message.DUPLICATE_ENTRY,
