@@ -2,6 +2,7 @@ import { User } from '../entity/User';
 import { getConnection } from 'typeorm';
 import { UserQueryRepository } from '../repository/UserQueryRepository';
 import { isNotFoundUser, NotFoundUser } from '../entity/NotFoundUser';
+import { UserCommandRepository } from '../repository/UserCommandRepository';
 
 // TODO: DI to be implemented
 const getConnectionToUserQueryRepository = async () => {
@@ -9,9 +10,14 @@ const getConnectionToUserQueryRepository = async () => {
   return connection.getCustomRepository(UserQueryRepository);
 };
 
+const getConnectionToUserCommandRepository = async () => {
+  const connection = getConnection();
+  return connection.getCustomRepository(UserCommandRepository);
+};
+
 // TODO: implement Null Object Pattern
 export const findUserByEmail = async (email: string): Promise<User> => {
-  const userRepository = getConnection().getRepository(User);
+  const userRepository = await getConnectionToUserQueryRepository();
   try {
     return await userRepository.findOneOrFail({ email });
   } catch (error) {
