@@ -3,6 +3,7 @@ import NewsController from '../controllers/NewsController';
 import passport from 'passport';
 import kakaoLoginStrategy from '../controllers/kakao-login';
 import UserController from "../controllers/UserController";
+import {errorHandler} from "../error/ErrorHandler";
 
 const router: express.Router = Router();
 
@@ -21,6 +22,6 @@ router.get(
   },
 );
 
-router.post('/login', UserController.loginUserWithKakao);
+router.post('/login', errorHandler(UserController.loginUserWithKakao));
 
 export default router;
