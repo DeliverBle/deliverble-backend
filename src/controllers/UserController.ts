@@ -1,9 +1,9 @@
 import {Request, Response} from "express";
 import {getKakaoRawInfo} from "../service/UserService";
 import UserService from "../service/UserService";
+import AccessTokenNotExpiredError from "../error/AccessTokenNotExpiredError";
 
 export const callbackKakao = async (req: Request, res: Response): Promise<void | Response> => {
-    console.log(">>>>>>>> req", req['user'])
     const accessToken = req['user'][0];
     const refreshToken = req['user'][1];
     res.send(
@@ -24,11 +24,21 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
 const loginUserWithKakao = async (req: Request, res: Response) => {
     const accessToken = req.body.accessToken!;
     const refreshToken = req.body.refreshToken!;
-    const kakaoRawInfo = await getKakaoRawInfo(accessToken, refreshToken);
-    return UserService.loginUserWithKakao(kakaoRawInfo);
+    return UserService.loginUserWithKakao(accessToken, refreshToken);
+}
+
+const refreshAccessToken = async (req: Request, res: Response) => {
+    const accessToken = req.body.accessToken!;
+    const refreshToken = req.body.refreshToken!;
+    const doesExpire = await UserService.doesAccessTokenExpire(accessToken, refreshToken);
+    if (!doesExpire) {
+        throw new AccessTokenNotExpiredError();
+    }
+    return UserService.updateAccessTokenByRefreshToken(refreshToken);
 }
 
 export default {
     loginUserWithKakao,
     callbackKakao,
+    refreshAccessToken
 };
