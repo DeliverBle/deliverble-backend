@@ -7,11 +7,11 @@ export class NotFoundUser extends User {
   }
 }
 
-export const isFoundUser = (user: User) => {
+export const isNotFoundUser = (user: User) => {
   try {
     user as NotFoundUser;
-    return false;
-  } catch (err) {
     return true;
+  } catch (err) {
+    return false;
   }
 };
