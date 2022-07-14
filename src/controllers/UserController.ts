@@ -1,38 +1,51 @@
-import { Request, Response } from 'express';
-import UserService from '../service/UserService';
-import { Logger } from 'tslog';
+import {Request, Response} from 'express';
+import UserService, {getKakaoRawInfo} from '../service/UserService';
+import {Logger} from 'tslog';
 import StatusCode from '../modules/statusCode';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
-const getTokensParsedFromBody = (body: string) => {
+const getTokensAndUserIdParsedFromBody = async (body: string) => {
   const accessToken = body['access_token'];
   const refreshToken = body['refresh_token'];
+  // TODO: 생각보다 컨트롤러가 비대한데... 책임을 분리할 방법은 없을까...
+  const userId = (await getKakaoRawInfo(accessToken)).id;
   return {
     accessToken,
     refreshToken,
+    userId
   }
 }
 
-const getTokensCallbackFromKakao = (req: Request) => {
+const getTokensAndIdCallbackFromKakao = async (req: Request) => {
   const accessToken = req['user'][0];
   const refreshToken = req['user'][1];
+  const userId = (await getKakaoRawInfo(accessToken)).id;
   return {
     accessToken,
     refreshToken,
+    userId
   }
+}
+
+const getUserIdParsedFromBody = (body: string): number => {
+  return body['user_id'];
 }
 
 export const callbackKakao = async (req: Request, res: Response): Promise<void | Response> => {
-  const accessToken = (getTokensCallbackFromKakao(req)).accessToken;
-  const refreshToken = (getTokensCallbackFromKakao(req)).refreshToken;
+  log.debug(" > req", req);
+  const tokensAndUserId = await getTokensAndIdCallbackFromKakao(req);
+  const accessToken = tokensAndUserId.accessToken;
+  const refreshToken = tokensAndUserId.refreshToken;
+  const userId = tokensAndUserId.userId;
   const accessTokenExpiresIn = await UserService.checkAccessTokenExpirySeconds(accessToken);
-  log.debug(accessToken, refreshToken, accessTokenExpiresIn);
+  log.debug(accessToken, refreshToken, accessTokenExpiresIn, userId);
   res.status(StatusCode.OK).send({
     status: StatusCode.OK,
     message: {
       accessToken: accessToken,
       refreshToken: refreshToken,
+      userId,
       expired_in: {
         accessTokenInSeconds: accessTokenExpiresIn,
       },
@@ -41,8 +54,10 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
 };
 
 const loginUserWithKakao = async (req: Request, res: Response) => {
-  const accessToken = (getTokensParsedFromBody(req.body)).accessToken;
-  const refreshToken = (getTokensParsedFromBody(req.body)).refreshToken;
+  const tokensAndUserId = await (getTokensAndUserIdParsedFromBody(req.body));
+  const accessToken = tokensAndUserId.accessToken;
+  const refreshToken = tokensAndUserId.refreshToken;
+  const userId = tokensAndUserId.userId;
   log.debug(accessToken, refreshToken);
   try {
     await UserService.loginUserWithKakao(accessToken, refreshToken);
@@ -50,6 +65,7 @@ const loginUserWithKakao = async (req: Request, res: Response) => {
       status: StatusCode.OK,
       message: {
         logged: 'success',
+        userId
       },
     });
   } catch (err) {
@@ -65,14 +81,16 @@ const loginUserWithKakao = async (req: Request, res: Response) => {
 };
 
 const signUpUserWithKakao = async (req: Request, res: Response) => {
-  const accessToken = (getTokensParsedFromBody(req.body)).accessToken;
-  const refreshToken = (getTokensParsedFromBody(req.body)).refreshToken;
+  const tokensAndUserId = await (getTokensAndUserIdParsedFromBody(req.body));
+  const accessToken = tokensAndUserId.accessToken;
+  const userId = tokensAndUserId.userId;
   try {
-    await UserService.signUpUserWithKakao(accessToken, refreshToken);
+    await UserService.signUpUserWithKakao(accessToken);
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: {
         signup: 'success',
+        userId
       },
     });
   } catch (err) {
@@ -88,14 +106,16 @@ const signUpUserWithKakao = async (req: Request, res: Response) => {
 };
 
 const refreshAccessToken = async (req: Request, res: Response) => {
-  const refreshToken = (getTokensParsedFromBody(req.body)).refreshToken;
+  const refreshToken = (await (getTokensAndUserIdParsedFromBody(req.body))).refreshToken;
+  const userId = getUserIdParsedFromBody(req.body);
   try {
-    const retrievedRefreshToken = await UserService.updateAccessTokenByRefreshToken(refreshToken);
+    const retrievedAccessToken = await UserService.updateAccessTokenByRefreshToken(userId, refreshToken);
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: {
         refresh: 'success',
-        refreshToken: retrievedRefreshToken,
+        retrievedAccessToken,
+        userId
       },
     });
   } catch (err) {
