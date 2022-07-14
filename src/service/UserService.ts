@@ -1,10 +1,10 @@
-import { User } from '../entity/User';
-import { getConnection } from 'typeorm';
-import { UserQueryRepository } from '../repository/UserQueryRepository';
-import { isFoundUser, NotFoundUser } from '../entity/NotFoundUser';
-import { UserCommandRepository } from '../repository/UserCommandRepository';
+import {User} from '../entity/User';
+import {getConnection} from 'typeorm';
+import {UserQueryRepository} from '../repository/UserQueryRepository';
+import {isFoundUser, NotFoundUser} from '../entity/NotFoundUser';
+import {UserCommandRepository} from '../repository/UserCommandRepository';
 import UserNotFoundError from '../error/UserNotFoundError';
-import { KakaoRawInfo } from '../types';
+import {KakaoRawInfo} from '../types';
 import axios from "axios";
 
 // TODO: DI to be implemented
@@ -39,7 +39,7 @@ export const getKakaoRawInfo = async (accessToken: string, refreshToken: string)
       .then((res) => {
         return res;
       });
-  return userInfo;
+  return KakaoRawInfo.toKakaoRawInfo(userInfo);
 }
 
 export const loginUserWithKakao = async (kakaoRawInfo: KakaoRawInfo): Promise<User> => {
