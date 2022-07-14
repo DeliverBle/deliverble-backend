@@ -10,6 +10,7 @@ import { Tag } from './entity/Tag';
 import routes from './routes';
 import { Channel } from './shared/common/Channel';
 import { insertNewsData } from './util/insertNews';
+import { MockUserToFavorite } from './util/MockUserToFavorite';
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use(routes);
 
 createConnection().then(async (connection) => {
   // await insertNewsData(connection);
+  console.log(' Mock Data User >>>>', await MockUserToFavorite(connection));
   app.listen(8080, () => {
     console.log('server is listening 8080');
   });
