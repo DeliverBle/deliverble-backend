@@ -6,22 +6,6 @@ import util from '../modules/util';
 import { SearchCondition } from '../types';
 import { validateConditions } from '../shared/common/utils';
 
-export const callbackKakao = async (req: Request, res: Response): Promise<void | Response> => {
-  console.log(">>>>>>>> req", req['user'])
-  const accessToken = req['user'][0];
-  const refreshToken = req['user'][1];
-  res.send(
-      {
-        "status": 200,
-        "message": {
-          "accessToken": accessToken,
-          "refreshToken": refreshToken
-        }
-      }
-  )
-  // res.send('v')
-};
-
 /**
  * @route get /search
  * @description Search for news based on conditions
@@ -72,5 +56,4 @@ const searchNews = async (req: Request, res: Response): Promise<void | Response>
 
 export default {
   searchNews,
-  callbackKakao,
 };
