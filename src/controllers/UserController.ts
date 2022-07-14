@@ -2,14 +2,16 @@ import {Request, Response} from 'express';
 import UserService, {getKakaoRawInfo} from '../service/UserService';
 import {Logger} from 'tslog';
 import StatusCode from '../modules/statusCode';
+import message from "../modules/responseMessage";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 const getTokensAndUserIdParsedFromBody = async (body: string) => {
+  log.info("body", body)
   const accessToken = body['access_token'];
   const refreshToken = body['refresh_token'];
   // TODO: 생각보다 컨트롤러가 비대한데... 책임을 분리할 방법은 없을까...
-  const userId = (await getKakaoRawInfo(accessToken)).id;
+  const userId = (await getKakaoRawInfo(accessToken)).kakaoId;
   return {
     accessToken,
     refreshToken,
@@ -20,7 +22,7 @@ const getTokensAndUserIdParsedFromBody = async (body: string) => {
 const getTokensAndIdCallbackFromKakao = async (req: Request) => {
   const accessToken = req['user'][0];
   const refreshToken = req['user'][1];
-  const userId = (await getKakaoRawInfo(accessToken)).id;
+  const userId = (await getKakaoRawInfo(accessToken)).kakaoId;
   return {
     accessToken,
     refreshToken,
@@ -60,7 +62,9 @@ const loginUserWithKakao = async (req: Request, res: Response) => {
   const userId = tokensAndUserId.userId;
   log.debug(accessToken, refreshToken);
   try {
-    await UserService.loginUserWithKakao(accessToken, refreshToken);
+    log.debug(" I HAVE ", accessToken)
+    const user = await UserService.loginUserWithKakao(accessToken, refreshToken);
+    log.debug("HEY ~ ", user);
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: {
@@ -69,9 +73,9 @@ const loginUserWithKakao = async (req: Request, res: Response) => {
       },
     });
   } catch (err) {
-    log.error(err.response.status);
-    res.status(err.response.status).send({
-      status: err.response.status,
+    log.error(err);
+    res.status(err.code).send({
+      status: err.code,
       message: {
         logged: 'fail',
         message: err.message,
@@ -85,7 +89,8 @@ const signUpUserWithKakao = async (req: Request, res: Response) => {
   const accessToken = tokensAndUserId.accessToken;
   const userId = tokensAndUserId.userId;
   try {
-    await UserService.signUpUserWithKakao(accessToken);
+    const signedUpUser = await UserService.signUpUserWithKakao(accessToken);
+    log.info(signedUpUser)
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: {
@@ -94,12 +99,13 @@ const signUpUserWithKakao = async (req: Request, res: Response) => {
       },
     });
   } catch (err) {
-    log.error(err.response.status);
-    res.status(err.response.status).send({
-      status: err.response.status,
+    log.error(err);
+    // TODO: 동적으로 MySQL의 오류를 잡아 처리하는 CustomError 작성
+    res.status(StatusCode.CONFLICT).send({
+      status: err.code,
       message: {
         signup: 'fail',
-        message: err.message,
+        message: message.DUPLICATE_ENTRY,
       },
     });
   }
