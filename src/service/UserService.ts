@@ -6,7 +6,13 @@ import { UserCommandRepository } from '../repository/UserCommandRepository';
 import UserNotFoundError from '../error/UserNotFoundError';
 import { KakaoRawInfo } from '../types';
 import axios from 'axios';
-import { ACCESS_TOKEN_INFO, CONTENT_TYPE, OAUTH_TOKEN, REQUEST_RAW_LINK } from '../shared/AuthLink';
+import {
+  ACCESS_TOKEN_INFO,
+  CONTENT_TYPE,
+  DEFAULT_EXPIRATION_SECONDS,
+  OAUTH_TOKEN,
+  REQUEST_RAW_LINK
+} from '../shared/AuthLink';
 import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
 import { promisify } from 'util';
 const redisClient = require('../util/redis');
@@ -123,7 +129,7 @@ const saveRefreshTokenAtRedisMappedByUserId = async (
   refreshToken: string,
 ): Promise<void> => {
   promisify(redisClient.get).bind(redisClient);
-  await redisClient.set(userId, refreshToken);
+  await redisClient.setex(userId, DEFAULT_EXPIRATION_SECONDS, refreshToken);
   return;
 };
 
