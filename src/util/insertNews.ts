@@ -8,7 +8,11 @@ import { Suitability } from '../shared/common/Suitability';
 import { NewsInfo } from '../types';
 import { Time } from '../vo/Time';
 
-// news 생성하고 포트 열기
+// 추천 태그 생성
+let tagTestRecommend = new Tag();
+tagTestRecommend.name = '딜리버블 추천';
+
+// 뉴스 별 태그 생성
 let tagTest1_1 = new Tag();
 tagTest1_1.name = '경제';
 let tagTest1_2 = new Tag();
@@ -142,9 +146,15 @@ export const insertNewsData = async (connection) => {
     await tagRepository.query(`set FOREIGN_KEY_CHECKS = 1`)
     await newsRepository.query(`set FOREIGN_KEY_CHECKS = 1`)
     
+    // 추천 태그 객체 생성
+    let tagRecommend = tagRepository.create(tagTestRecommend);
+    tagRepository.save(tagRecommend);
+
+    // 뉴스 별 태그 객체 생성
     let tag1_1 = tagRepository.create(tagTest1_1);
     let tag1_2 = tagRepository.create(tagTest1_2);
     let tag1_3 = tagRepository.create(tagTest1_3);
+    
     tagRepository.save(tag1_1);
     tagRepository.save(tag1_2);
     tagRepository.save(tag1_3);
@@ -244,7 +254,8 @@ export const insertNewsData = async (connection) => {
       {
         title: '비트코인, 한때 1만 8천 달러 붕괴',
         category: Category.ECONOMY,
-        tags: [tag1_1, tag1_2, tag1_3],
+        tags: [tag1_1, tag1_2, tag1_3, tagRecommend],
+        // tags: ['비트코인', '붕괴', '우진'],
         announcerGender: Gender.MEN,
         channel: Channel.SBS,
         link: 'S_gtbu2VRlI',
@@ -258,7 +269,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '북, 최근 임진강 상류 황강댐 수문 개방',
         category: Category.SOCIETY,
-        tags: [tag2_1, tag2_2, tag3_3],
+        tags: [tag2_1, tag2_2, tag2_3, tagRecommend],
         announcerGender: Gender.MEN,
         channel: Channel.KBS,
         link: 'ee-0DeY21rU',
@@ -272,7 +283,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '제주, 초중고교 무상급식 예산 46억 원 증액 ',
         category: Category.SOCIETY,
-        tags: [tag3_1, tag3_2, tag3_3],
+        tags: [tag3_1, tag3_2, tag3_3, tagRecommend],
         announcerGender: Gender.WOMEN,
         channel: Channel.SBS,
         link: '45IAfzlB_tQ',
@@ -286,7 +297,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '안동시 공무원, 동료 직원 흉기에 찔려 사망',
         category: Category.SOCIETY,
-        tags: [tag4_1, tag4_2, tag4_3],
+        tags: [tag4_1, tag4_2, tag4_3, tagRecommend],
         announcerGender: Gender.WOMEN,
         channel: Channel.SBS,
         link: 'sId-zbgWuZU',
@@ -342,7 +353,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '우크라이나 재건회의 \'루가노 선언\' 채택',
         category: Category.WORLD,
-        tags: [tag8_1, tag8_2, tag8_3],
+        tags: [tag8_1, tag8_2, tag8_3, tagRecommend],
         announcerGender: Gender.WOMEN,
         channel: Channel.MBC,
         link: '1SRz_AE8R9E',
@@ -356,7 +367,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '원숭이두창 치료제 504명분 이번 주 도입',
         category: Category.SOCIETY,
-        tags: [tag9_1, tag9_2, tag9_3],
+        tags: [tag9_1, tag9_2, tag9_3, tagRecommend],
         announcerGender: Gender.WOMEN,
         channel: Channel.MBC,
         link: 'WtuMp5G3yNo',
@@ -370,7 +381,7 @@ export const insertNewsData = async (connection) => {
       {
         title: 'WHO "여름철 원숭이두창 추가 확산 가능성"',
         category: Category.SOCIETY,
-        tags: [tag10_1, tag10_2, tag10_3],
+        tags: [tag10_1, tag10_2, tag10_3, tagRecommend],
         announcerGender: Gender.MEN,
         channel: Channel.MBC,
         link: 'nsTeNVwGRMQ',
@@ -384,7 +395,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '"청나라 말기 같다"‥\'日 선진국 탈락\' 잇단 경고',
         category: Category.WORLD,
-        tags: [tag11_1, tag11_2, tag11_3],
+        tags: [tag11_1, tag11_2, tag11_3, tagRecommend],
         announcerGender: Gender.WOMEN,
         channel: Channel.MBC,
         link: 'hhbs2rUII94',
@@ -398,7 +409,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '손님들이 건넨 술 마시고 사망…함께 있던 남성은 사고사',
         category: Category.SOCIETY,
-        tags: [tag12_1, tag12_2, tag12_3],
+        tags: [tag12_1, tag12_2, tag12_3, tagRecommend],
         announcerGender: Gender.WOMEN,
         channel: Channel.SBS,
         link: 'mDW6crrUVpA',
@@ -426,7 +437,7 @@ export const insertNewsData = async (connection) => {
       { 
         title: '누리호 2차 발사 성공.."우주시대 도약"',
         category: Category.SOCIETY,
-        tags: [tag14_1, tag14_2, tag14_3],
+        tags: [tag14_1, tag14_2, tag14_3, tagRecommend],
         announcerGender: Gender.WOMEN,
         channel: Channel.KBS,
         link: 'srjLy3NQO6w',
@@ -441,14 +452,17 @@ export const insertNewsData = async (connection) => {
 
     const news = newsRepository.create(newsInfo);
     const news2 = await newsRepository.save(news);
-    // const news3 = await newsRepository.find({
-    //   relations: ['tags'],
-    //   where: {
-    //     id: news2._id,
-    //   },
-    // });
-    console.log('>>>>>>>>>', news2);
-  // });
+    
+    for (let i in news2) {
+      // console.log(i);
+      const news3 = await newsRepository.find({
+        relations: ['tags'],
+        where: {
+          id: news2[i].id,
+        },
+      });
+      console.log(news3);
+    }
 };
 // insertNewsData();
 // 

@@ -54,6 +54,26 @@ const searchNews = async (req: Request, res: Response): Promise<void | Response>
   }
 };
 
+
+const recommendNews = async (req: Request, res: Response): Promise<void | Response> => {
+  
+  let data;
+
+  try {
+    data = await NewsService.searchRecommendNews();
+        res
+          .status(statusCode.OK)
+          .send(util.success(statusCode.OK, message.RECOMMEND_NEWS_SUCCESS, data));
+    }
+  catch (error) {
+    console.log(error);
+    res
+      .status(statusCode.INTERNAL_SERVER_ERROR)
+      .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
+  }
+};
+
 export default {
   searchNews,
+  recommendNews,
 };

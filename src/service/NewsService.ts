@@ -124,10 +124,19 @@ const searchByConditions = async (
   return [newsData, totalCount];
 };
 
+const searchRecommendNews = async () => {
+  const recommendCount: number = 8;
+  const newsRepository = await getConnectionToMySql();
+  let newsData = await newsRepository.findRecommendNews();
+  newsData = sortByDateAndTitle([newsData]);
+  return newsData.slice(0,recommendCount)
+};
+
 export default {
   searchAllNews,
   searchByCategory,
   searchByChannel,
   searchByGender,
   searchByConditions,
+  searchRecommendNews,
 };
