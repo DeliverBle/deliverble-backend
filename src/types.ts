@@ -68,15 +68,15 @@ export class SearchCondition {
 }
 
 export class KakaoRawInfo {
-  constructor(id, nickname, profile_image, email, gender) {
-    this.id = id;
+  constructor(kakaoId, nickname, profile_image, email, gender) {
+    this.kakaoId = kakaoId;
     this.nickname = nickname;
     this.profile_image = profile_image;
     this.email = email;
     this.gender = gender;
   }
 
-  id: number;
+  kakaoId: string;
   nickname: string;
   profile_image: string;
   email: string;
