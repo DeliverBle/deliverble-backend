@@ -10,9 +10,9 @@ import { ACCESS_TOKEN_INFO, CONTENT_TYPE, OAUTH_TOKEN, REQUEST_RAW_LINK } from '
 import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
 import { promisify } from 'util';
 const redisClient = require('../util/redis');
-import { Logger } from "tslog";
+import { Logger } from 'tslog';
 
-const log: Logger = new Logger({ name: "딜리버블 백엔드 짱짱" });
+const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 // TODO: DI to be implemented
 const getConnectionToUserQueryRepository = async () => {
@@ -40,7 +40,12 @@ export const doesAccessTokenExpire = async (
   accessToken: string,
   refreshToken: string,
 ): Promise<boolean> => {
-  log.info("refreshToken >>>> ", refreshToken);
+  log.info('refreshToken >>>> ', refreshToken);
+  const expire_in = await checkAccessTokenExpirySeconds(accessToken);
+  return expire_in < 0;
+};
+
+const checkAccessTokenExpirySeconds = async (accessToken: string) => {
   const { data: expireInfo } = await axios
     .get(ACCESS_TOKEN_INFO, {
       headers: {
@@ -52,7 +57,7 @@ export const doesAccessTokenExpire = async (
       return res;
     });
 
-  return expireInfo.expires_in < 0;
+  return expireInfo.expires_in;
 };
 
 export const updateAccessTokenByRefreshToken = async (refreshToken: string): Promise<string> => {
@@ -81,7 +86,7 @@ export const getKakaoRawInfo = async (
   _refreshToken: string,
 ): Promise<KakaoRawInfo> => {
   const accessToken = await doesAccessTokenExpire(_accessToken, _refreshToken);
-  log.info("accessToken >>>> ", accessToken);
+  log.info('accessToken >>>> ', accessToken);
   const { data: userInfo } = await axios
     .get(REQUEST_RAW_LINK, {
       headers: {
@@ -126,5 +131,6 @@ export default {
   loginUserWithKakao,
   findUserByEmail,
   doesAccessTokenExpire,
+  checkAccessTokenExpirySeconds,
   updateAccessTokenByRefreshToken,
 };
