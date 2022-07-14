@@ -1,5 +1,7 @@
 import passport from 'passport';
 import KakaoStrategy from 'passport-kakao';
+import { findUserByEmail, loginUserWithKakao } from '../service/UserService';
+import { isNotFoundUser, NotFoundUser } from '../entity/NotFoundUser';
 
 export default function kakaoLoginStrategy() {
   passport.use(
@@ -10,13 +12,16 @@ export default function kakaoLoginStrategy() {
         callbackURL: process.env.KAKAO_CALLBACK_URL,
       },
       async (accessToken, refreshToken, profile, done) => {
-        console.log(' >>>>>>> accessToken >>>>>>>>> ', accessToken);
-        console.log(' >>>>>>>>> refreshToken >>>>>>>>> ', refreshToken);
-        console.log(' >>>>>>>>> profile >>>>>>>>> ', profile);
+        const {
+          id,
+          username: name,
+          _json: {
+            properties: { profile_image, nickname, thumbnail_image },
+            kakao_account: { email },
+          },
+        } = profile;
         try {
-          console.log(' >>>>>>> accessToken >>>>>>>>> ', accessToken);
-          console.log(' >>>>>>>>> refreshToken >>>>>>>>> ', refreshToken);
-          console.log(' >>>>>>>>> profile >>>>>>>>> ', profile);
+          await loginUserWithKakao(email);
           done(null);
         } catch (err) {
           console.log(err);
