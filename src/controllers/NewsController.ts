@@ -54,7 +54,11 @@ const searchNews = async (req: Request, res: Response): Promise<void | Response>
   }
 };
 
-
+/**
+ * @route post / recommend
+ * @description Find news recommended by PM
+ * @access Public
+ */
 const recommendNews = async (req: Request, res: Response): Promise<void | Response> => {
   
   let data;
