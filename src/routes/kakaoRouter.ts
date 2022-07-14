@@ -2,6 +2,7 @@ import express, { Router } from 'express';
 import NewsController from '../controllers/NewsController';
 import passport from 'passport';
 import kakaoLoginStrategy from '../controllers/kakao-login';
+import UserController from "../controllers/UserController";
 
 const router: express.Router = Router();
 
@@ -9,15 +10,17 @@ const router: express.Router = Router();
 kakaoLoginStrategy();
 
 router.get('/kakao', passport.authenticate('kakao-login'));
+
 router.get(
   '/kakao/oauth',
   passport.authenticate('kakao-login', {
     failureRedirect: '/', session: false
   }),
   (req, res) => {
-    console.log('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> YE');
-    NewsController.callbackKakao(req, res).then((v) => console.log('kakao login succeeded'));
+    UserController.callbackKakao(req, res).then((v) => console.log('kakao login succeeded'));
   },
 );
+
+router.post('/login', UserController.loginUserWithKakao);
 
 export default router;
