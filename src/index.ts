@@ -3,6 +3,7 @@ import { createConnection } from 'typeorm';
 import routes from './routes';
 import {errorHandler} from './error/ErrorHandler';
 import redis from "redis";
+import {Logger} from "tslog";
 
 // redis setting
 const port = 6379;
@@ -21,11 +22,13 @@ app.use(express.urlencoded({ extended: true }));
 app.use(routes);
 app.use(errorHandler);
 
+const log: Logger = new Logger({ name: "딜리버블 백엔드 짱짱" });
+
 createConnection().then(async (connection) => {
   // await insertNewsData(connection);
   // const user = await MockUserToFavorite(connection);
 
   app.listen(8080, () => {
-    console.log('server is listening 8080');
+    log.info('Server is running on port 8080');
   });
 });

@@ -7,6 +7,12 @@ import UserNotFoundError from '../error/UserNotFoundError';
 import { KakaoRawInfo } from '../types';
 import axios from 'axios';
 import { ACCESS_TOKEN_INFO, CONTENT_TYPE, OAUTH_TOKEN, REQUEST_RAW_LINK } from '../shared/AuthLink';
+import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
+import { promisify } from 'util';
+const redisClient = require('../util/redis');
+import { Logger } from "tslog";
+
+const log: Logger = new Logger({ name: "딜리버블 백엔드 짱짱" });
 
 // TODO: DI to be implemented
 const getConnectionToUserQueryRepository = async () => {
@@ -33,7 +39,8 @@ export const findUserByEmail = async (email: string): Promise<User> => {
 export const doesAccessTokenExpire = async (
   accessToken: string,
   refreshToken: string,
-): Promise<string> => {
+): Promise<boolean> => {
+  log.info("refreshToken >>>> ", refreshToken);
   const { data: expireInfo } = await axios
     .get(ACCESS_TOKEN_INFO, {
       headers: {
@@ -45,11 +52,7 @@ export const doesAccessTokenExpire = async (
       return res;
     });
 
-  if (expireInfo.expires_in < 0) {
-    return updateAccessTokenByRefreshToken(refreshToken);
-  }
-
-  return accessToken;
+  return expireInfo.expires_in < 0;
 };
 
 export const updateAccessTokenByRefreshToken = async (refreshToken: string): Promise<string> => {
@@ -78,10 +81,11 @@ export const getKakaoRawInfo = async (
   _refreshToken: string,
 ): Promise<KakaoRawInfo> => {
   const accessToken = await doesAccessTokenExpire(_accessToken, _refreshToken);
+  log.info("accessToken >>>> ", accessToken);
   const { data: userInfo } = await axios
     .get(REQUEST_RAW_LINK, {
       headers: {
-        Authorization: 'Bearer ' + accessToken,
+        Authorization: 'Bearer ' + _accessToken,
         'Content-Type': CONTENT_TYPE,
       },
     })
@@ -92,15 +96,35 @@ export const getKakaoRawInfo = async (
   return KakaoRawInfo.toKakaoRawInfo(userInfo);
 };
 
-export const loginUserWithKakao = async (kakaoRawInfo: KakaoRawInfo): Promise<User> => {
-  const user = await findUserByEmail(kakaoRawInfo.email);
-  if (isFoundUser(user)) {
-    return user;
+export const loginUserWithKakao = async (
+  accessToken: string,
+  refreshToken: string,
+): Promise<User> => {
+  if (await doesAccessTokenExpire(accessToken, refreshToken)) {
+    throw new AccessTokenExpiredError();
   }
-  throw new UserNotFoundError();
+  const kakaoRawInfo = await getKakaoRawInfo(accessToken, refreshToken);
+  const user = await findUserByEmail(kakaoRawInfo.email);
+  if (!isFoundUser(user)) {
+    await saveRefreshTokenAtRedisMappedByUserId(user.id, refreshToken);
+    throw new UserNotFoundError();
+  }
+  await saveRefreshTokenAtRedisMappedByUserId(user.id, refreshToken);
+  return user;
+};
+
+const saveRefreshTokenAtRedisMappedByUserId = async (
+  userId: number,
+  refreshToken: string,
+): Promise<void> => {
+  promisify(redisClient.get).bind(redisClient);
+  await redisClient.set(userId, refreshToken);
+  return;
 };
 
 export default {
-    loginUserWithKakao,
-    findUserByEmail,
-}
+  loginUserWithKakao,
+  findUserByEmail,
+  doesAccessTokenExpire,
+  updateAccessTokenByRefreshToken,
+};
