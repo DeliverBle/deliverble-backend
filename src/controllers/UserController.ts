@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import UserService, {getKakaoRawInfo} from '../service/UserService';
+import UserService, { getKakaoRawInfo } from '../service/UserService';
 import { Logger } from 'tslog';
 import StatusCode from '../modules/statusCode';
 
@@ -13,7 +13,7 @@ const getTokensParsedFromBody = async (body: string) => {
   return {
     accessToken,
     refreshToken,
-    userId
+    userId,
   };
 };
 
@@ -68,7 +68,10 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
   const accessToken = tokensAndUserId.accessToken;
   const refreshToken = tokensAndUserId.refreshToken;
   const userId = tokensAndUserId.kakaoId;
-  const accessTokenExpiresIn = await UserService.checkAccessTokenExpiryTTLToRedisServer(accessToken, userId);
+  const accessTokenExpiresIn = await UserService.checkAccessTokenExpiryTTLToRedisServer(
+    accessToken,
+    userId,
+  );
   // TODO: initial callback to save refreshToken at Redis with userId
   await UserService.saveTokensAtRedisWithUserId(userId, accessToken, refreshToken);
 
@@ -123,7 +126,7 @@ const loginUserWithKakao = async (req: Request, res: Response) => {
 };
 
 const logOutUserWithKakao = async (req: Request, res: Response) => {
-  const tokensAndUserId = (await getTokensParsedFromBody(req.body));
+  const tokensAndUserId = await getTokensParsedFromBody(req.body);
   const accessToken = tokensAndUserId.accessToken;
   const userId = tokensAndUserId.userId;
 
@@ -196,13 +199,13 @@ const signUpUserWithKakao = async (req: Request, res: Response) => {
 };
 
 const refreshAccessToken = async (req: Request, res: Response) => {
-  const refreshToken = (await getTokensAndUserIdParsedFromBody(req.body)).refreshToken;
+  const accessToken = (await getTokensAndUserIdParsedFromBody(req.body)).accessToken;
   const userId = getUserIdParsedFromBody(req.body);
 
   try {
     const retrievedAccessToken = await UserService.updateAccessTokenByRefreshToken(
       userId,
-      refreshToken,
+      accessToken,
     );
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,

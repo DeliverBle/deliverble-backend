@@ -5,7 +5,7 @@ import { Suitability } from './shared/common/Suitability';
 import { Tag } from './entity/Tag';
 import { Channel } from './shared/common/Channel';
 import { User } from './entity/User';
-import {Logger} from "tslog";
+import { Logger } from 'tslog';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -152,7 +152,7 @@ export class ScriptReturnDto {
   scriptId: number;
   startTime: number;
   endTime: number;
-  text: string; 
+  text: string;
 }
 
 export class KakaoRawInfo {
@@ -203,10 +203,10 @@ export class UpdatedAccessTokenDTO {
   refresh_token?: string;
   refresh_token_expires_in?: string;
 
-  doesRetrievedRefreshTokenExist(): boolean {
+  doesRetrievedAccessOrRefreshTokenExist(): boolean {
     return (
-      this.refresh_token !== UpdatedAccessTokenDTO.NONE_TOKEN &&
-      this.refresh_token_expires_in !== UpdatedAccessTokenDTO.NONE_TOKEN
+      this.access_token !== UpdatedAccessTokenDTO.NONE_TOKEN ||
+      this.refresh_token !== UpdatedAccessTokenDTO.NONE_TOKEN
     );
   }
 }

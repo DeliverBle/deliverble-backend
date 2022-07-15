@@ -80,6 +80,31 @@ export const checkAccessTokenExpiryTTLToRedisServer = async (
   return await ttl(KEY);
 };
 
+export const getRefreshTokenByTTLOnRedisServer = async (
+    accessToken: string,
+    userId: string,
+): Promise<string> => {
+  // TODO: validate this logic in controller or additional DTO type class
+  if (!accessToken || !userId) {
+    throw new ResourceNotFoundError();
+  }
+  const ACCESS_KEY = ACCESS_TOKEN_PREFIX + userId;
+  const REFRESH_KEY = REFRESH_TOKEN_PREFIX + userId;
+
+  redisClient.get(ACCESS_KEY, (err, value) => {
+    if (!(value === accessToken)) {
+      log.debug(' >>>>>>>> accessToken not matched ', value);
+      throw new AccessTokenExpiredError();
+    }
+  })
+
+  const getAsync = promisify(redisClient.get).bind(redisClient);
+  log.debug("HHH")
+  let returnValue = await getAsync(REFRESH_KEY);
+  log.debug(returnValue);
+  return returnValue;
+};
+
 const checkAccessTokenExpirySecondsToKakaoServer = async (accessToken: string): Promise<number> => {
   log.info(' >>>>>>>> accessToken ', accessToken);
   try {
@@ -97,8 +122,9 @@ const checkAccessTokenExpirySecondsToKakaoServer = async (accessToken: string): 
 
 export const updateAccessTokenByRefreshToken = async (
   userId: string,
-  refreshToken: string,
+  accessToken: string,
 ): Promise<object> => {
+  const refreshToken = await getRefreshTokenByTTLOnRedisServer(accessToken, userId);
   const payload = new URLSearchParams();
   payload.append('grant_type', 'refresh_token');
   payload.append('refresh_token', refreshToken);
@@ -106,6 +132,7 @@ export const updateAccessTokenByRefreshToken = async (
 
   log.debug('payload >>>> ', payload);
   log.debug('userId >>>>', userId);
+  log.debug('accessToken >>>>', accessToken)
 
   const config = {
     headers: {
@@ -127,7 +154,8 @@ export const updateAccessTokenByRefreshToken = async (
   );
 
   log.info(refresh_token, refresh_token_expires_in);
-  if (updatedAccessTokenDTO.doesRetrievedRefreshTokenExist()) {
+  log.debug("updatedAccessTokenDTO ", updatedAccessTokenDTO);
+  if (updatedAccessTokenDTO.doesRetrievedAccessOrRefreshTokenExist()) {
     await updateTokensAtRedisWithUserIdWithWrappedDTO(userId, updatedAccessTokenDTO);
   }
 
@@ -145,16 +173,21 @@ export const saveTokensAtRedisWithUserId = async (
   const ACCESS_TOKEN = ACCESS_TOKEN_PREFIX
   const REFRESH_TOKEN = REFRESH_TOKEN_PREFIX
   promisify(redisClient.get).bind(redisClient);
-  await redisClient.setex(
-    ACCESS_TOKEN + userId,
-    DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
-    accessToken,
-  );
-  await redisClient.setex(
-    REFRESH_TOKEN + userId,
-    DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
-    refreshToken,
-  );
+  // TODO: move validation logic to other class
+  if (accessToken !== 'NONE') {
+    await redisClient.setex(
+        ACCESS_TOKEN + userId,
+        DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
+        accessToken,
+    );
+  }
+  if (refreshToken !== 'NONE') {
+    await redisClient.setex(
+        REFRESH_TOKEN + userId,
+        DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
+        refreshToken,
+    );
+  }
   return;
 };
 
@@ -165,6 +198,7 @@ export const updateTokensAtRedisWithUserIdWithWrappedDTO = async (
   // TODO: to be refactored; is it possible to expire each value in Redis?
   const accessToken = updatedAccessTokenDTO.access_token;
   const refreshToken = updatedAccessTokenDTO.refresh_token;
+  log.debug(" updateTokensAtRedisWithUserIdWithWrappedDTO ", accessToken, refreshToken);
   await saveTokensAtRedisWithUserId(userId, accessToken, refreshToken);
   return;
 };
