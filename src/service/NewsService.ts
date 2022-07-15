@@ -120,7 +120,7 @@ const searchByConditions = async (
   newsData = sortByDateAndTitle([newsData]);
   totalCount = newsData.length;
 
-  newsData = paginateWithOffsetAndLimit(searchCondition, newsData)
+  newsData = paginateWithOffsetAndLimit(searchCondition, newsData);
   return [newsData, totalCount];
 };
 
@@ -129,13 +129,17 @@ const searchRecommendNews = async () => {
   const newsRepository = await getConnectionToMySql();
   let newsData = await newsRepository.findRecommendNews();
   newsData = sortByDateAndTitle([newsData]);
-  return newsData.slice(0,recommendCount)
+  return newsData.slice(0, recommendCount);
 };
 
 const findNewsDetail = async (newsId: number) => {
   const newsRepository = await getConnectionToMySql();
-  let newsData = await newsRepository.findNewsDetail(newsId);
-  return newsData
+  return await newsRepository.findNewsDetail(newsId);
+};
+
+const searchByNewsId = async (newsId: string) => {
+  const newsRepository = await getConnectionToMySql();
+  return await newsRepository.findByNewsId(newsId);
 };
 
 export default {
@@ -146,4 +150,5 @@ export default {
   searchByConditions,
   searchRecommendNews,
   findNewsDetail,
+  searchByNewsId
 };
