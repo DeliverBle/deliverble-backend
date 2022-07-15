@@ -4,7 +4,7 @@ import { UserQueryRepository } from '../repository/UserQueryRepository';
 import { isNotFoundUser, NotFoundUser } from '../entity/NotFoundUser';
 import { UserCommandRepository } from '../repository/UserCommandRepository';
 import UserNotFoundError from '../error/UserNotFoundError';
-import { KakaoRawInfo, UpdatedAccessTokenDTO } from '../types';
+import { KakaoRawInfo, UpdatedAccessTokenDTO, UserFavoriteNewsReturnDTO, UserInfo } from '../types';
 import axios from 'axios';
 import {
   ACCESS_TOKEN_INFO,
@@ -16,10 +16,12 @@ import {
 } from '../shared/AuthLink';
 import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
 import { promisify } from 'util';
-const redisClient = require('../util/redis');
 import { Logger } from 'tslog';
 import AlreadyLoggedOutError from '../error/AlreadyLoggedOutError';
-import AlreadySignedUpError from "../error/AlreadySignedUpError";
+import AlreadySignedUpError from '../error/AlreadySignedUpError';
+import NewsService from './NewsService';
+
+const redisClient = require('../util/redis');
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -37,11 +39,8 @@ const getConnectionToUserCommandRepository = async () => {
 export const findUserByKakaoId = async (kakaoId: string): Promise<User> => {
   const userQueryRepository = await getConnectionToUserQueryRepository();
   try {
-    const foundUser = await userQueryRepository.findByKakaoId(kakaoId);
-    log.debug(' >>>>>>>>> foundUser using kakaoId', foundUser);
-    return foundUser;
+    return await userQueryRepository.findByKakaoId(kakaoId);
   } catch (error) {
-    log.debug(' >>>>>>>>>>>> NotFoundUser using kakaoId');
     return new NotFoundUser();
   }
 };
@@ -168,18 +167,20 @@ const verifyUserAlreadyExistsByKakaoId = async (userId: string): Promise<void> =
   if (!isNotFoundUser(await findUserByKakaoId(userId))) {
     throw new AlreadySignedUpError();
   }
-}
+};
 
 // TODO: return user entity with wrapping object DTO
 export const signUpUserWithKakao = async (accessToken: string, userId: string): Promise<User> => {
   if (await doesAccessTokenExpire(accessToken)) {
     throw new AccessTokenExpiredError();
   }
+
   await verifyUserAlreadyExistsByKakaoId(userId);
   const kakaoRawInfo = await getKakaoRawInfo(accessToken);
   const newUser = User.fromKakaoRawInfo(kakaoRawInfo);
   const userCommandRepository = await getConnectionToUserCommandRepository();
-  return await userCommandRepository.registerNewUser(newUser);
+
+  return await userCommandRepository.registerOrSaveUser(newUser);
 };
 
 // TODO: refactor by splitting to AuthService from UserService
@@ -190,7 +191,6 @@ export const doesAccessTokenExists = async (accessToken: string): Promise<boolea
 };
 
 export const logOutUserWithKakao = async (_accessToken): Promise<string> => {
-  log.debug('HELLO >>>>>>>>>>>>>>>>>>>>>> ');
   if (await doesAccessTokenExists(_accessToken)) {
     throw new AlreadyLoggedOutError();
   }
@@ -216,6 +216,55 @@ const saveRefreshTokenAtRedisMappedByUserId = async (
   return;
 };
 
+export const getAllFavoriteNewsList = async (
+  kakaoId: string,
+): Promise<UserFavoriteNewsReturnDTO> => {
+  const userQueryRepository = await getConnectionToUserQueryRepository();
+  const toBeUpdatedUser = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
+  const favoriteNews = await toBeUpdatedUser.getFavoriteNews();
+
+  return {
+    kakaoId: kakaoId,
+    favoriteNews: favoriteNews,
+  };
+};
+
+export const updateExistingUser = async (user: User): Promise<UserInfo> => {
+  const userQueryRepository = await getConnectionToUserQueryRepository();
+  const userCommandRepository = await getConnectionToUserCommandRepository();
+
+  try {
+    await userQueryRepository.findByKakaoId(user.kakaoId);
+  } catch {
+    throw new UserNotFoundError();
+  }
+
+  const returnUser = await userCommandRepository.registerOrSaveUser(user);
+  const returnUserFavoriteNews = await returnUser.favoriteNews;
+  const returnUserInfo = new UserInfo(returnUser);
+  returnUserInfo.addFavoriteNewsAfterPromiseResolved(returnUserFavoriteNews);
+
+  return returnUserInfo;
+};
+
+export const addNewFavoriteNews = async (kakaoId: string, newsId: string): Promise<UserInfo> => {
+  const userQueryRepository = await getConnectionToUserQueryRepository();
+  const pendingFavoriteNews = await NewsService.searchByNewsId(newsId);
+  const toBeUpdatedUser2 = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
+
+  await toBeUpdatedUser2.addFavoriteNews(pendingFavoriteNews);
+  return await updateExistingUser(toBeUpdatedUser2);
+};
+
+export const removeFavoriteNews = async (kakaoId: string, newsId: string): Promise<UserInfo> => {
+  const userQueryRepository = await getConnectionToUserQueryRepository();
+  const toBeforeUpdatedUser = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
+  const pendingRemovedNews = await NewsService.searchByNewsId(newsId);
+
+  const toAfterUpdatedUser = await toBeforeUpdatedUser.removeFavoriteNews(pendingRemovedNews);
+  return await updateExistingUser(toAfterUpdatedUser);
+};
+
 export default {
   loginUserWithKakao,
   signUpUserWithKakao,
@@ -226,4 +275,7 @@ export default {
   checkAccessTokenExpirySeconds,
   saveRefreshTokenAtRedisMappedByUserId,
   updateAccessTokenByRefreshToken,
+  getAllFavoriteNewsList,
+  addNewFavoriteNews,
+  removeFavoriteNews
 };

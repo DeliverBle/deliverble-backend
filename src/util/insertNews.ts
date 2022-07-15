@@ -8,6 +8,7 @@ import { Gender } from '../shared/common/Gender';
 import { Suitability } from '../shared/common/Suitability';
 import { NewsInfo } from '../types';
 import { Time } from '../vo/Time';
+import {Logger} from "tslog";
 
 // 추천 태그 생성
 let tagTestRecommend = new Tag();
@@ -219,13 +220,15 @@ tagTest14_2.name = '우주';
 let tagTest14_3 = new Tag();
 tagTest14_3.name = '누리호';
 
+const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
+
 export const insertNewsData = async (connection) => {
   // await createConnection().then(async (connection) => {
 
     // drop tables
     const queryRunner = connection.createQueryRunner();
     await queryRunner.connect();
-    console.log("queryRunner executed")
+    log.info("queryRunner executed")
     // console.log(">>>>>>", await queryRunner.hasTable("tag"))
     // if (await queryRunner.hasTable("tag")) {
     //   await queryRunner.dropTable("tag")
@@ -564,7 +567,7 @@ export const insertNewsData = async (connection) => {
           id: news2[i].id,
         },
       });
-      console.log(news3);
+      log.debug(news3);
     }
 };
 // insertNewsData();
