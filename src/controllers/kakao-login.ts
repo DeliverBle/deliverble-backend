@@ -16,7 +16,7 @@ export default function kakaoLoginStrategy() {
       },
       async (accessToken, refreshToken, profile, done) => {
         // log.debug(`accessToken`, accessToken);
-        done(null, [accessToken, refreshToken]);
+        done(null, [accessToken, refreshToken, profile._json.id]);
       },
     ),
   );
