@@ -28,7 +28,7 @@ const getTokensAndUserIdParsedFromBody = async (body: string) => {
     accessToken,
     refreshToken,
     userId,
-    newsId
+    newsId,
   };
 };
 
@@ -84,7 +84,6 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
 const loginUserWithKakao = async (req: Request, res: Response) => {
   const tokensAndUserId = await getTokensAndUserIdParsedFromBody(req.body);
   const accessToken = tokensAndUserId.accessToken;
-  const userId = tokensAndUserId.userId;
 
   log.debug(accessToken);
 
@@ -210,13 +209,13 @@ export const getAllFavoriteNewsList = async (req: Request, res: Response) => {
 };
 
 export const addFavoriteNews = async (req: Request, res: Response) => {
-  log.debug('addFavroiteNews Method Started')
+  log.debug('addFavroiteNews Method Started');
   const ids = await getTokensAndUserIdParsedFromBody(req.body);
   const userId = ids.userId;
   const newsId = ids.newsId;
   try {
     const favoriteNewsListWithUserId = await UserService.addNewFavoriteNews(userId, newsId);
-    log.debug(favoriteNewsListWithUserId)
+    log.debug(favoriteNewsListWithUserId);
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: favoriteNewsListWithUserId,
@@ -234,13 +233,13 @@ export const addFavoriteNews = async (req: Request, res: Response) => {
 };
 
 export const removeFavoriteNews = async (req: Request, res: Response) => {
-  log.debug('addFavoriteNews Method Started')
+  log.debug('addFavoriteNews Method Started');
   const ids = await getTokensAndUserIdParsedFromBody(req.body);
   const userId = ids.userId;
   const newsId = ids.newsId;
   try {
     const favoriteNewsListWithUserId = await UserService.removeFavoriteNews(userId, newsId);
-    log.debug(favoriteNewsListWithUserId)
+    log.debug(favoriteNewsListWithUserId);
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: favoriteNewsListWithUserId,
@@ -255,7 +254,7 @@ export const removeFavoriteNews = async (req: Request, res: Response) => {
       },
     });
   }
-}
+};
 
 export default {
   loginUserWithKakao,
@@ -265,5 +264,5 @@ export default {
   refreshAccessToken,
   getAllFavoriteNewsList,
   addFavoriteNews,
-  removeFavoriteNews
+  removeFavoriteNews,
 };
