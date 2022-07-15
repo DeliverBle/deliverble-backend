@@ -8,7 +8,8 @@ import { KakaoRawInfo, UpdatedAccessTokenDTO, UserFavoriteNewsReturnDTO, UserInf
 import axios from 'axios';
 import {
   ACCESS_TOKEN_INFO,
-  CONTENT_TYPE, DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
+  CONTENT_TYPE,
+  DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
   DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
   OAUTH_TOKEN,
   REQUEST_RAW_LINK,
@@ -124,11 +125,16 @@ const updateRefreshTokenAtRedisWithUserId = async (
   userId: string,
   updatedAccessTokenDTO: UpdatedAccessTokenDTO,
 ): Promise<void> => {
-  await saveTokensAtRedisMappedByUserId(
-    userId,
-    updatedAccessTokenDTO.access_token,
-    updatedAccessTokenDTO.refresh_token,
+  // TODO: to be refactored; is it possible to expire each value in Redis?
+  const REFRESH_TOKEN = 'RT ';
+  const refreshToken = updatedAccessTokenDTO.refresh_token;
+  promisify(redisClient.get).bind(redisClient);
+  await redisClient.setex(
+    REFRESH_TOKEN + userId,
+    DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
+    refreshToken,
   );
+  return;
 };
 
 export const getKakaoRawInfo = async (_accessToken: string): Promise<KakaoRawInfo> => {
@@ -211,20 +217,6 @@ export const logOutUserWithKakao = async (_accessToken): Promise<string> => {
   return id;
 };
 
-const saveTokensAtRedisMappedByUserId = async (
-  userId: string,
-  accessToken: string,
-  refreshToken: string,
-): Promise<void> => {
-  // TODO: to be refactored; is it possible to expire each value in Redis?
-  const ACCESS_TOKEN = 'AT ';
-  const REFRESH_TOKEN = 'RT ';
-  promisify(redisClient.get).bind(redisClient);
-  await redisClient.setex(ACCESS_TOKEN + userId, DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS, accessToken);
-  await redisClient.setex(REFRESH_TOKEN + userId, DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS, refreshToken);
-  return;
-};
-
 export const getAllFavoriteNewsList = async (
   kakaoId: string,
 ): Promise<UserFavoriteNewsReturnDTO> => {
@@ -282,7 +274,6 @@ export default {
   getKakaoRawInfo,
   doesAccessTokenExpire,
   checkAccessTokenExpirySeconds,
-  saveRefreshTokenAtRedisMappedByUserId: saveTokensAtRedisMappedByUserId,
   updateAccessTokenByRefreshToken,
   getAllFavoriteNewsList,
   addNewFavoriteNews,
