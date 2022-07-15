@@ -1,9 +1,11 @@
 import { News } from "../entity/News";
 import { Script } from "../entity/Script";
 import { Time } from "../vo/Time";
+import {Logger} from "tslog";
+
+const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 // 뉴스 별 스크립트 생성
-
 
 export const insertScriptData = async (connection) => {
 
@@ -33,11 +35,11 @@ export const insertScriptData = async (connection) => {
             id: scripts[i].news_id,
           },
         });
-        console.log(scripts[i].news_id);
-        console.log(news);
+        log.debug(scripts[i].news_id);
+        log.debug(news);
         // console.log(scripts1[i].news_id)
         // console.log(scripts2[i].news_id)
-        console.log(scripts3);
+        log.debug(scripts3);
       }
   };
 
