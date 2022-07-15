@@ -8,6 +8,7 @@ const message = {
   DUPLICATE_ENTRY: '이미 회원가입을 하였습니다.',
   ALREADY_LOGGED_OUT: '이미 로그아웃을 하였습니다.',
   ACCESS_TOKEN_EXPIRED: '액세스 토큰이 만료되었습니다.',
+  ALREADY_SIGNED_UP: '이미 회원가입을 하였습니다.',
 
   // 뉴스
   SEARCH_NEWS_SUCCESS: '영상 검색 결과 조회 성공',
