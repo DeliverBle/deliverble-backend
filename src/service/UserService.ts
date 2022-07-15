@@ -19,6 +19,7 @@ import { promisify } from 'util';
 const redisClient = require('../util/redis');
 import { Logger } from 'tslog';
 import AlreadyLoggedOutError from '../error/AlreadyLoggedOutError';
+import AlreadySignedUpError from "../error/AlreadySignedUpError";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -60,11 +61,6 @@ export const findUserByEmail = async (email: string): Promise<User> => {
 export const doesAccessTokenExpire = async (accessToken: string): Promise<boolean> => {
   log.debug(' before expiry seconds validation ', accessToken);
   const expire_in: number = await checkAccessTokenExpirySeconds(accessToken);
-  // TODO : 에러 핸들러가 안먹혀서 지금 임시 방편으로 이렇게 해놓음
-  if (expire_in['code'] !== undefined) {
-    return true;
-  }
-  log.debug(' >>>>>>>>>>>>>>>>>> exprire_in < 0', expire_in < 0);
   return expire_in < 0;
 };
 
@@ -79,9 +75,7 @@ const checkAccessTokenExpirySeconds = async (accessToken: string): Promise<numbe
     });
     return expireInfo.expires_in;
   } catch (err) {
-    // TODO: 여기도 에러 핸들러가 안먹는데...
-    log.error(err.response.data);
-    return err.response.data;
+    throw new AccessTokenExpiredError();
   }
 };
 
@@ -135,7 +129,6 @@ const updateRefreshTokenAtRedisWithUserId = async (
 };
 
 export const getKakaoRawInfo = async (_accessToken: string): Promise<KakaoRawInfo> => {
-  log.info(' >>>>> ____accessToken ', _accessToken);
   const accessToken = await doesAccessTokenExpire(_accessToken);
   if (accessToken) {
     throw new AccessTokenExpiredError();
@@ -161,8 +154,6 @@ export const loginUserWithKakao = async (accessToken: string): Promise<User> => 
     throw new AccessTokenExpiredError();
   }
   const kakaoRawInfo = await getKakaoRawInfo(accessToken);
-  // TODO: 카카오에서 넘겨주는 user_id로 중복성 체크
-  // const user = await findUserByEmail(kakaoRawInfo.email);
   const user = await findUserByKakaoId(kakaoRawInfo.kakaoId);
   log.debug(' findUserByKakaoId USER >>>> ', user);
   log.debug(' isNotFoundUser ', isNotFoundUser(user));
@@ -173,10 +164,18 @@ export const loginUserWithKakao = async (accessToken: string): Promise<User> => 
   return user;
 };
 
-export const signUpUserWithKakao = async (accessToken) => {
+const verifyUserAlreadyExistsByKakaoId = async (userId: string): Promise<void> => {
+  if (!isNotFoundUser(await findUserByKakaoId(userId))) {
+    throw new AlreadySignedUpError();
+  }
+}
+
+// TODO: return user entity with wrapping object DTO
+export const signUpUserWithKakao = async (accessToken: string, userId: string): Promise<User> => {
   if (await doesAccessTokenExpire(accessToken)) {
     throw new AccessTokenExpiredError();
   }
+  await verifyUserAlreadyExistsByKakaoId(userId);
   const kakaoRawInfo = await getKakaoRawInfo(accessToken);
   const newUser = User.fromKakaoRawInfo(kakaoRawInfo);
   const userCommandRepository = await getConnectionToUserCommandRepository();
@@ -187,11 +186,6 @@ export const signUpUserWithKakao = async (accessToken) => {
 export const doesAccessTokenExists = async (accessToken: string): Promise<boolean> => {
   log.debug(' before expiry seconds validation ', accessToken);
   const expire_in: number = await checkAccessTokenExpirySeconds(accessToken);
-  // TODO : 에러 핸들러가 안먹혀서 지금 임시 방편으로 이렇게 해놓음
-  if (expire_in['code'] !== undefined) {
-    return true;
-  }
-  log.debug(' >>>>>>>>>>>>>>>>>> exprire_in < 0', expire_in < 0);
   return expire_in < 0;
 };
 
