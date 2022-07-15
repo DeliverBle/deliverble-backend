@@ -55,4 +55,8 @@ export class NewsQueryRepository extends Repository<News> {
       .where('news.id = :newsId', { newsId })
       .getOne();
   }
+
+  async findByNewsId(newsId: string) {
+    return this.createQueryBuilder('news').where('news.id = :newsId', { newsId }).getOneOrFail();
+  }
 }
