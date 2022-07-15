@@ -152,7 +152,7 @@ export const getKakaoRawInfo = async (_accessToken: string): Promise<KakaoRawInf
   return kakaoRawInfo;
 };
 
-export const loginUserWithKakao = async (accessToken: string): Promise<User> => {
+export const loginUserWithKakao = async (accessToken: string): Promise<UserInfo> => {
   if (await doesAccessTokenExpire(accessToken)) {
     throw new AccessTokenExpiredError();
   }
@@ -164,7 +164,7 @@ export const loginUserWithKakao = async (accessToken: string): Promise<User> => 
     log.warn('NOT FOUND USER ', user);
     throw new UserNotFoundError();
   }
-  return user;
+  return new UserInfo(user);
 };
 
 const verifyUserAlreadyExistsByKakaoId = async (userId: string): Promise<void> => {
