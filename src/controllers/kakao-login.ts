@@ -1,6 +1,8 @@
 import passport from 'passport';
 import KakaoStrategy from 'passport-kakao';
 import { Logger } from 'tslog';
+require("dotenv").config();
+
 
 const log: Logger = new Logger({ name: '카카오 로그인 좀 되자!' });
 
