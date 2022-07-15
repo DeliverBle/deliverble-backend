@@ -50,12 +50,21 @@ export class NewsQueryRepository extends Repository<News> {
       .getMany();
   }
 
-  // announcerGender가 일치하는 속하는 모든 News 조회
+  // 추천 뉴스 조회
   findRecommendNews() {
     return this.createQueryBuilder('news')
       .leftJoinAndSelect("news.tags", "tags")
       .where('tags.name = :name', { name: '딜리버블 추천' })
       .getMany();
+  }
+
+  // newsId가 일치하는 News의 모든 정보 조회
+  findNewsDetail(newsId: number) {
+    return this.createQueryBuilder('news')
+      .leftJoinAndSelect("news.tags", "tags")
+      .leftJoinAndSelect("news.scripts", "scripts")
+      .where('news.id = :newsId', { newsId })
+      .getOne();
   }
 
 }

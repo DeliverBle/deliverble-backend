@@ -132,6 +132,12 @@ const searchRecommendNews = async () => {
   return newsData.slice(0,recommendCount)
 };
 
+const findNewsDetail = async (newsId: number) => {
+  const newsRepository = await getConnectionToMySql();
+  let newsData = await newsRepository.findNewsDetail(newsId);
+  return newsData
+};
+
 export default {
   searchAllNews,
   searchByCategory,
@@ -139,4 +145,5 @@ export default {
   searchByGender,
   searchByConditions,
   searchRecommendNews,
+  findNewsDetail,
 };

@@ -16,6 +16,7 @@ import { Suitability } from '../shared/common/Suitability';
 import { Tag } from './Tag';
 import { NewsInfo } from '../types';
 import { Channel } from '../shared/common/Channel';
+import { Script } from './Script';
 
 @Entity()
 export class News extends BaseEntity {
@@ -38,6 +39,12 @@ export class News extends BaseEntity {
     onDelete: "CASCADE"
   })
   tags: Tag[];
+
+  @OneToMany(() => Script, (script) => script.news, {
+    cascade: true,
+    onDelete: "CASCADE"
+  })
+  scripts: Script[];
 
   @Column({
     type: 'enum',

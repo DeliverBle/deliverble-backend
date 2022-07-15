@@ -5,5 +5,6 @@ const router: express.Router = Router();
 
 router.post('/search', NewsController.searchNews);
 router.get('/recommend', NewsController.recommendNews);
+router.get('/detail/:newsId', NewsController.newsDetail);
 
 export default router;

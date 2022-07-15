@@ -67,6 +67,13 @@ export class SearchCondition {
   }
 }
 
+export interface Script {
+  scriptId: number;
+  startTime: Time;
+  endTime: Time;
+  text: string;
+}
+
 export class KakaoRawInfo {
   constructor(kakaoId, nickname, profile_image, email, gender) {
     this.kakaoId = kakaoId;
