@@ -61,9 +61,6 @@ export class User extends BaseEntity {
   @AfterLoad()
   async nullChecks() {
     const NO_EMAIL = "NO_EMAIL";
-    // if (!this.favoriteNews) {
-    //   this.favoriteNews = [];
-    // }
     if (!this.email) {
       log.info("User denied to provide email information")
       this.email = NO_EMAIL
@@ -71,9 +68,16 @@ export class User extends BaseEntity {
   }
 
   public addFavoriteNews = async (news: News) => {
-    console.log('>>> favoriteNews ', this.favoriteNews);
     const favoriteNewsList = await this.favoriteNews;
     favoriteNewsList.push(news);
+    return this;
+  };
+
+  public removeFavoriteNews = async (toBeDeletedNews: News) => {
+    const favoriteNewsList = await this.favoriteNews;
+    this.favoriteNews = Promise.resolve(favoriteNewsList.filter((nowIteratedNews) => {
+      return nowIteratedNews.id !== toBeDeletedNews.id;
+    }));
     return this;
   };
 
