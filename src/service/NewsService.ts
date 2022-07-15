@@ -141,7 +141,7 @@ const searchRecommendNews = async () => {
     newsDataReturn.push(news);
   }
   newsDataReturn = sortByDateAndTitle([newsDataReturn]);
-  return newsDataReturn.slice(0,recommendCount)
+  return newsDataReturn.slice(0, recommendCount)
 };
 
 const findNewsDetail = async (newsId: number): Promise<NewsScriptReturnDTO> => {
@@ -159,6 +159,11 @@ const findNewsDetail = async (newsId: number): Promise<NewsScriptReturnDTO> => {
   return newsScriptData;
 };
 
+const searchByNewsId = async (newsId: string) => {
+  const newsRepository = await getConnectionToMySql();
+  return await newsRepository.findByNewsId(newsId);
+};
+
 
 export default {
   searchAllNews,
@@ -168,4 +173,5 @@ export default {
   searchByConditions,
   searchRecommendNews,
   findNewsDetail,
-}
+  searchByNewsId
+};

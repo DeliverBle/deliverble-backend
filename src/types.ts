@@ -4,6 +4,7 @@ import { Time } from './vo/Time';
 import { Suitability } from './shared/common/Suitability';
 import { Tag } from './entity/Tag';
 import { Channel } from './shared/common/Channel';
+import { User } from './entity/User';
 
 export interface ConditionList {
   channels: boolean;
@@ -178,6 +179,7 @@ export class KakaoRawInfo {
 
 export class UpdatedAccessTokenDTO {
   static NONE_TOKEN = 'NONE';
+
   constructor(
     _access_token: string,
     _expires_in: string,
@@ -191,6 +193,7 @@ export class UpdatedAccessTokenDTO {
       ? UpdatedAccessTokenDTO.NONE_TOKEN
       : _refresh_token_expires_in;
   }
+
   access_token: string;
   expires_in: string;
   // TODO: NONE이면 반환하지 않는 방법 고민해보기
@@ -203,4 +206,29 @@ export class UpdatedAccessTokenDTO {
       this.refresh_token_expires_in !== UpdatedAccessTokenDTO.NONE_TOKEN
     );
   }
+}
+
+export class UserInfo {
+  constructor(user: User) {
+    this.kakaoId = user.kakaoId;
+    this.nickname = user.nickname;
+    this.email = user.email;
+    this.gender = user.gender;
+  }
+  kakaoId: string;
+  nickname: string;
+  email: string;
+  gender: string;
+  favoriteNews?: NewsInfo[] | Promise<NewsInfo[]>;
+
+  addFavoriteNewsAfterPromiseResolved(_favoriteNews: NewsInfo[] | Promise<NewsInfo[]>) {
+    this.favoriteNews = _favoriteNews;
+    return this.favoriteNews;
+  }
+}
+
+export interface UserFavoriteNewsReturnDTO {
+  readonly kakaoId: string;
+  // EAGER LOADING | LAZY LOADING
+  readonly favoriteNews: NewsInfo[] | Promise<NewsInfo[]>;
 }
