@@ -43,6 +43,35 @@ export interface NewsInfo {
   reportDate: Date;
 }
 
+export class NewsReturnDTO {
+  constructor(newsInfo: NewsInfo) {
+    this.title = newsInfo.title;
+    this.category = newsInfo.category;
+    this.tags = newsInfo.tags;
+    this.announcerGender = newsInfo.announcerGender;
+    this.channel = newsInfo.channel;
+    this.link = newsInfo.link;
+    this.thumbnail = newsInfo.thumbnail;
+    this.suitability = newsInfo.suitability;
+    this.isEmbeddable = newsInfo.isEmbeddable;
+    this.reportDate = newsInfo.reportDate;
+    this.startTime = Time.toNumber(newsInfo.startTime);
+    this.endTime = Time.toNumber(newsInfo.endTime);
+  }
+  title: string;
+  category: Category;
+  tags: Tag[];
+  announcerGender: Gender;
+  channel: Channel;
+  link: string;
+  thumbnail: string;
+  suitability: Suitability;
+  isEmbeddable: boolean;
+  reportDate: Date;
+  startTime: number;
+  endTime: number;
+}
+
 export class SearchCondition {
   constructor(_channels, _categories, _announcerGender, _currentPage, _listSize) {
     this.channels = _channels;
