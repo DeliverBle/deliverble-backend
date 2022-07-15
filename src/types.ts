@@ -29,6 +29,7 @@ export const hasFindAll = (conditionList: ConditionList): boolean => {
 };
 
 export interface NewsInfo {
+  id: number;
   title: string;
   category: Category;
   tags: Tag[];
@@ -45,22 +46,23 @@ export interface NewsInfo {
 
 export class NewsReturnDTO {
   constructor(newsInfo: NewsInfo) {
+    this.id = newsInfo.id;
     this.title = newsInfo.title;
     this.category = newsInfo.category;
-    this.tags = newsInfo.tags;
     this.announcerGender = newsInfo.announcerGender;
     this.channel = newsInfo.channel;
     this.link = newsInfo.link;
     this.thumbnail = newsInfo.thumbnail;
+    this.startTime = Time.toNumber(newsInfo.startTime);
+    this.endTime = Time.toNumber(newsInfo.endTime);
     this.suitability = newsInfo.suitability;
     this.isEmbeddable = newsInfo.isEmbeddable;
     this.reportDate = newsInfo.reportDate;
-    this.startTime = Time.toNumber(newsInfo.startTime);
-    this.endTime = Time.toNumber(newsInfo.endTime);
+    this.tags = newsInfo.tags;
   }
+  id: number;
   title: string;
   category: Category;
-  tags: Tag[];
   announcerGender: Gender;
   channel: Channel;
   link: string;
@@ -70,6 +72,7 @@ export class NewsReturnDTO {
   reportDate: Date;
   startTime: number;
   endTime: number;
+  tags: Tag[];
 }
 
 export class SearchCondition {
