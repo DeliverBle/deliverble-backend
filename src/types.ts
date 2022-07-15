@@ -4,6 +4,7 @@ import { Time } from './vo/Time';
 import { Suitability } from './shared/common/Suitability';
 import { Tag } from './entity/Tag';
 import { Channel } from './shared/common/Channel';
+import { User } from './entity/User';
 
 export interface ConditionList {
   channels: boolean;
@@ -130,7 +131,27 @@ export class UpdatedAccessTokenDTO {
   }
 }
 
+export class UserInfo {
+  constructor(user: User) {
+    this.kakaoId = user.kakaoId;
+    this.nickname = user.nickname;
+    this.email = user.email;
+    this.gender = user.gender;
+  }
+  kakaoId: string;
+  nickname: string;
+  email: string;
+  gender: string;
+  favoriteNews?: NewsInfo[] | Promise<NewsInfo[]>;
+
+  addFavoriteNewsAfterPromiseResolved(_favoriteNews: NewsInfo[] | Promise<NewsInfo[]>) {
+    this.favoriteNews = _favoriteNews;
+    return this.favoriteNews;
+  }
+}
+
 export interface UserFavoriteNewsReturnDTO {
   readonly kakaoId: string;
-  readonly favoriteNews: NewsInfo[];
+  // EAGER LOADING | LAZY LOADING
+  readonly favoriteNews: NewsInfo[] | Promise<NewsInfo[]>;
 }
