@@ -236,7 +236,7 @@ export const addFavoriteNews = async (req: Request, res: Response) => {
 };
 
 export const removeFavoriteNews = async (req: Request, res: Response) => {
-  log.debug('addFavroiteNews Method Started')
+  log.debug('addFavoriteNews Method Started')
   const ids = await getTokensAndUserIdParsedFromBody(req.body);
   const userId = ids.userId;
   const newsId = ids.newsId;
