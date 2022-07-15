@@ -4,7 +4,7 @@ import { UserQueryRepository } from '../repository/UserQueryRepository';
 import { isNotFoundUser, NotFoundUser } from '../entity/NotFoundUser';
 import { UserCommandRepository } from '../repository/UserCommandRepository';
 import UserNotFoundError from '../error/UserNotFoundError';
-import { KakaoRawInfo, UpdatedAccessTokenDTO } from '../types';
+import {KakaoRawInfo, UpdatedAccessTokenDTO, UserFavoriteNewsReturnDTO} from '../types';
 import axios from 'axios';
 import {
   ACCESS_TOKEN_INFO,
@@ -216,6 +216,14 @@ const saveRefreshTokenAtRedisMappedByUserId = async (
   return;
 };
 
+export const getAllFavoriteNewsList = async (userId: string): Promise<UserFavoriteNewsReturnDTO> => {
+  const user = await findUserByKakaoId(userId);
+  return {
+    kakaoId: user.kakaoId,
+    favoriteNews: user.favoriteNews,
+  }
+}
+
 export default {
   loginUserWithKakao,
   signUpUserWithKakao,
@@ -226,4 +234,5 @@ export default {
   checkAccessTokenExpirySeconds,
   saveRefreshTokenAtRedisMappedByUserId,
   updateAccessTokenByRefreshToken,
+  getAllFavoriteNewsList
 };
