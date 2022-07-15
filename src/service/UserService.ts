@@ -112,7 +112,7 @@ export const updateAccessTokenByRefreshToken = async (
 
   log.info(refresh_token, refresh_token_expires_in);
   if (updatedAccessTokenDTO.doesRetrievedRefreshTokenExist()) {
-    await updateRefreshTokenAtRedisWithUserId(userId, updatedAccessTokenDTO);
+    await updateTokensAtRedisWithUserIdWithWrappedDTO(userId, updatedAccessTokenDTO);
   }
 
   return {
@@ -121,19 +121,35 @@ export const updateAccessTokenByRefreshToken = async (
   };
 };
 
-const updateRefreshTokenAtRedisWithUserId = async (
+export const saveTokensAtRedisWithUserId = async (
+    userId: string,
+    accessToken: string,
+    refreshToken: string
+): Promise<void> => {
+  const ACCESS_TOKEN = 'AT ';
+  const REFRESH_TOKEN = 'RT ';
+  promisify(redisClient.get).bind(redisClient);
+  await redisClient.setex(
+      ACCESS_TOKEN + userId,
+      DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
+      accessToken,
+  );
+  await redisClient.setex(
+      REFRESH_TOKEN + userId,
+      DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
+      refreshToken,
+  );
+  return;
+}
+
+export const updateTokensAtRedisWithUserIdWithWrappedDTO = async (
   userId: string,
   updatedAccessTokenDTO: UpdatedAccessTokenDTO,
 ): Promise<void> => {
   // TODO: to be refactored; is it possible to expire each value in Redis?
-  const REFRESH_TOKEN = 'RT ';
+  const accessToken = updatedAccessTokenDTO.access_token;
   const refreshToken = updatedAccessTokenDTO.refresh_token;
-  promisify(redisClient.get).bind(redisClient);
-  await redisClient.setex(
-    REFRESH_TOKEN + userId,
-    DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
-    refreshToken,
-  );
+  await saveTokensAtRedisWithUserId(userId, accessToken, refreshToken);
   return;
 };
 
@@ -274,7 +290,8 @@ export default {
   getKakaoRawInfo,
   doesAccessTokenExpire,
   checkAccessTokenExpirySeconds,
-  updateRefreshTokenAtRedisWithUserId,
+  updateTokensAtRedisWithUserIdWithWrappedDTO,
+  saveTokensAtRedisWithUserId,
   updateAccessTokenByRefreshToken,
   getAllFavoriteNewsList,
   addNewFavoriteNews,

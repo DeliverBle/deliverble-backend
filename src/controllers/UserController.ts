@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import UserService, { getKakaoRawInfo } from '../service/UserService';
+import UserService, { getKakaoRawInfo, saveTokensAtRedisWithUserId } from '../service/UserService';
 import { Logger } from 'tslog';
 import StatusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
@@ -67,7 +67,7 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
   const userId = tokensAndUserId.kakaoId;
   const accessTokenExpiresIn = await UserService.checkAccessTokenExpirySeconds(accessToken);
   // TODO: initial callback to save refreshToken at Redis with userId
-  await UserService.updateRefreshTokenAtRedisWithUserId(userId, refreshToken);
+  await UserService.saveTokensAtRedisWithUserId(userId, accessToken, refreshToken);
 
   log.debug(accessToken, refreshToken, accessTokenExpiresIn, userId);
 
