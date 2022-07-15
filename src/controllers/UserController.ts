@@ -37,22 +37,22 @@ const getTokensAndUserIdParsedFromHeader = async (req: any) => {
   const accessToken = req.header('access_token');
   const refreshToken = req.header('refresh_token');
   // TODO: 생각보다 컨트롤러가 비대한데... 책임을 분리할 방법은 없을까...
-  const userId = (await getKakaoRawInfo(accessToken)).kakaoId;
+  const kakaoId = (await getKakaoRawInfo(accessToken)).kakaoId;
   return {
     accessToken,
     refreshToken,
-    userId,
+    kakaoId,
   };
 };
 
 const getTokensAndIdCallbackFromKakao = async (req: Request) => {
   const accessToken = req['user'][0];
   const refreshToken = req['user'][1];
-  const userId = (await getKakaoRawInfo(accessToken)).kakaoId;
+  const kakaoId = (await getKakaoRawInfo(accessToken)).kakaoId;
   return {
     accessToken,
     refreshToken,
-    userId,
+    kakaoId,
   };
 };
 
@@ -64,7 +64,7 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
   const tokensAndUserId = await getTokensAndIdCallbackFromKakao(req);
   const accessToken = tokensAndUserId.accessToken;
   const refreshToken = tokensAndUserId.refreshToken;
-  const userId = tokensAndUserId.userId;
+  const userId = tokensAndUserId.kakaoId;
   const accessTokenExpiresIn = await UserService.checkAccessTokenExpirySeconds(accessToken);
   await UserService.saveRefreshTokenAtRedisMappedByUserId(userId, accessToken, refreshToken);
 
@@ -74,11 +74,8 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
     status: StatusCode.OK,
     message: {
       accessToken: accessToken,
-      refreshToken: refreshToken,
+      expired_in: accessTokenExpiresIn,
       userId,
-      expired_in: {
-        accessTokenInSeconds: accessTokenExpiresIn,
-      },
     },
   });
 };
@@ -192,9 +189,9 @@ const refreshAccessToken = async (req: Request, res: Response) => {
 };
 
 export const getAllFavoriteNewsList = async (req: Request, res: Response) => {
-  const userId = (await getTokensAndUserIdParsedFromHeader(req)).userId;
+  const kakaoId = (await getTokensAndUserIdParsedFromHeader(req)).kakaoId;
   try {
-    const favoriteNewsListWithUserId = await UserService.getAllFavoriteNewsList(userId);
+    const favoriteNewsListWithUserId = await UserService.getAllFavoriteNewsList(kakaoId);
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: favoriteNewsListWithUserId,
