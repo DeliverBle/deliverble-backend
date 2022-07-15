@@ -1,26 +1,28 @@
-import { User } from '../entity/User';
-import { getConnection } from 'typeorm';
-import { UserQueryRepository } from '../repository/UserQueryRepository';
-import { isNotFoundUser, NotFoundUser } from '../entity/NotFoundUser';
-import { UserCommandRepository } from '../repository/UserCommandRepository';
+import {User} from '../entity/User';
+import {getConnection} from 'typeorm';
+import {UserQueryRepository} from '../repository/UserQueryRepository';
+import {isNotFoundUser, NotFoundUser} from '../entity/NotFoundUser';
+import {UserCommandRepository} from '../repository/UserCommandRepository';
 import UserNotFoundError from '../error/UserNotFoundError';
-import { KakaoRawInfo, UpdatedAccessTokenDTO, UserFavoriteNewsReturnDTO, UserInfo } from '../types';
+import {KakaoRawInfo, UpdatedAccessTokenDTO, UserFavoriteNewsReturnDTO, UserInfo} from '../types';
 import axios from 'axios';
 import {
   ACCESS_TOKEN_INFO,
+  ACCESS_TOKEN_PREFIX,
   CONTENT_TYPE,
   DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
   DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
-  OAUTH_TOKEN,
+  OAUTH_TOKEN, REFRESH_TOKEN_PREFIX,
   REQUEST_RAW_LINK,
   USER_LOGOUT_LINK,
 } from '../shared/AuthLink';
 import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
-import { promisify } from 'util';
-import { Logger } from 'tslog';
+import {promisify} from 'util';
+import {Logger} from 'tslog';
 import AlreadyLoggedOutError from '../error/AlreadyLoggedOutError';
 import AlreadySignedUpError from '../error/AlreadySignedUpError';
 import NewsService from './NewsService';
+import ResourceNotFoundError from "../error/ResourceNotFoundError";
 
 const redisClient = require('../util/redis');
 
@@ -58,13 +60,27 @@ export const findUserByEmail = async (email: string): Promise<User> => {
 };
 
 // TODO: refactor by splitting to AuthService from UserService
-export const doesAccessTokenExpire = async (accessToken: string): Promise<boolean> => {
+export const doesAccessTokenExpire = async (accessToken: string, userId: string): Promise<boolean> => {
   log.debug(' before expiry seconds validation ', accessToken);
-  const expire_in: number = await checkAccessTokenExpirySeconds(accessToken);
+  const expire_in: number = await checkAccessTokenExpiryTTLToRedisServer(accessToken, userId);
+  log.debug(' expire_in ', expire_in)
   return expire_in < 0;
 };
 
-const checkAccessTokenExpirySeconds = async (accessToken: string): Promise<number> => {
+export const checkAccessTokenExpiryTTLToRedisServer = async (
+  accessToken: string,
+  userId: string,
+): Promise<number> => {
+  // TODO: validate this logic in controller or additional DTO type class
+  if (!accessToken || !userId) {
+    throw new ResourceNotFoundError();
+  }
+  const KEY = ACCESS_TOKEN_PREFIX + userId;
+  const ttl = promisify(redisClient.ttl).bind(redisClient);
+  return await ttl(KEY);
+};
+
+const checkAccessTokenExpirySecondsToKakaoServer = async (accessToken: string): Promise<number> => {
   log.info(' >>>>>>>> accessToken ', accessToken);
   try {
     const { data: expireInfo } = await axios.get(ACCESS_TOKEN_INFO, {
@@ -122,25 +138,25 @@ export const updateAccessTokenByRefreshToken = async (
 };
 
 export const saveTokensAtRedisWithUserId = async (
-    userId: string,
-    accessToken: string,
-    refreshToken: string
+  userId: string,
+  accessToken: string,
+  refreshToken: string,
 ): Promise<void> => {
-  const ACCESS_TOKEN = 'AT ';
-  const REFRESH_TOKEN = 'RT ';
+  const ACCESS_TOKEN = ACCESS_TOKEN_PREFIX
+  const REFRESH_TOKEN = REFRESH_TOKEN_PREFIX
   promisify(redisClient.get).bind(redisClient);
   await redisClient.setex(
-      ACCESS_TOKEN + userId,
-      DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
-      accessToken,
+    ACCESS_TOKEN + userId,
+    DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
+    accessToken,
   );
   await redisClient.setex(
-      REFRESH_TOKEN + userId,
-      DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
-      refreshToken,
+    REFRESH_TOKEN + userId,
+    DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
+    refreshToken,
   );
   return;
-}
+};
 
 export const updateTokensAtRedisWithUserIdWithWrappedDTO = async (
   userId: string,
@@ -153,8 +169,8 @@ export const updateTokensAtRedisWithUserIdWithWrappedDTO = async (
   return;
 };
 
-export const getKakaoRawInfo = async (_accessToken: string): Promise<KakaoRawInfo> => {
-  const accessToken = await doesAccessTokenExpire(_accessToken);
+export const getKakaoRawInfo = async (_accessToken: string, userId: string): Promise<KakaoRawInfo> => {
+  const accessToken = await doesAccessTokenExpire(_accessToken, userId);
   if (accessToken) {
     throw new AccessTokenExpiredError();
   }
@@ -174,11 +190,11 @@ export const getKakaoRawInfo = async (_accessToken: string): Promise<KakaoRawInf
   return kakaoRawInfo;
 };
 
-export const loginUserWithKakao = async (accessToken: string): Promise<UserInfo> => {
-  if (await doesAccessTokenExpire(accessToken)) {
+export const loginUserWithKakao = async (accessToken: string, userId: string): Promise<UserInfo> => {
+  if (await doesAccessTokenExpire(accessToken, userId)) {
     throw new AccessTokenExpiredError();
   }
-  const kakaoRawInfo = await getKakaoRawInfo(accessToken);
+  const kakaoRawInfo = await getKakaoRawInfo(accessToken, userId);
   const user = await findUserByKakaoId(kakaoRawInfo.kakaoId);
   log.debug(' findUserByKakaoId USER >>>> ', user);
   log.debug(' isNotFoundUser ', isNotFoundUser(user));
@@ -197,12 +213,12 @@ const verifyUserAlreadyExistsByKakaoId = async (userId: string): Promise<void> =
 
 // TODO: return user entity with wrapping object DTO
 export const signUpUserWithKakao = async (accessToken: string, userId: string): Promise<User> => {
-  if (await doesAccessTokenExpire(accessToken)) {
+  if (await doesAccessTokenExpire(accessToken, userId)) {
     throw new AccessTokenExpiredError();
   }
 
   await verifyUserAlreadyExistsByKakaoId(userId);
-  const kakaoRawInfo = await getKakaoRawInfo(accessToken);
+  const kakaoRawInfo = await getKakaoRawInfo(accessToken, userId);
   const newUser = User.fromKakaoRawInfo(kakaoRawInfo);
   const userCommandRepository = await getConnectionToUserCommandRepository();
 
@@ -210,14 +226,14 @@ export const signUpUserWithKakao = async (accessToken: string, userId: string): 
 };
 
 // TODO: refactor by splitting to AuthService from UserService
-export const doesAccessTokenExists = async (accessToken: string): Promise<boolean> => {
+export const doesAccessTokenExists = async (accessToken: string, userId: string): Promise<boolean> => {
   log.debug(' before expiry seconds validation ', accessToken);
-  const expire_in: number = await checkAccessTokenExpirySeconds(accessToken);
+  const expire_in: number = await checkAccessTokenExpiryTTLToRedisServer(accessToken, userId);
   return expire_in < 0;
 };
 
-export const logOutUserWithKakao = async (_accessToken): Promise<string> => {
-  if (await doesAccessTokenExists(_accessToken)) {
+export const logOutUserWithKakao = async (_accessToken: string, _userId: string): Promise<string> => {
+  if (await doesAccessTokenExists(_accessToken, _userId)) {
     throw new AlreadyLoggedOutError();
   }
   const { data: id } = await axios
@@ -289,8 +305,8 @@ export default {
   findUserByEmail,
   getKakaoRawInfo,
   doesAccessTokenExpire,
-  checkAccessTokenExpirySeconds,
   updateTokensAtRedisWithUserIdWithWrappedDTO,
+  checkAccessTokenExpiryTTLToRedisServer,
   saveTokensAtRedisWithUserId,
   updateAccessTokenByRefreshToken,
   getAllFavoriteNewsList,
