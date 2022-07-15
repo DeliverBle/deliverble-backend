@@ -21,6 +21,7 @@ export class User extends BaseEntity {
     this.kakaoId = _kakaoId;
     this.nickname = _nickname;
     this.email = _email;
+    log.info(_gender);
     this.gender = determineGenderByGivenString(_gender);
   }
 
@@ -41,7 +42,11 @@ export class User extends BaseEntity {
   })
   email: string;
 
-  @Column()
+  @Column({
+    type: "enum",
+    enum: Gender,
+    default: Gender.UNSPECIFIED
+  })
   gender: Gender;
 
   @ManyToMany(() => News, { eager: false })
@@ -86,6 +91,6 @@ export class User extends BaseEntity {
   }
 
   static fromKakaoRawInfo(kakaoRawInfo: KakaoRawInfo): User {
-    return new User(kakaoRawInfo.kakaoId, kakaoRawInfo.nickname, kakaoRawInfo.email, Gender.UNSPECIFIED);
+    return new User(kakaoRawInfo.kakaoId, kakaoRawInfo.nickname, kakaoRawInfo.email, kakaoRawInfo.gender);
   }
 }
