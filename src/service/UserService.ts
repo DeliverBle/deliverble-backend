@@ -252,7 +252,16 @@ export const addNewFavoriteNews = async (kakaoId: string, newsId: string): Promi
   const pendingFavoriteNews = await NewsService.searchByNewsId(newsId);
   const toBeUpdatedUser2 = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
 
-  await toBeUpdatedUser2.favoriteFreshNews(pendingFavoriteNews);
+  await toBeUpdatedUser2.addFavoriteNews(pendingFavoriteNews);
+  return await updateExistingUser(toBeUpdatedUser2);
+};
+
+export const removeFavoriteNews = async (kakaoId: string, newsId: string): Promise<UserInfo> => {
+  const userQueryRepository = await getConnectionToUserQueryRepository();
+  const toBeUpdatedUser = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
+  const pendingRemovedNews = await NewsService.searchByNewsId(newsId);
+
+  const toBeUpdatedUser2 = await toBeUpdatedUser.removeFavoriteNews(pendingRemovedNews);
   return await updateExistingUser(toBeUpdatedUser2);
 };
 
@@ -268,4 +277,5 @@ export default {
   updateAccessTokenByRefreshToken,
   getAllFavoriteNewsList,
   addNewFavoriteNews,
+  removeFavoriteNews
 };
