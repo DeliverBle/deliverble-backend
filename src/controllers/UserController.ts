@@ -66,7 +66,7 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
   const refreshToken = tokensAndUserId.refreshToken;
   const userId = tokensAndUserId.userId;
   const accessTokenExpiresIn = await UserService.checkAccessTokenExpirySeconds(accessToken);
-  await UserService.saveRefreshTokenAtRedisMappedByUserId(userId, refreshToken);
+  await UserService.saveRefreshTokenAtRedisMappedByUserId(userId, accessToken, refreshToken);
 
   log.debug(accessToken, refreshToken, accessTokenExpiresIn, userId);
 
