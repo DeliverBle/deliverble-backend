@@ -44,37 +44,42 @@ export class User extends BaseEntity {
   @Column()
   gender: Gender;
 
-  @ManyToMany((type) => News)
+  @ManyToMany(() => News, { eager: false })
   @JoinTable({
     name: 'user_favorite_news',
     joinColumn: {
       name: 'user',
-      referencedColumnName: 'id',
+      referencedColumnName: 'kakaoId',
     },
     inverseJoinColumn: {
       name: 'news',
       referencedColumnName: 'id',
     },
   })
-  favoriteNews: News[];
+  favoriteNews: Promise<News[]>;
 
   @AfterLoad()
   async nullChecks() {
     const NO_EMAIL = "NO_EMAIL";
-    if (!this.favoriteNews) {
-      this.favoriteNews = [];
-    }
+    // if (!this.favoriteNews) {
+    //   this.favoriteNews = [];
+    // }
     if (!this.email) {
       log.info("User denied to provide email information")
       this.email = NO_EMAIL
     }
   }
 
-  public favoriteFreshNews = (news: News) => {
+  public addFavoriteNews = async (news: News) => {
     console.log('>>> favoriteNews ', this.favoriteNews);
-    this.favoriteNews.push(news);
+    const favoriteNewsList = await this.favoriteNews;
+    favoriteNewsList.push(news);
     return this;
   };
+
+  public getFavoriteNews = async () => {
+    return await this.favoriteNews;
+  }
 
   static fromKakaoRawInfo(kakaoRawInfo: KakaoRawInfo): User {
     return new User(kakaoRawInfo.kakaoId, kakaoRawInfo.nickname, kakaoRawInfo.email, Gender.UNSPECIFIED);
