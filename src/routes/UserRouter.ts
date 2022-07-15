@@ -7,7 +7,6 @@ const router: express.Router = Router();
 const FAVORITE = "/favorite";
 
 router.get(FAVORITE + '/all', errorHandler(UserController.getAllFavoriteNewsList));
-// router.get('/recommend', NewsController.recommendNews);
-// router.get('/detail/:newsId', NewsController.newsDetail);
+router.post(FAVORITE + '/add', errorHandler(UserController.addFavoriteNews));
 
 export default router;
