@@ -258,11 +258,11 @@ export const addNewFavoriteNews = async (kakaoId: string, newsId: string): Promi
 
 export const removeFavoriteNews = async (kakaoId: string, newsId: string): Promise<UserInfo> => {
   const userQueryRepository = await getConnectionToUserQueryRepository();
-  const toBeUpdatedUser = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
+  const toBeforeUpdatedUser = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
   const pendingRemovedNews = await NewsService.searchByNewsId(newsId);
 
-  const toBeUpdatedUser2 = await toBeUpdatedUser.removeFavoriteNews(pendingRemovedNews);
-  return await updateExistingUser(toBeUpdatedUser2);
+  const toAfterUpdatedUser = await toBeforeUpdatedUser.removeFavoriteNews(pendingRemovedNews);
+  return await updateExistingUser(toAfterUpdatedUser);
 };
 
 export default {
