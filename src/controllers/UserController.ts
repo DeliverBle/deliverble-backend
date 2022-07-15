@@ -235,6 +235,30 @@ export const addFavoriteNews = async (req: Request, res: Response) => {
   }
 };
 
+export const removeFavoriteNews = async (req: Request, res: Response) => {
+  log.debug('addFavroiteNews Method Started')
+  const ids = await getTokensAndUserIdParsedFromBody(req.body);
+  const userId = ids.userId;
+  const newsId = ids.newsId;
+  try {
+    const favoriteNewsListWithUserId = await UserService.removeFavoriteNews(userId, newsId);
+    log.debug(favoriteNewsListWithUserId)
+    res.status(StatusCode.OK).send({
+      status: StatusCode.OK,
+      message: favoriteNewsListWithUserId,
+    });
+  } catch (err) {
+    log.error(err);
+    res.status(err.code).send({
+      status: err.code,
+      message: {
+        favoriteNewsList: 'fail',
+        message: err.message,
+      },
+    });
+  }
+}
+
 export default {
   loginUserWithKakao,
   signUpUserWithKakao,
@@ -242,5 +266,6 @@ export default {
   callbackKakao,
   refreshAccessToken,
   getAllFavoriteNewsList,
-  addFavoriteNews
+  addFavoriteNews,
+  removeFavoriteNews
 };
