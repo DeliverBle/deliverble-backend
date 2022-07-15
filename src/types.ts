@@ -5,6 +5,9 @@ import { Suitability } from './shared/common/Suitability';
 import { Tag } from './entity/Tag';
 import { Channel } from './shared/common/Channel';
 import { User } from './entity/User';
+import {Logger} from "tslog";
+
+const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 export interface ConditionList {
   channels: boolean;
@@ -171,9 +174,9 @@ export class KakaoRawInfo {
     const {
       id,
       properties: { nickname, profile_image },
-      kakao_account: { email },
+      kakao_account: { email, gender },
     } = profile;
-    return new KakaoRawInfo(id, nickname, profile_image, email, Gender.UNSPECIFIED.toString());
+    return new KakaoRawInfo(id, nickname, profile_image, email, gender);
   }
 }
 
