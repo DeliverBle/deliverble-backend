@@ -9,6 +9,9 @@ import {
   hasFindAll,
   NewsInfo,
   NewsReturnDTO,
+  NewsScriptReturnDTO,
+  Script,
+  ScriptReturnDto,
   SearchCondition,
 } from '../types';
 import { News } from '../entity/News';
@@ -141,10 +144,18 @@ const searchRecommendNews = async () => {
   return newsDataReturn.slice(0,recommendCount)
 };
 
-const findNewsDetail = async (newsId: number): Promise<NewsReturnDTO> => {
+const findNewsDetail = async (newsId: number): Promise<NewsScriptReturnDTO> => {
   const newsRepository = await getConnectionToMySql();
   let newsData: NewsInfo = await newsRepository.findNewsDetail(newsId);
-  return new NewsReturnDTO(newsData);
+  let newsScriptData = new NewsScriptReturnDTO(newsData);
+  newsScriptData['scripts'] = newsData['scripts'];
+  let scriptList: ScriptReturnDto[] = [];
+  for (let i in newsData['scripts']) {
+    let script = new ScriptReturnDto(newsData['scripts'][i]);
+    scriptList.push(script)
+  newsScriptData['scripts'] = scriptList;
+  return newsScriptData;
+  };
 };
 
 export default {
@@ -155,4 +166,4 @@ export default {
   searchByConditions,
   searchRecommendNews,
   findNewsDetail,
-};
+}
