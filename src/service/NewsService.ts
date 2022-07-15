@@ -152,11 +152,13 @@ const findNewsDetail = async (newsId: number): Promise<NewsScriptReturnDTO> => {
   let scriptList: ScriptReturnDto[] = [];
   for (let i in newsData['scripts']) {
     let script = new ScriptReturnDto(newsData['scripts'][i]);
+    console.log(script);
     scriptList.push(script)
+  }
   newsScriptData['scripts'] = scriptList;
   return newsScriptData;
-  };
 };
+
 
 export default {
   searchAllNews,
