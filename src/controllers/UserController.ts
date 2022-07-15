@@ -20,12 +20,15 @@ const getTokensAndUserIdParsedFromBody = async (body: string) => {
   log.info('body', body);
   const accessToken = body['access_token'];
   const refreshToken = body['refresh_token'];
+  const newsId = body['news_id'];
   // TODO: 생각보다 컨트롤러가 비대한데... 책임을 분리할 방법은 없을까...
   const userId = (await getKakaoRawInfo(accessToken)).kakaoId;
+  log.debug(accessToken, refreshToken, newsId, userId);
   return {
     accessToken,
     refreshToken,
     userId,
+    newsId
   };
 };
 
@@ -208,11 +211,36 @@ export const getAllFavoriteNewsList = async (req: Request, res: Response) => {
   }
 };
 
+export const addFavoriteNews = async (req: Request, res: Response) => {
+  log.debug('addFavroiteNews Method Started')
+  const ids = await getTokensAndUserIdParsedFromBody(req.body);
+  const userId = ids.userId;
+  const newsId = ids.newsId;
+  try {
+    const favoriteNewsListWithUserId = await UserService.addNewFavoriteNews(userId, newsId);
+    log.debug(favoriteNewsListWithUserId)
+    res.status(StatusCode.OK).send({
+      status: StatusCode.OK,
+      message: favoriteNewsListWithUserId,
+    });
+  } catch (err) {
+    log.error(err);
+    res.status(err.code).send({
+      status: err.code,
+      message: {
+        favoriteNewsList: 'fail',
+        message: err.message,
+      },
+    });
+  }
+};
+
 export default {
   loginUserWithKakao,
   signUpUserWithKakao,
   logOutUserWithKakao,
   callbackKakao,
   refreshAccessToken,
-  getAllFavoriteNewsList
+  getAllFavoriteNewsList,
+  addFavoriteNews
 };
