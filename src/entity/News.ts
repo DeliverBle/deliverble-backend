@@ -3,10 +3,6 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  CreateDateColumn,
-  UpdateDateColumn,
-  ManyToMany,
-  JoinTable,
   OneToMany,
 } from 'typeorm';
 import { Category } from '../shared/common/Category';
@@ -14,7 +10,6 @@ import { Gender } from '../shared/common/Gender';
 import { Time } from '../vo/Time';
 import { Suitability } from '../shared/common/Suitability';
 import { Tag } from './Tag';
-import { NewsInfo } from '../types';
 import { Channel } from '../shared/common/Channel';
 import { Script } from './Script';
 
