@@ -1,4 +1,4 @@
-import { getConnection } from 'typeorm';
+import { getConnection, Logger } from 'typeorm';
 import { NewsQueryRepository } from '../repository/NewsRepository';
 import { sortByDateAndTitle } from '../shared/common/utils';
 import {
@@ -8,6 +8,10 @@ import {
   hasChannels,
   hasFindAll,
   NewsInfo,
+  NewsReturnDTO,
+  NewsScriptReturnDTO,
+  Script,
+  ScriptReturnDto,
   SearchCondition,
 } from '../types';
 import { News } from '../entity/News';
@@ -83,13 +87,13 @@ const filterNewsDataByAnnouncerGender = (newsData: any, searchCondition: SearchC
   return [filteredNewsData];
 };
 
-const validateNewsDataLength = (offset: number, newsData: News[]) => {
+const validateNewsDataLength = (offset: number, newsData: NewsInfo[]) => {
   if (offset > newsData.length) {
     throw new Error(message.EXCEED_PAGE_INDEX);
   }
 };
 
-const paginateWithOffsetAndLimit = (searchCondition: SearchCondition, newsData: News[]) => {
+const paginateWithOffsetAndLimit = (searchCondition: SearchCondition, newsData: NewsInfo[]) => {
   const offset = searchCondition.getOffset();
   const limit = searchCondition.getLimit();
   const endIndex = offset + limit;
@@ -118,29 +122,48 @@ const searchByConditions = async (
 
   // TODO: wrapping newsData with first collection so that avoiding any mistakes
   newsData = sortByDateAndTitle([newsData]);
-  totalCount = newsData.length;
-
   newsData = paginateWithOffsetAndLimit(searchCondition, newsData);
-  return [newsData, totalCount];
+  let newsDataReturn: NewsReturnDTO[] = [];
+  for (let i in newsData) {
+    let news = new NewsReturnDTO(newsData[i]);
+    newsDataReturn.push(news);
+  }
+  return [newsDataReturn, totalCount];
 };
 
 const searchRecommendNews = async () => {
   const recommendCount: number = 8;
   const newsRepository = await getConnectionToMySql();
   let newsData = await newsRepository.findRecommendNews();
-  newsData = sortByDateAndTitle([newsData]);
-  return newsData.slice(0, recommendCount);
+  let newsDataReturn: NewsReturnDTO[] = [];
+  for (let i in newsData) {
+    let news = new NewsReturnDTO(newsData[i]);
+    newsDataReturn.push(news);
+  }
+  newsDataReturn = sortByDateAndTitle([newsDataReturn]);
+  return newsDataReturn.slice(0, recommendCount)
 };
 
-const findNewsDetail = async (newsId: number) => {
+const findNewsDetail = async (newsId: number): Promise<NewsScriptReturnDTO> => {
   const newsRepository = await getConnectionToMySql();
-  return await newsRepository.findNewsDetail(newsId);
+  let newsData: NewsInfo = await newsRepository.findNewsDetail(newsId);
+  let newsScriptData = new NewsScriptReturnDTO(newsData);
+  newsScriptData['scripts'] = newsData['scripts'];
+  let scriptList: ScriptReturnDto[] = [];
+  for (let i in newsData['scripts']) {
+    let script = new ScriptReturnDto(newsData['scripts'][i]);
+    console.log(script);
+    scriptList.push(script)
+  }
+  newsScriptData['scripts'] = scriptList;
+  return newsScriptData;
 };
 
 const searchByNewsId = async (newsId: string) => {
   const newsRepository = await getConnectionToMySql();
   return await newsRepository.findByNewsId(newsId);
 };
+
 
 export default {
   searchAllNews,

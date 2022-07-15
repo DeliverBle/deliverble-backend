@@ -8,7 +8,15 @@ export class Time {
 
   @Column({ type: 'integer' })
   seconds!: number;
-  
+
   @Column({ type: 'integer' })
   milliseconds!: number;
+
+  static toNumber(_time: Time): number {
+    return Number(parseFloat(_time.seconds.toString())
+                  .toFixed(2))
+          + Number(parseFloat((_time.milliseconds / 100)
+                  .toFixed(2))
+    );
+  }
 }

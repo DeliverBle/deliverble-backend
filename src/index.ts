@@ -1,5 +1,12 @@
 import express from 'express';
 import { createConnection } from 'typeorm';
+import { News } from './entity/News';
+import { NewsInfo } from './types';
+import { Category } from './shared/common/Category';
+import { Gender } from './shared/common/Gender';
+import { Time } from './vo/Time';
+import { Suitability } from './shared/common/Suitability';
+import { Tag } from './entity/Tag';
 import routes from './routes';
 import { Channel } from './shared/common/Channel';
 import { insertNewsData } from './util/insertNews';
@@ -30,8 +37,8 @@ app.use(errorHandler);
 const log: Logger = new Logger({ name: "딜리버블 백엔드 짱짱" });
 
 createConnection().then(async (connection) => {
-  await insertNewsData(connection);
-  await insertScriptData(connection);
+  // await insertNewsData(connection);
+  // await insertScriptData(connection);
   // const user = await MockUserToFavorite(connection);
 
   app.listen(8080, () => {

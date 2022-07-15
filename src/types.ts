@@ -30,6 +30,7 @@ export const hasFindAll = (conditionList: ConditionList): boolean => {
 };
 
 export interface NewsInfo {
+  id: number;
   title: string;
   category: Category;
   tags: Tag[];
@@ -42,6 +43,69 @@ export interface NewsInfo {
   suitability: Suitability;
   isEmbeddable: boolean;
   reportDate: Date;
+}
+
+export class NewsReturnDTO {
+  constructor(newsInfo: NewsInfo) {
+    this.id = newsInfo.id;
+    this.title = newsInfo.title;
+    this.category = newsInfo.category;
+    this.announcerGender = newsInfo.announcerGender;
+    this.channel = newsInfo.channel;
+    this.link = newsInfo.link;
+    this.thumbnail = newsInfo.thumbnail;
+    this.startTime = Time.toNumber(newsInfo.startTime);
+    this.endTime = Time.toNumber(newsInfo.endTime);
+    this.suitability = newsInfo.suitability;
+    this.isEmbeddable = newsInfo.isEmbeddable;
+    this.reportDate = newsInfo.reportDate;
+    this.tags = newsInfo.tags;
+  }
+  id: number;
+  title: string;
+  category: Category;
+  announcerGender: Gender;
+  channel: Channel;
+  link: string;
+  thumbnail: string;
+  suitability: Suitability;
+  isEmbeddable: boolean;
+  reportDate: Date;
+  startTime: number;
+  endTime: number;
+  tags: Tag[];
+}
+
+export class NewsScriptReturnDTO {
+  constructor(newsInfo: NewsInfo) {
+    this.id = newsInfo.id;
+    this.title = newsInfo.title;
+    this.category = newsInfo.category;
+    this.announcerGender = newsInfo.announcerGender;
+    this.channel = newsInfo.channel;
+    this.link = newsInfo.link;
+    this.thumbnail = newsInfo.thumbnail;
+    this.startTime = Time.toNumber(newsInfo.startTime);
+    this.endTime = Time.toNumber(newsInfo.endTime);
+    this.suitability = newsInfo.suitability;
+    this.isEmbeddable = newsInfo.isEmbeddable;
+    this.reportDate = newsInfo.reportDate;
+    this.tags = newsInfo.tags;
+  }
+  id: number;
+  title: string;
+  category: Category;
+  announcerGender: Gender;
+  channel: Channel;
+  link: string;
+  thumbnail: string;
+  suitability: Suitability;
+  isEmbeddable: boolean;
+  reportDate: Date;
+  startTime: number;
+  endTime: number;
+  tags: Tag[];
+  scripts: ScriptReturnDto[];
 }
 
 export class SearchCondition {
@@ -73,6 +137,19 @@ export interface Script {
   startTime: Time;
   endTime: Time;
   text: string;
+}
+
+export class ScriptReturnDto {
+  constructor(script: Script) {
+    this.scriptId = script.scriptId;
+    this.startTime = Time.toNumber(script.startTime);
+    this.endTime = Time.toNumber(script.endTime);
+    this.text = script.text;
+  }
+  scriptId: number;
+  startTime: number;
+  endTime: number;
+  text: string; 
 }
 
 export class KakaoRawInfo {
