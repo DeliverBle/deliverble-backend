@@ -274,6 +274,7 @@ export default {
   getKakaoRawInfo,
   doesAccessTokenExpire,
   checkAccessTokenExpirySeconds,
+  updateRefreshTokenAtRedisWithUserId,
   updateAccessTokenByRefreshToken,
   getAllFavoriteNewsList,
   addNewFavoriteNews,
