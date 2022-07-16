@@ -114,7 +114,7 @@ export class NewsScriptReturnDTO {
 
 export class SearchCondition {
   constructor(_channels, _categories, _announcerGender, _currentPage, _listSize) {
-    this.channels = _channels;
+    this.channels = _channels ? _channels : [];
     this.categories = _categories;
     this.announcerGender = _announcerGender;
     this.currentPage = _currentPage;

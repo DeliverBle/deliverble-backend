@@ -67,7 +67,7 @@ const fetchByChannel = async (
   const newsRepository = await getConnectionToMySql();
 
   console.log('hasFindAll >>>>>>> ', hasFindAll(conditionList));
-
+  log.debug(searchCondition.channels);
   if (hasFindAll(conditionList) || searchCondition.channels.length === 0) {
     return await newsRepository.findAllNews(searchCondition);
   }
