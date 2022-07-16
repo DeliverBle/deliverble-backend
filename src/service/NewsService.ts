@@ -68,7 +68,7 @@ const fetchByChannel = async (
 
   console.log('hasFindAll >>>>>>> ', hasFindAll(conditionList));
 
-  if (hasFindAll(conditionList)) {
+  if (hasFindAll(conditionList) || searchCondition.channels.length === 0) {
     return await newsRepository.findAllNews(searchCondition);
   }
   if (hasChannels(conditionList)) {
@@ -78,24 +78,30 @@ const fetchByChannel = async (
 };
 
 const filterNewsDataByCategory = (newsData: any, searchCondition: SearchCondition) => {
+  if (searchCondition.categories.length === 0) {
+    return newsData;
+  };
   const filteredNewsData = newsData.filter((news) => {
     if (searchCondition.categories.includes(news.category)) {
+      console.log(news);
       return news;
-    }
+    };
   });
   // TODO: wrapping newsData with first collection so that avoiding any mistakes
-  return [filteredNewsData, filteredNewsData.length];
+  return filteredNewsData;
 };
 
 const filterNewsDataByAnnouncerGender = (newsData: any, searchCondition: SearchCondition) => {
+  if (searchCondition.announcerGender.length == 0) {
+    return newsData;
+  };
   const filteredNewsData = newsData.filter((news) => {
-    if (news.announcerGender === searchCondition.announcerGender) {
+    if (searchCondition.announcerGender.includes(news.announcerGender)) {
       return news;
-    }
+    }    
   });
-  console.log('filterNewsDataByAnnouncerGender', filteredNewsData);
   // TODO: wrapping newsData with first collection so that avoiding any mistakes
-  return [filteredNewsData];
+  return filteredNewsData;
 };
 
 const validateNewsDataLength = (offset: number, newsData: NewsInfo[]) => {
@@ -121,16 +127,17 @@ const searchByConditions = async (
   let newsData = await fetchByChannel(conditionList, searchCondition);
   if (hasCategories(conditionList)) {
     const filteredNewsData = await filterNewsDataByCategory(newsData, searchCondition);
-    newsData = filteredNewsData[0];
+    newsData = filteredNewsData;
   }
 
   if (hasAnnouncerGender(conditionList)) {
-    const filteredNewsData = filterNewsDataByAnnouncerGender(newsData, searchCondition);
+    const filteredNewsData = await filterNewsDataByAnnouncerGender(newsData, searchCondition);
     // TODO: wrapping newsData with first collection so that avoiding any mistakes
-    newsData = filteredNewsData[0];
+    newsData = filteredNewsData;
   }
   
   // pagination offset, listsize에 맞게 슬라이싱하기 전 totalCount, lastPage를 구함
+  console.log(newsData);
   let totalCount = newsData.length;
   let lastPage = getLastPage(12, totalCount);
   let paginationInfo = new PaginationInfo(totalCount, lastPage);

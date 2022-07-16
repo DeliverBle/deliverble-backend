@@ -123,7 +123,7 @@ export class SearchCondition {
 
   channels: string[];
   categories: string[];
-  announcerGender: string;
+  announcerGender: string[];
   currentPage: number | 1;
   listSize: number | 12;
 
