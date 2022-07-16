@@ -137,7 +137,7 @@ export class SearchCondition {
 }
 
 export interface Script {
-  scriptId: number;
+  id: number;
   startTime: Time;
   endTime: Time;
   text: string;
@@ -145,12 +145,12 @@ export interface Script {
 
 export class ScriptReturnDto {
   constructor(script: Script) {
-    this.scriptId = script.scriptId;
+    this.id = script.id;
     this.startTime = Time.toNumber(script.startTime);
     this.endTime = Time.toNumber(script.endTime);
     this.text = script.text;
   }
-  scriptId: number;
+  id: number;
   startTime: number;
   endTime: number;
   text: string;
