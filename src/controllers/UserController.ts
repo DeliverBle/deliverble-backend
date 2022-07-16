@@ -238,9 +238,11 @@ const refreshAccessToken = async (req: Request, res: Response) => {
 };
 
 export const getAllFavoriteNewsList = async (req: Request, res: Response) => {
-  const kakaoId = (await getTokensAndUserIdParsedFromHeader(req)).kakaoId;
+  const tokensAndId = (await getTokensAndUserIdParsedFromHeader(req));
+  const accessToken = tokensAndId.accessToken
+  const kakaoId = tokensAndId.kakaoId;
   try {
-    const favoriteNewsListWithUserId = await UserService.getAllFavoriteNewsList(kakaoId);
+    const favoriteNewsListWithUserId = await UserService.getAllFavoriteNewsList(accessToken, kakaoId);
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: favoriteNewsListWithUserId,
@@ -268,13 +270,12 @@ export const getAllFavoriteNewsList = async (req: Request, res: Response) => {
 };
 
 export const addFavoriteNews = async (req: Request, res: Response) => {
-  log.debug('addFavroiteNews Method Started');
   const ids = await getTokensAndUserIdParsedFromBody(req.body);
+  const accessToken = ids.accessToken;
   const userId = ids.userId;
   const newsId = ids.newsId;
   try {
-    const favoriteNewsListWithUserId = await UserService.addNewFavoriteNews(userId, newsId);
-    log.debug(favoriteNewsListWithUserId);
+    const favoriteNewsListWithUserId = await UserService.addNewFavoriteNews(accessToken, userId, newsId);
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: favoriteNewsListWithUserId,

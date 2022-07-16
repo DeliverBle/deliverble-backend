@@ -1,7 +1,7 @@
-import { EntityRepository, getConnection, Repository } from 'typeorm';
-import { News } from '../entity/News';
-import { User } from '../entity/User';
-import { Logger } from 'tslog';
+import {EntityRepository, getConnection, Repository} from 'typeorm';
+import {User} from '../entity/User';
+import {Logger} from 'tslog';
+import CustomError from "../error/CustomError";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -23,13 +23,17 @@ export class UserQueryRepository extends Repository<User> {
   }
 
   async findByKakaoIdActiveRecordManner(kakaoId: string) {
-    const userRepository2 = await getConnection().getRepository(User);
-    const toBeUpdatedUser2 = await userRepository2.findOne({
-      where: {
-        kakaoId: kakaoId,
-      },
-      relations: ['favoriteNews'],
-    });
-    return toBeUpdatedUser2;
+    const userRepository = await getConnection().getRepository(User);
+    try {
+      return await userRepository.findOneOrFail({
+        where: {
+          kakaoId: kakaoId,
+        },
+        relations: ['favoriteNews'],
+      });
+    } catch (err) {
+      log.debug(" >> ERR ", err)
+      throw new CustomError(404, "User Not Found")
+    }
   }
 }
