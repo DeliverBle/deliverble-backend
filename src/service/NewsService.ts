@@ -10,6 +10,7 @@ import {
   NewsInfo,
   NewsReturnDTO,
   NewsScriptReturnDTO,
+  PaginationInfo,
   Script,
   ScriptReturnDto,
   SearchCondition,
@@ -19,6 +20,7 @@ import { Logger } from 'tslog';
 import message from '../modules/responseMessage';
 import ResourceNotFoundError from "../error/ResourceNotFoundError";
 import CustomError from "../error/CustomError";
+import { getLastPage } from '../util/pagination'
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -27,9 +29,13 @@ const getConnectionToMySql = async () => {
   return connection.getCustomRepository(NewsQueryRepository);
 };
 
-const searchAllNews = async () => {
+const searchAllNews = async (): Promise<any> => {
   const newsRepository = await getConnectionToMySql();
-  return await newsRepository.find();
+  let newsData = await newsRepository.find()
+  let totalCount = newsData.length;
+  let lastPage = getLastPage(12, totalCount);
+  let paginationInfo = new PaginationInfo(totalCount, lastPage);
+  return [newsData, paginationInfo];
 };
 
 const searchByChannel = async (searchCondition: SearchCondition) => {
@@ -112,7 +118,6 @@ const searchByConditions = async (
   searchCondition: SearchCondition,
   // TODO: using any type is evil! change appropriate data type
 ): Promise<any> => {
-  let totalCount;
   let newsData = await fetchByChannel(conditionList, searchCondition);
   if (hasCategories(conditionList)) {
     const filteredNewsData = await filterNewsDataByCategory(newsData, searchCondition);
@@ -124,7 +129,13 @@ const searchByConditions = async (
     // TODO: wrapping newsData with first collection so that avoiding any mistakes
     newsData = filteredNewsData[0];
   }
-
+  
+  // pagination offset, listsize에 맞게 슬라이싱하기 전 totalCount, lastPage를 구함
+  let totalCount = newsData.length;
+  let lastPage = getLastPage(12, totalCount);
+  let paginationInfo = new PaginationInfo(totalCount, lastPage);
+  
+  console.log('>>>>>>>>>>>>>>>>length', totalCount);
   // TODO: wrapping newsData with first collection so that avoiding any mistakes
   newsData = sortByDateAndTitle([newsData]);
   newsData = paginateWithOffsetAndLimit(searchCondition, newsData);
@@ -133,7 +144,8 @@ const searchByConditions = async (
     let news = new NewsReturnDTO(newsData[i]);
     newsDataReturn.push(news);
   }
-  return [newsDataReturn, totalCount];
+
+  return [newsDataReturn, paginationInfo];
 };
 
 const searchRecommendNews = async () => {
