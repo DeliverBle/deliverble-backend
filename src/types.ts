@@ -156,6 +156,15 @@ export class ScriptReturnDto {
   text: string;
 }
 
+export class PaginationInfo {
+  constructor(_totalCount: number, _lastPage: number) {
+    this.totalCount = _totalCount;
+    this.lastPage = _lastPage;
+  }
+  totalCount: number;
+  lastPage: number;
+}
+
 export class KakaoRawInfo {
   constructor(kakaoId, nickname, profile_image, email, gender) {
     this.kakaoId = kakaoId;
