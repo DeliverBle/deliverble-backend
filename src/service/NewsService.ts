@@ -149,10 +149,13 @@ const findNewsDetail = async (newsId: number): Promise<NewsScriptReturnDTO> => {
   let newsData: NewsInfo = await newsRepository.findNewsDetail(newsId);
   let newsScriptData = new NewsScriptReturnDTO(newsData);
   newsScriptData['scripts'] = newsData['scripts'];
+  // console.log( newsScriptData['scripts']);
   let scriptList: ScriptReturnDto[] = [];
   for (let i in newsData['scripts']) {
+    console.log(newsData['scripts'][i]);
     let script = new ScriptReturnDto(newsData['scripts'][i]);
-    console.log(script);
+    // script.scriptId = (newsData['scripts'][i]['scriptId'];
+    // console.log(script);
     scriptList.push(script)
   }
   newsScriptData['scripts'] = scriptList;
