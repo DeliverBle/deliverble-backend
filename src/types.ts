@@ -6,6 +6,7 @@ import { Tag } from './entity/Tag';
 import { Channel } from './shared/common/Channel';
 import { User } from './entity/User';
 import { Logger } from 'tslog';
+import {IsNotEmpty} from "class-validator";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -164,7 +165,9 @@ export class KakaoRawInfo {
     this.gender = gender;
   }
 
+  @IsNotEmpty()
   kakaoId: string;
+  @IsNotEmpty()
   nickname: string;
   profile_image: string;
   email: string;
@@ -218,6 +221,7 @@ export class UserInfo {
     this.email = user.email;
     this.gender = user.gender;
   }
+  @IsNotEmpty()
   kakaoId: string;
   nickname: string;
   email: string;

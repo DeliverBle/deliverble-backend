@@ -11,6 +11,7 @@ import { determineGenderByGivenString, Gender } from '../shared/common/Gender';
 import { News } from './News';
 import {KakaoRawInfo} from "../types";
 import {Logger} from "tslog";
+import {IsEmail, Length} from "class-validator";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -34,9 +35,11 @@ export class User extends BaseEntity {
   })
   kakaoId: string;
 
+  @Length(10, 20)
   @Column()
   nickname: string;
 
+  @IsEmail()
   @Column({
     unique: true
   })

@@ -8,12 +8,15 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { News } from './News';
+import {IsNotEmpty, Length} from "class-validator";
 
 @Entity()
 export class Tag extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
+  @IsNotEmpty()
+  @Length(10, 20)
   @Column()
   name!: string;
 
