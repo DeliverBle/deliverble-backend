@@ -60,7 +60,7 @@ export const MockUserToFavorite = async (connection) => {
   await newsRepository.query(`set FOREIGN_KEY_CHECKS = 1`);
 
   // save user1
-  let userMock1 = new User(userInfo.nickname, userInfo.email, userInfo.gender);
+  let userMock1 = new User("2323", userInfo.nickname, userInfo.email, userInfo.gender);
   await userRepository.save(userMock1);
 
   let user1 = await userRepository.findOne({
@@ -79,7 +79,7 @@ export const MockUserToFavorite = async (connection) => {
   const news = await newsRepository.save(news1Mock);
 
   // user favorite news
-  user1.favoriteFreshNews(news);
+  user1.addFavoriteNews(news);
   await newsRepository.save(user1);
 
   return user1;

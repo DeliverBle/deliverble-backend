@@ -7,6 +7,7 @@ export const errorHandler = (fn) => (req, res, next) => {
   log.info("ERROR HANDLER")
   Promise.resolve(fn(req, res, next)).catch((err) => {
     if (err instanceof CustomError || RangeError) {
+      log.debug(" >>>>>>>>>>>>>>>>>> ", err)
       res.status(err.code).send({
         msg: err.message
       });
