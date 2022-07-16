@@ -3,7 +3,7 @@ import NewsService from '../service/NewsService';
 import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
-import { SearchCondition } from '../types';
+import { PaginationInfo, SearchCondition } from '../types';
 import { validateConditions } from '../shared/common/utils';
 
 /**
@@ -29,18 +29,18 @@ const searchNews = async (req: Request, res: Response): Promise<void | Response>
   console.log(conditionList);
 
   let data;
-  let totalCount;
+  let paginationInfo: PaginationInfo;
 
   try {
     if (conditionList) {
-      [data, totalCount] = await NewsService.searchByConditions(conditionList, searchCondition);
+      [data, paginationInfo] = await NewsService.searchByConditions(conditionList, searchCondition);
     } else {
-      data = await NewsService.searchAllNews();
+      [data, paginationInfo] = await NewsService.searchAllNews();
     }
 
     res
       .status(statusCode.OK)
-      .send(util.success(statusCode.OK, message.SEARCH_NEWS_SUCCESS, data, totalCount));
+      .send(util.success(statusCode.OK, message.SEARCH_NEWS_SUCCESS, data, paginationInfo));
   } catch (error) {
     console.log(error);
     if (error.message === message.EXCEED_PAGE_INDEX) {

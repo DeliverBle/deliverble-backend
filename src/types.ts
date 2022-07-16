@@ -123,7 +123,7 @@ export class SearchCondition {
 
   channels: string[];
   categories: string[];
-  announcerGender: string;
+  announcerGender: string[];
   currentPage: number | 1;
   listSize: number | 12;
 
@@ -154,6 +154,15 @@ export class ScriptReturnDto {
   startTime: number;
   endTime: number;
   text: string;
+}
+
+export class PaginationInfo {
+  constructor(_totalCount: number, _lastPage: number) {
+    this.totalCount = _totalCount;
+    this.lastPage = _lastPage;
+  }
+  totalCount: number;
+  lastPage: number;
 }
 
 export class KakaoRawInfo {

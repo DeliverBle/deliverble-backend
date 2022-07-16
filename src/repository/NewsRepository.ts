@@ -26,16 +26,16 @@ export class NewsQueryRepository extends Repository<News> {
   };
 
   // category가 categories에 속하는 모든 News 조회
-  findByCategories = async (categories: object) => {
+  findByCategories = async (categories: string[]) => {
     return this.createQueryBuilder('news')
       .where('news.category IN (:...categories)', { categories })
       .getMany();
   };
 
   // announcerGender가 일치하는 속하는 모든 News 조회
-  findByAnnouncerGender(announcerGender: string) {
+  findByAnnouncerGender(announcerGender: string[]) {
     return this.createQueryBuilder('news')
-      .where('news.announcerGender = :announcerGender', { announcerGender })
+      .where('news.announcerGender IN (:...announcerGender)', { announcerGender })
       .getMany();
   }
 

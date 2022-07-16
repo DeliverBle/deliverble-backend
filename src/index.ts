@@ -11,6 +11,7 @@ import routes from './routes';
 import { Channel } from './shared/common/Channel';
 import { insertNewsData } from './util/insertNews';
 import { MockUserToFavorite } from './util/MockUserToFavorite';
+import { insertScriptData } from './util/insertScript';
 import {errorHandler} from './error/ErrorHandler';
 import redis from "redis";
 import {Logger} from "tslog";
@@ -35,9 +36,9 @@ app.use(errorHandler);
 const log: Logger = new Logger({ name: "딜리버블 백엔드 짱짱" });
 
 createConnection().then(async (connection) => {
-  await insertNewsData(connection);
   // await insertScriptData(connection);
   // const user = await MockUserToFavorite(connection);
+  await insertNewsData(connection);
 
   app.listen(8080, () => {
     log.info('Server is running on port 8080');
