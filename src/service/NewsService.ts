@@ -1,4 +1,4 @@
-import { getConnection, Logger } from 'typeorm';
+import { getConnection } from 'typeorm';
 import { NewsQueryRepository } from '../repository/NewsRepository';
 import { sortByDateAndTitle } from '../shared/common/utils';
 import {
@@ -15,7 +15,12 @@ import {
   SearchCondition,
 } from '../types';
 import { News } from '../entity/News';
+import { Logger } from 'tslog';
 import message from '../modules/responseMessage';
+import ResourceNotFoundError from "../error/ResourceNotFoundError";
+import CustomError from "../error/CustomError";
+
+const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 const getConnectionToMySql = async () => {
   const connection = getConnection();
@@ -161,7 +166,13 @@ const findNewsDetail = async (newsId: number): Promise<NewsScriptReturnDTO> => {
 
 const searchByNewsId = async (newsId: string) => {
   const newsRepository = await getConnectionToMySql();
-  return await newsRepository.findByNewsId(newsId);
+  try {
+    return await newsRepository.findByNewsId(newsId);
+  } catch {
+    log.debug('meow');
+    // TODO: need an another handler for this error
+    throw new CustomError(404, "News Not Found");
+  }
 };
 
 

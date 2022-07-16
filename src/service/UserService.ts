@@ -12,7 +12,8 @@ import {
   CONTENT_TYPE,
   DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
   DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
-  OAUTH_TOKEN, REFRESH_TOKEN_PREFIX,
+  OAUTH_TOKEN,
+  REFRESH_TOKEN_PREFIX,
   REQUEST_RAW_LINK,
   USER_LOGOUT_LINK,
 } from '../shared/AuthLink';
@@ -22,7 +23,7 @@ import {Logger} from 'tslog';
 import AlreadyLoggedOutError from '../error/AlreadyLoggedOutError';
 import AlreadySignedUpError from '../error/AlreadySignedUpError';
 import NewsService from './NewsService';
-import ResourceNotFoundError from "../error/ResourceNotFoundError";
+import ResourceNotFoundError from '../error/ResourceNotFoundError';
 
 const redisClient = require('../util/redis');
 
@@ -60,10 +61,13 @@ export const findUserByEmail = async (email: string): Promise<User> => {
 };
 
 // TODO: refactor by splitting to AuthService from UserService
-export const doesAccessTokenExpire = async (accessToken: string, userId: string): Promise<boolean> => {
+export const doesAccessTokenExpire = async (
+  accessToken: string,
+  userId: string,
+): Promise<boolean> => {
   log.debug(' before expiry seconds validation ', accessToken);
   const expire_in: number = await checkAccessTokenExpiryTTLToRedisServer(accessToken, userId);
-  log.debug(' expire_in ', expire_in)
+  log.debug(' expire_in ', expire_in);
   return expire_in < 0;
 };
 
@@ -81,8 +85,8 @@ export const checkAccessTokenExpiryTTLToRedisServer = async (
 };
 
 export const getRefreshTokenByTTLOnRedisServer = async (
-    accessToken: string,
-    userId: string,
+  accessToken: string,
+  userId: string,
 ): Promise<string> => {
   // TODO: validate this logic in controller or additional DTO type class
   if (!accessToken || !userId) {
@@ -91,18 +95,17 @@ export const getRefreshTokenByTTLOnRedisServer = async (
   const ACCESS_KEY = ACCESS_TOKEN_PREFIX + userId;
   const REFRESH_KEY = REFRESH_TOKEN_PREFIX + userId;
 
+  // TODO; need to fix this error hanling not working well
   redisClient.get(ACCESS_KEY, (err, value) => {
     if (!(value === accessToken)) {
       log.debug(' >>>>>>>> accessToken not matched ', value);
-      throw new AccessTokenExpiredError();
+      return;
+      // throw new AccessTokenExpiredError();
     }
-  })
+  });
 
   const getAsync = promisify(redisClient.get).bind(redisClient);
-  log.debug("HHH")
-  let returnValue = await getAsync(REFRESH_KEY);
-  log.debug(returnValue);
-  return returnValue;
+  return await getAsync(REFRESH_KEY);
 };
 
 const checkAccessTokenExpirySecondsToKakaoServer = async (accessToken: string): Promise<number> => {
@@ -124,7 +127,7 @@ export const updateAccessTokenByRefreshToken = async (
   userId: string,
   accessToken: string,
 ): Promise<object> => {
-  const refreshToken = await getRefreshTokenByTTLOnRedisServer(accessToken, userId);
+  let refreshToken = await getRefreshTokenByTTLOnRedisServer(accessToken, userId);
   const payload = new URLSearchParams();
   payload.append('grant_type', 'refresh_token');
   payload.append('refresh_token', refreshToken);
@@ -132,7 +135,7 @@ export const updateAccessTokenByRefreshToken = async (
 
   log.debug('payload >>>> ', payload);
   log.debug('userId >>>>', userId);
-  log.debug('accessToken >>>>', accessToken)
+  log.debug('accessToken >>>>', accessToken);
 
   const config = {
     headers: {
@@ -154,7 +157,7 @@ export const updateAccessTokenByRefreshToken = async (
   );
 
   log.info(refresh_token, refresh_token_expires_in);
-  log.debug("updatedAccessTokenDTO ", updatedAccessTokenDTO);
+  log.debug('updatedAccessTokenDTO ', updatedAccessTokenDTO);
   if (updatedAccessTokenDTO.doesRetrievedAccessOrRefreshTokenExist()) {
     await updateTokensAtRedisWithUserIdWithWrappedDTO(userId, updatedAccessTokenDTO);
   }
@@ -170,22 +173,22 @@ export const saveTokensAtRedisWithUserId = async (
   accessToken: string,
   refreshToken: string,
 ): Promise<void> => {
-  const ACCESS_TOKEN = ACCESS_TOKEN_PREFIX
-  const REFRESH_TOKEN = REFRESH_TOKEN_PREFIX
+  const ACCESS_TOKEN = ACCESS_TOKEN_PREFIX;
+  const REFRESH_TOKEN = REFRESH_TOKEN_PREFIX;
   promisify(redisClient.get).bind(redisClient);
   // TODO: move validation logic to other class
   if (accessToken !== 'NONE') {
     await redisClient.setex(
-        ACCESS_TOKEN + userId,
-        DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
-        accessToken,
+      ACCESS_TOKEN + userId,
+      DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
+      accessToken,
     );
   }
   if (refreshToken !== 'NONE') {
     await redisClient.setex(
-        REFRESH_TOKEN + userId,
-        DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
-        refreshToken,
+      REFRESH_TOKEN + userId,
+      DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
+      refreshToken,
     );
   }
   return;
@@ -198,12 +201,15 @@ export const updateTokensAtRedisWithUserIdWithWrappedDTO = async (
   // TODO: to be refactored; is it possible to expire each value in Redis?
   const accessToken = updatedAccessTokenDTO.access_token;
   const refreshToken = updatedAccessTokenDTO.refresh_token;
-  log.debug(" updateTokensAtRedisWithUserIdWithWrappedDTO ", accessToken, refreshToken);
+  log.debug(' updateTokensAtRedisWithUserIdWithWrappedDTO ', accessToken, refreshToken);
   await saveTokensAtRedisWithUserId(userId, accessToken, refreshToken);
   return;
 };
 
-export const getKakaoRawInfo = async (_accessToken: string, userId: string): Promise<KakaoRawInfo> => {
+export const getKakaoRawInfo = async (
+  _accessToken: string,
+  userId: string,
+): Promise<KakaoRawInfo> => {
   const accessToken = await doesAccessTokenExpire(_accessToken, userId);
   if (accessToken) {
     throw new AccessTokenExpiredError();
@@ -224,7 +230,10 @@ export const getKakaoRawInfo = async (_accessToken: string, userId: string): Pro
   return kakaoRawInfo;
 };
 
-export const loginUserWithKakao = async (accessToken: string, userId: string): Promise<UserInfo> => {
+export const loginUserWithKakao = async (
+  accessToken: string,
+  userId: string,
+): Promise<UserInfo> => {
   if (await doesAccessTokenExpire(accessToken, userId)) {
     throw new AccessTokenExpiredError();
   }
@@ -260,13 +269,19 @@ export const signUpUserWithKakao = async (accessToken: string, userId: string): 
 };
 
 // TODO: refactor by splitting to AuthService from UserService
-export const doesAccessTokenExists = async (accessToken: string, userId: string): Promise<boolean> => {
+export const doesAccessTokenExists = async (
+  accessToken: string,
+  userId: string,
+): Promise<boolean> => {
   log.debug(' before expiry seconds validation ', accessToken);
   const expire_in: number = await checkAccessTokenExpiryTTLToRedisServer(accessToken, userId);
   return expire_in < 0;
 };
 
-export const logOutUserWithKakao = async (_accessToken: string, _userId: string): Promise<string> => {
+export const logOutUserWithKakao = async (
+  _accessToken: string,
+  _userId: string,
+): Promise<string> => {
   if (await doesAccessTokenExists(_accessToken, _userId)) {
     throw new AlreadyLoggedOutError();
   }
@@ -284,8 +299,12 @@ export const logOutUserWithKakao = async (_accessToken: string, _userId: string)
 };
 
 export const getAllFavoriteNewsList = async (
+  accessToken: string,
   kakaoId: string,
 ): Promise<UserFavoriteNewsReturnDTO> => {
+  if (await doesAccessTokenExpire(accessToken, kakaoId)) {
+    throw new AccessTokenExpiredError();
+  }
   const userQueryRepository = await getConnectionToUserQueryRepository();
   const toBeUpdatedUser = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
   const favoriteNews = await toBeUpdatedUser.getFavoriteNews();
@@ -314,7 +333,10 @@ export const updateExistingUser = async (user: User): Promise<UserInfo> => {
   return returnUserInfo;
 };
 
-export const addNewFavoriteNews = async (kakaoId: string, newsId: string): Promise<UserInfo> => {
+export const addNewFavoriteNews = async (accessToken: string, kakaoId: string, newsId: string): Promise<UserInfo> => {
+  if (await doesAccessTokenExpire(accessToken, kakaoId)) {
+    throw new AccessTokenExpiredError();
+  }
   const userQueryRepository = await getConnectionToUserQueryRepository();
   const pendingFavoriteNews = await NewsService.searchByNewsId(newsId);
   const toBeUpdatedUser2 = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
