@@ -12,12 +12,14 @@ import { Suitability } from '../shared/common/Suitability';
 import { Tag } from './Tag';
 import { Channel } from '../shared/common/Channel';
 import { Script } from './Script';
+import {IsNotEmpty} from "class-validator";
 
 @Entity()
 export class News extends BaseEntity {
   @PrimaryGeneratedColumn()
   id: number;
 
+  @IsNotEmpty()
   @Column({ type: 'varchar', length: 100 })
   title: string;
 
@@ -57,9 +59,11 @@ export class News extends BaseEntity {
   })
   channel: Channel;
 
+  @IsNotEmpty()
   @Column({ type: 'varchar', length: 1000 })
   link: string;
 
+  @IsNotEmpty()
   @Column({ type: 'varchar', length: 1000 })
   thumbnail: string;
 
