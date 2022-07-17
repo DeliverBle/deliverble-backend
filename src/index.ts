@@ -12,7 +12,6 @@ import { Channel } from './shared/common/Channel';
 import { insertNewsData } from './util/insertNews';
 import { MockUserToFavorite } from './util/MockUserToFavorite';
 import { insertScriptData } from './util/insertScript';
-// import { insertScriptData } from './util/insertScript';
 import {errorHandler} from './error/ErrorHandler';
 import redis from "redis";
 import {Logger} from "tslog";
