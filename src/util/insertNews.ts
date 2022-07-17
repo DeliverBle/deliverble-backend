@@ -2632,7 +2632,7 @@ export const insertNewsData = async (connection) => {
       // 48번 뉴스            
       { 
         title: '\'스쳐도 실격\' 현실로‥ 도 넘은 편파 판정 "제소"',
-        category: Category.ETC,
+        category: Category.UNSPECIFIED,
         tags: [tag48_1, tag48_2, tag48_3],
         scripts: [script48_1, script48_2, script48_3, script48_4, script48_5],
         announcerGender: Gender.MEN,
