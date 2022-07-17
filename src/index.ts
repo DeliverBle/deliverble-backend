@@ -26,6 +26,18 @@ redisClient.auth(password);
 
 const app = express();
 
+
+// CORS 미들웨어 사용
+app.use(
+  cors({
+     credentials: true,
+     origin: [
+       "http://localhost",
+       "http://13.209.32.166",
+     ],
+   })
+ );
+
 // Request body를 parsing 하기 위한 미들웨어 사용
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -34,16 +46,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(routes);
 app.use(errorHandler);
 
-// CORS 미들웨어 사용
-app.use(
-  cors({
-     credentials: true,
-     origin: [
-       "http://localhost:8080",
-       "http://13.209.32.166:8080",
-     ],
-   })
- );
+
 
 const log: Logger = new Logger({ name: "딜리버블 백엔드 짱짱" });
 
