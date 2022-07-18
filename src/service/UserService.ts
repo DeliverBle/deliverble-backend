@@ -77,6 +77,7 @@ export const checkAccessTokenExpiryTTLToRedisServer = async (
 ): Promise<number> => {
   // TODO: validate this logic in controller or additional DTO type class
   if (!accessToken || !userId) {
+    log.debug(accessToken, userId)
     throw new ResourceNotFoundError();
   }
   const KEY = ACCESS_TOKEN_PREFIX + userId;
