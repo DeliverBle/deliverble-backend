@@ -26,9 +26,15 @@ redisClient.auth(password);
 
 const app = express();
 
-
 // CORS 미들웨어 사용
+const corsOpt = function(req, callback) {
+  callback(null, {origin: true});
+};
+// 모든 도메인의 통신을 허용합니다.
+app.options('*', cors(corsOpt));
+// 모든 options 메서드로의 사전 전달 접근을 허용합니다.
 app.use(cors());
+
 
 // Request body를 parsing 하기 위한 미들웨어 사용
 app.use(express.json());

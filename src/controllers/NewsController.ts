@@ -5,6 +5,9 @@ import message from '../modules/responseMessage';
 import util from '../modules/util';
 import { PaginationInfo, SearchCondition } from '../types';
 import { validateConditions } from '../shared/common/utils';
+import { Logger } from 'tslog';
+
+const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 /**
  * @route get /search
@@ -12,6 +15,7 @@ import { validateConditions } from '../shared/common/utils';
  * @access Public
  */
 const searchNews = async (req: Request, res: Response): Promise<void | Response> => {
+  log.debug(req.body)
   const channels = req.body.channels;
   const categories = req.body.categories;
   const announcerGender = req.body.announcerGender;

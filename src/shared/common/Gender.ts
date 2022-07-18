@@ -9,7 +9,6 @@ export enum Gender {
 }
 
 export const determineGenderByGivenString = (_genderString: string) => {
-  log.info(_genderString)
   return Object.values(Gender).find((gender) => gender === _genderString);
 };
 
