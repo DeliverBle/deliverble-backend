@@ -7,6 +7,10 @@ const VERSION2 = '/v2';
 
 const router: Router = Router();
 
+router.get('/', function(req, res, next) {
+    res.send('hello')
+});
+
 router.use(VERSION2 + '/user', UserRouter);
 
 router.use(VERSION2 + '/news', NewsRouter);
