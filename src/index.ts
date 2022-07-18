@@ -58,7 +58,7 @@ createConnection().then(async (connection) => {
   // const user = await MockUserToFavorite(connection);
   await insertNewsData(connection);
 
-  app.listen(80, () => {
-    log.info('Server is running on port 80');
+  app.listen(8080, () => {
+    log.info('Server is running on port 8080');
   });
 });
