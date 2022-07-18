@@ -15,6 +15,7 @@ import { insertScriptData } from './util/insertScript';
 import {errorHandler} from './error/ErrorHandler';
 import redis from "redis";
 import {Logger} from "tslog";
+const cors = require('cors');
 
 // redis setting
 const port = 6379;
@@ -25,6 +26,10 @@ redisClient.auth(password);
 
 const app = express();
 
+
+// CORS 미들웨어 사용
+app.use(cors());
+
 // Request body를 parsing 하기 위한 미들웨어 사용
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -32,6 +37,8 @@ app.use(express.urlencoded({ extended: true }));
 // routes 폴더로 분기
 app.use(routes);
 app.use(errorHandler);
+
+
 
 const log: Logger = new Logger({ name: "딜리버블 백엔드 짱짱" });
 

@@ -12,3 +12,24 @@ export const determineGenderByGivenString = (_genderString: string) => {
   log.info(_genderString)
   return Object.values(Gender).find((gender) => gender === _genderString);
 };
+
+export const convertKoreanToGenderObject = (_givenKoreanString: string[]) => {
+  const koreanChar = _givenKoreanString[0];
+  if (koreanChar === '남자') {
+    return [Gender.MEN];
+  }
+  if (koreanChar === '여자') {
+    return [Gender.WOMEN];
+  }
+  return [];
+}
+
+export const convertGenderEnglishToKorean = (_gender: Gender) => {
+  if (_gender === Gender.MEN) {
+    return "남자"
+  } else if (_gender === Gender.WOMEN) {
+    return "여자"
+  } else if (_gender === Gender.UNSPECIFIED) {
+    return "분류 안됨"
+  }
+}

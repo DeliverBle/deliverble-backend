@@ -1,5 +1,5 @@
 import { Category } from './shared/common/Category';
-import { Gender } from './shared/common/Gender';
+import { convertGenderEnglishToKorean, convertKoreanToGenderObject, Gender } from './shared/common/Gender';
 import { Time } from './vo/Time';
 import { Suitability } from './shared/common/Suitability';
 import { Tag } from './entity/Tag';
@@ -54,7 +54,7 @@ export class NewsReturnDTO {
     this.id = newsInfo.id;
     this.title = newsInfo.title;
     this.category = newsInfo.category;
-    this.announcerGender = newsInfo.announcerGender;
+    this.announcerGender = convertGenderEnglishToKorean(newsInfo.announcerGender);
     this.channel = newsInfo.channel;
     this.link = newsInfo.link;
     this.thumbnail = newsInfo.thumbnail;
@@ -68,7 +68,7 @@ export class NewsReturnDTO {
   id: number;
   title: string;
   category: Category;
-  announcerGender: Gender;
+  announcerGender: string;
   channel: Channel;
   link: string;
   thumbnail: string;
@@ -85,7 +85,7 @@ export class NewsScriptReturnDTO {
     this.id = newsInfo.id;
     this.title = newsInfo.title;
     this.category = newsInfo.category;
-    this.announcerGender = newsInfo.announcerGender;
+    this.announcerGender = convertGenderEnglishToKorean(newsInfo.announcerGender);
     this.channel = newsInfo.channel;
     this.link = newsInfo.link;
     this.thumbnail = newsInfo.thumbnail;
@@ -99,7 +99,7 @@ export class NewsScriptReturnDTO {
   id: number;
   title: string;
   category: Category;
-  announcerGender: Gender;
+  announcerGender: string;
   channel: Channel;
   link: string;
   thumbnail: string;
@@ -116,11 +116,11 @@ export class SearchCondition {
   constructor(_channels, _categories, _announcerGender, _currentPage, _listSize) {
     this.channels = _channels ? _channels : [];
     this.categories = _categories;
-    this.announcerGender = _announcerGender;
+    this.announcerGender = convertKoreanToGenderObject(_announcerGender);
     this.currentPage = _currentPage;
     this.listSize = _listSize;
   }
-
+  // ["남자"] --> ["male"]
   channels: string[];
   categories: string[];
   announcerGender: string[];
@@ -248,3 +248,4 @@ export interface UserFavoriteNewsReturnDTO {
   // EAGER LOADING | LAZY LOADING
   readonly favoriteNews: NewsInfo[] | Promise<NewsInfo[]>;
 }
+
