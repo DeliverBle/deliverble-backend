@@ -239,6 +239,7 @@ const refreshAccessToken = async (req: Request, res: Response) => {
 };
 
 export const getAllFavoriteNewsList = async (req: Request, res: Response) => {
+  log.debug(req, req.header['access_token']);
   const tokensAndId = (await getTokensAndUserIdParsedFromHeader(req));
   const accessToken = tokensAndId.accessToken
   const kakaoId = tokensAndId.kakaoId;
