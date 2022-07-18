@@ -34,21 +34,6 @@ const getTokensAndUserIdParsedFromBody = async (body: string) => {
   };
 };
 
-const getTokensAndUserIdParsedFromHeader = async (req: any) => {
-  log.info('req', req.header('access_token'));
-  const accessToken = req.header('access_token');
-  const refreshToken = req.header('refresh_token');
-  // TODO: kakaoId와 user_id의 변수명이 혼동되어 사용되고 있으니 이를 리팩토링하도록 한다.
-  const kakaoId = req.header('user_id');
-  // TODO: 생각보다 컨트롤러가 비대한데... 책임을 분리할 방법은 없을까...
-  // const kakaoId = (await getKakaoRawInfo(accessToken)).kakaoId;
-  return {
-    accessToken,
-    refreshToken,
-    kakaoId,
-  };
-};
-
 const getTokensAndIdCallbackFromKakao = async (req: Request) => {
   const accessToken = req['user'][0];
   const refreshToken = req['user'][1];
@@ -239,10 +224,11 @@ const refreshAccessToken = async (req: Request, res: Response) => {
 };
 
 export const getAllFavoriteNewsList = async (req: Request, res: Response) => {
-  log.debug(req, req.header['access_token']);
-  const tokensAndId = (await getTokensAndUserIdParsedFromHeader(req));
+  log.debug(req.header('access_token'));
+  const tokensAndId = (await getTokensAndUserIdParsedFromBody(req.body));
+  log.debug(tokensAndId)
   const accessToken = tokensAndId.accessToken
-  const kakaoId = tokensAndId.kakaoId;
+  const kakaoId = tokensAndId.userId;
   try {
     const favoriteNewsListWithUserId = await UserService.getAllFavoriteNewsList(accessToken, kakaoId);
     res.status(StatusCode.OK).send({
