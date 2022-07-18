@@ -28,15 +28,18 @@ const app = express();
 
 
 // CORS 미들웨어 사용
-app.use(
-  cors({
-     credentials: true,
-     origin: [
-       "http://localhost",
-       "http://13.209.32.166",
-     ],
-   })
- );
+// app.use(
+//   cors()
+//  );
+const allowlist = ['http://localhost:8080'];
+app.use(cors({
+  credentials: true,
+  // origin: ["http://localhost:8080", "http://13.209.32.166:8080"], 
+  origin: "http://localhost:8080", 
+  methods: 'GET, POST, OPTIONS',
+  preflightContinue: true,
+  })
+);
 
 // Request body를 parsing 하기 위한 미들웨어 사용
 app.use(express.json());
@@ -55,7 +58,7 @@ createConnection().then(async (connection) => {
   // const user = await MockUserToFavorite(connection);
   await insertNewsData(connection);
 
-  app.listen(8080, () => {
-    log.info('Server is running on port 8080');
+  app.listen(80, () => {
+    log.info('Server is running on port 80');
   });
 });
