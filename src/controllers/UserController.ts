@@ -23,7 +23,8 @@ const getTokensAndUserIdParsedFromBody = async (body: string) => {
   const refreshToken = body['refresh_token'];
   const newsId = body['news_id'];
   // TODO: 생각보다 컨트롤러가 비대한데... 책임을 분리할 방법은 없을까...
-  const userId = body['user_id'];
+  let userId = body['user_id'];
+  userId = parseInt(userId);
   // const userId = (await getKakaoRawInfo(accessToken)).kakaoId;
   log.debug(accessToken, refreshToken, newsId, userId);
   return {
@@ -45,8 +46,9 @@ const getTokensAndIdCallbackFromKakao = async (req: Request) => {
   };
 };
 
-const getUserIdParsedFromBody = (body: string): string => {
-  return body['user_id'].toString();
+const getUserIdParsedFromBody = (body: string) => {
+  log.debug(" >>>>>>>>>>>>>>>> ", body['user_id'])
+  return body['user_id'];
 };
 
 export const callbackKakao = async (req: Request, res: Response): Promise<void | Response> => {
@@ -180,7 +182,9 @@ const signUpUserWithKakao = async (req: Request, res: Response) => {
 
 const refreshAccessToken = async (req: Request, res: Response) => {
   const accessToken = (await getTokensAndUserIdParsedFromBody(req.body)).accessToken;
-  const userId = getUserIdParsedFromBody(req.body);
+  let userId = getUserIdParsedFromBody(req.body);
+  log.debug("userId >>>>>>>>>>>>>>>>>> ", userId);
+  userId = userId.replace(/['"]+/g, '');
 
   try {
     const retrievedAccessToken = await UserService.updateAccessTokenByRefreshToken(

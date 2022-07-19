@@ -102,12 +102,14 @@ export const getRefreshTokenByTTLOnRedisServer = async (
   if (!accessToken || !userId) {
     throw new ResourceNotFoundError();
   }
-  const ACCESS_KEY = ACCESS_TOKEN_PREFIX + userId;
-  const REFRESH_KEY = REFRESH_TOKEN_PREFIX + userId;
+  const ACCESS_KEY = (ACCESS_TOKEN_PREFIX + userId).replace(/['"]+/g, '');
+  log.debug("ACCESS KEY ", ACCESS_KEY)
+  const REFRESH_KEY = (REFRESH_TOKEN_PREFIX + userId).replace(/['"]+/g, '');
 
   // TODO; need to fix this error hanling not working well
   redisClient.get(ACCESS_KEY, (err, value) => {
-    if (!(value === accessToken)) {
+    // log.debug("VALUE, ", value, "accessToken ", accessToken, "COMPARE ", value == accessToken)
+    if (!(value == accessToken)) {
       log.debug(' >>>>>>>> accessToken not matched ', value);
       return;
       // throw new AccessTokenExpiredError();
@@ -155,9 +157,7 @@ export const updateAccessTokenByRefreshToken = async (
 
   const {
     data: { access_token, expires_in, refresh_token, refresh_token_expires_in },
-  } = await axios.post(OAUTH_TOKEN, payload, config).then((res) => {
-    return res;
-  });
+  } = await axios.post(OAUTH_TOKEN, payload, config);
 
   const updatedAccessTokenDTO = new UpdatedAccessTokenDTO(
     access_token,
