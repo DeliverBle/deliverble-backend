@@ -1,33 +1,64 @@
-import { getConnection } from 'typeorm';
+import {getConnection} from 'typeorm';
 
-import { Logger } from 'tslog';
-import { CreateHighlight, HighlightInfo } from '../types';
-import { HighlightQueryRepository } from '../repository/HighlightRepository';
-import { Highlight } from '../entity/Highlight';
-import UserService from './UserService';
+import {Logger} from 'tslog';
+import {CreateHighlight} from '../types';
+import {HighlightQueryRepository} from '../repository/HighlightRepository';
+import UserService, {findUserByKakaoId} from './UserService';
+import {HighlightCommandRepository} from "../repository/HighlightCommandRepository";
+import CustomError from "../error/CustomError";
+import statusCode from "../modules/statusCode";
+import message from "../modules/responseMessage";
+import {Highlight} from "../entity/Highlight";
+import NewsService from "./NewsService";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
-const getConnectionToMySql = async () => {
+const getConnectionToHighlightQueryRepository = async () => {
   const connection = getConnection();
   return connection.getCustomRepository(HighlightQueryRepository);
 };
+const getConnectionToHighlightCommandRepository = async () => {
+  const connection = getConnection();
+  return connection.getCustomRepository(HighlightCommandRepository);
+};
 
-const createHighlight = async (createHighlight: CreateHighlight): Promise<any> => {
-  const highlightRepository = await getConnectionToMySql();
-  //   const user = UserService.searchByUserId(createHighlight.userId);
-  //   highlightInfo.userId = user;
+const getHighlightByKakaoIdAndNewsId = async (kakaoId: number, newsId: number): Promise<any> => {
+  const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
+
+  const user = await UserService.findUserByKakaoId(kakaoId.toString());
+  const userId = user.id;
+
+  log.debug('userId', userId);
+
+  const highlightOfAllUserId = await highlightQueryRepository.findAllHighlightByUserId(userId);
+  const scriptIdsOfNewsId = await NewsService.findScriptIdsByNewsId(newsId.toString());
+
+  const returnHighlights = highlightOfAllUserId.filter(highlight => scriptIdsOfNewsId.includes(highlight.scriptId));
+  returnHighlights.forEach((highlight) => log.debug(" highlight", highlight))
+  return returnHighlights;
+}
+
+const createHighlight = async (createHighlight: CreateHighlight): Promise<Highlight> => {
+  const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
+  const highlightCommandRepository = await getConnectionToHighlightCommandRepository();
+
+  const user = await UserService.searchByUserId(createHighlight.userId);
+  const highlight = createHighlight.toEntity(user);
   log.debug(' createHighlight.scriptId ', createHighlight.scriptId);
-  // log.debug(' highlightInfo ', highlightInfo);
-  // let highlightInfo: HighlightInfo;
-  // highlightInfo.scriptId = createHighlight.scriptId;
-  // highlightInfo.startingIndex = createHighlight.startingIndex;
-  // highlightInfo.endingIndex = createHighlight.endingIndex;
-  await highlightRepository.createHighlight(createHighlight);
-  const highlightData = highlightRepository.findAllHighlight();
-  return highlightData;
+
+  try {
+    // save highlight
+    const savedHighlight = await highlightCommandRepository.saveNewHighlight(highlight);
+    log.debug('savedHighlight ', savedHighlight);
+    return getHighlightByKakaoIdAndNewsId(Number(createHighlight.userId), createHighlight.scriptId);
+  } catch (error) {
+    log.error('error', error);
+    // TODO: make new custom error
+    throw new CustomError(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
+  }
 };
 
 export default {
-    createHighlight,
-}
+  createHighlight,
+  getHighlightByKakaoIdAndNewsId
+};
