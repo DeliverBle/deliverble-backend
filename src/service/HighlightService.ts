@@ -10,6 +10,7 @@ import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import { Highlight } from '../entity/Highlight';
 import NewsService from './NewsService';
+import {ScriptQueryRepository} from "../repository/ScriptQueryRepository";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -20,6 +21,11 @@ const getConnectionToHighlightQueryRepository = async () => {
 const getConnectionToHighlightCommandRepository = async () => {
   const connection = getConnection();
   return connection.getCustomRepository(HighlightCommandRepository);
+};
+
+const getConnectionToScriptQueryRepository = async () => {
+  const connection = getConnection();
+  return connection.getCustomRepository(ScriptQueryRepository);
 };
 
 const getHighlightByKakaoIdAndNewsId = async (kakaoId: number, newsId: number): Promise<any> => {
@@ -72,6 +78,11 @@ const getHighlightByKakaoIdAndNewsId = async (kakaoId: number, newsId: number): 
   return objectsByScriptIds;
 };
 
+const findNewsIdOfScriptId = async (scriptId: number): Promise<number> => {
+    const scriptQueryRepository = await getConnectionToScriptQueryRepository();
+    return await scriptQueryRepository.findNewsIdOfScriptId(scriptId);
+}
+
 const createHighlight = async (createHighlight: CreateHighlight): Promise<Highlight> => {
   const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
   const highlightCommandRepository = await getConnectionToHighlightCommandRepository();
@@ -84,7 +95,11 @@ const createHighlight = async (createHighlight: CreateHighlight): Promise<Highli
     // save highlight
     const savedHighlight = await highlightCommandRepository.saveNewHighlight(highlight);
     log.debug('savedHighlight ', savedHighlight);
-    return getHighlightByKakaoIdAndNewsId(Number(createHighlight.userId), createHighlight.scriptId);
+
+    // get newsId of highlight
+    const newsId = await findNewsIdOfScriptId(savedHighlight.scriptId);
+
+    return getHighlightByKakaoIdAndNewsId(Number(createHighlight.userId), newsId);
   } catch (error) {
     log.error('error', error);
     // TODO: make new custom error
