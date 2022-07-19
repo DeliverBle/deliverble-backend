@@ -11,6 +11,7 @@ import message from '../modules/responseMessage';
 import { Highlight } from '../entity/Highlight';
 import NewsService from './NewsService';
 import { ScriptQueryRepository } from '../repository/ScriptQueryRepository';
+import DuplicateStartingIndexAndEndingIndex from "../error/DuplicateStartingIndexAndEndingIndex";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -101,7 +102,9 @@ const createHighlight = async (createHighlight: CreateHighlight): Promise<Highli
     return await new HighlightReturnDTO(savedHighlight);
   } catch (error) {
     log.error('error', error);
-    // TODO: make new custom error
+    if (error.errno === 1062) {
+      throw new DuplicateStartingIndexAndEndingIndex();
+    }
     throw new CustomError(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
   }
 };
