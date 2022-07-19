@@ -77,12 +77,20 @@ export const checkAccessTokenExpiryTTLToRedisServer = async (
   userId: string,
 ): Promise<number> => {
   // TODO: validate this logic in controller or additional DTO type class
+  log.debug(" HELLO ")
   if (!accessToken || !userId) {
     log.debug(accessToken, userId)
     throw new ResourceNotFoundError();
   }
   const KEY = ACCESS_TOKEN_PREFIX + userId;
+  log.debug("KEY ", KEY)
+  const getAsync = promisify(redisClient.get).bind(redisClient);
+  const ACCESS_TOKEN_KEY_ON_REDIS = await getAsync(KEY);
+  if (ACCESS_TOKEN_KEY_ON_REDIS !== accessToken) {
+    throw new CustomError(403, "Access Token or Kakao ID is not valid");
+  }
   const ttl = promisify(redisClient.ttl).bind(redisClient);
+  log.debug("TTL ", ttl)
   return await ttl(KEY);
 };
 
@@ -94,12 +102,14 @@ export const getRefreshTokenByTTLOnRedisServer = async (
   if (!accessToken || !userId) {
     throw new ResourceNotFoundError();
   }
-  const ACCESS_KEY = ACCESS_TOKEN_PREFIX + userId;
-  const REFRESH_KEY = REFRESH_TOKEN_PREFIX + userId;
+  const ACCESS_KEY = (ACCESS_TOKEN_PREFIX + userId).replace(/['"]+/g, '');
+  log.debug("ACCESS KEY ", ACCESS_KEY)
+  const REFRESH_KEY = (REFRESH_TOKEN_PREFIX + userId).replace(/['"]+/g, '');
 
   // TODO; need to fix this error hanling not working well
   redisClient.get(ACCESS_KEY, (err, value) => {
-    if (!(value === accessToken)) {
+    // log.debug("VALUE, ", value, "accessToken ", accessToken, "COMPARE ", value == accessToken)
+    if (!(value == accessToken)) {
       log.debug(' >>>>>>>> accessToken not matched ', value);
       return;
       // throw new AccessTokenExpiredError();
@@ -147,9 +157,7 @@ export const updateAccessTokenByRefreshToken = async (
 
   const {
     data: { access_token, expires_in, refresh_token, refresh_token_expires_in },
-  } = await axios.post(OAUTH_TOKEN, payload, config).then((res) => {
-    return res;
-  });
+  } = await axios.post(OAUTH_TOKEN, payload, config);
 
   const updatedAccessTokenDTO = new UpdatedAccessTokenDTO(
     access_token,
@@ -237,6 +245,7 @@ export const loginUserWithKakao = async (
   userId: string,
 ): Promise<UserInfo> => {
   if (await doesAccessTokenExpire(accessToken, userId)) {
+    log.debug("acc, us", accessToken, userId);
     throw new AccessTokenExpiredError();
   }
   const kakaoRawInfo = await getKakaoRawInfo(accessToken, userId);
@@ -363,7 +372,7 @@ const searchByKakaoId = async (kakaoId: string) => {
   } catch {
     log.debug('meow');
     // TODO: need an another handler for this error
-    throw new CustomError(404, "News Not Found");
+    throw new CustomError(404, "User Not Found");
   }
 };
 

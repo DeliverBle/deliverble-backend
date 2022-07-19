@@ -1,10 +1,12 @@
 import express, { Router } from 'express';
-import HighlightController from '../controllers/HighlightController';
+import HighlightController, {
+  removeHighlightByKakaoIdAndHighlightId,
+} from '../controllers/HighlightController';
 
 const router: express.Router = Router();
 
+router.post('/remove', HighlightController.removeHighlightByKakaoIdAndHighlightId);
 router.post('/create', HighlightController.createHighlight);
-// TODO: BODY로 받지 말고 PARAM QUERY로 받을 것
-router.get('/all', HighlightController.getHighlightByKakaoIdAndNewsId);
+router.get('/', HighlightController.getHighlightByKakaoIdAndNewsId);
 
 export default router;

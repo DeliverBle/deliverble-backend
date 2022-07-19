@@ -1,6 +1,7 @@
 import { Logger } from "tslog";
 import { getConnection } from "typeorm";
 import { Spacing } from "../entity/Spacing";
+import AccessTokenExpiredError from "../error/AccessTokenExpiredError";
 import CustomError from "../error/CustomError";
 import message from "../modules/responseMessage";
 import statusCode from "../modules/statusCode";
@@ -8,7 +9,7 @@ import { SpacingCommandRepository } from "../repository/SpacingCommandRepository
 import { SpacingQueryRepository } from "../repository/SpacingQueryRepository";
 import { CreateSpacing } from "../types";
 import NewsService from "./NewsService";
-import UserService from "./UserService";
+import UserService, { doesAccessTokenExpire } from "./UserService";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -45,16 +46,21 @@ const getSpacingByKakaoIdAndNewsId = async (kakaoId: number, newsId: number): Pr
 
 const createSpacing = async (createSpacing: CreateSpacing): Promise<Spacing> => {
 	// const spacingQueryRepository = await getConnectionToSpacingQueryRepository();
+	const accessToken = createSpacing.accessToken;
+	const kakaoId = createSpacing.kakaoId;
+	if (await doesAccessTokenExpire(accessToken, kakaoId)) {
+    throw new AccessTokenExpiredError();
+  }
 	const spacingCommandRepository = await getConnectionToSpacingCommandRepository();
 
-	const user = await UserService.searchByUserId(createSpacing.userId);
+	const user = await UserService.searchByUserId(createSpacing.kakaoId);
 	const spacing = createSpacing.toEntity(user);
 
 	try {
 		// save highlight
 		const savedSpacing = await spacingCommandRepository.saveNewSpacing(spacing);
 		log.debug('savedHighlight ', savedSpacing);
-		return await getSpacingByKakaoIdAndNewsId(Number(createSpacing.userId), createSpacing.newsId);
+		return await getSpacingByKakaoIdAndNewsId(Number(createSpacing.kakaoId), createSpacing.newsId);
 	} catch (error) {
 		log.error('error', error);
 		// TODO: make new custom error

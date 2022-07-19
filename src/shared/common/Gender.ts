@@ -15,10 +15,10 @@ export const determineGenderByGivenString = (_genderString: string) => {
 
 export const convertKoreanToGenderObject = (_givenKoreanString: string[]) => {
   const koreanChar = _givenKoreanString[0];
-  if (koreanChar === '남자') {
+  if ((koreanChar === '남성') || (koreanChar === '남자')) {
     return [Gender.MEN];
   }
-  if (koreanChar === '여자') {
+  if ((koreanChar === '여성') || (koreanChar === '여자')) {
     return [Gender.WOMEN];
   }
   return [];
@@ -26,9 +26,9 @@ export const convertKoreanToGenderObject = (_givenKoreanString: string[]) => {
 
 export const convertGenderEnglishToKorean = (_gender: Gender) => {
   if (_gender === Gender.MEN) {
-    return "남자"
+    return "남성"
   } else if (_gender === Gender.WOMEN) {
-    return "여자"
+    return "여성"
   } else if (_gender === Gender.UNSPECIFIED) {
     return "분류 안됨"
   }

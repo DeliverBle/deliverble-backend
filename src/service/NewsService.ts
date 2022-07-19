@@ -18,9 +18,9 @@ import {
 import { News } from '../entity/News';
 import { Logger } from 'tslog';
 import message from '../modules/responseMessage';
-import ResourceNotFoundError from "../error/ResourceNotFoundError";
-import CustomError from "../error/CustomError";
-import { getLastPage } from '../util/pagination'
+import ResourceNotFoundError from '../error/ResourceNotFoundError';
+import CustomError from '../error/CustomError';
+import { getLastPage } from '../util/pagination';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -31,7 +31,7 @@ const getConnectionToMySql = async () => {
 
 const searchAllNews = async (): Promise<any> => {
   const newsRepository = await getConnectionToMySql();
-  let newsData = await newsRepository.find()
+  let newsData = await newsRepository.find();
   let totalCount = newsData.length;
   let lastPage = getLastPage(12, totalCount);
   let paginationInfo = new PaginationInfo(totalCount, lastPage);
@@ -78,12 +78,12 @@ const fetchByChannel = async (
 const filterNewsDataByCategory = (newsData: any, searchCondition: SearchCondition) => {
   if (searchCondition.categories.length === 0) {
     return newsData;
-  };
+  }
   const filteredNewsData = newsData.filter((news) => {
     if (searchCondition.categories.includes(news.category)) {
       console.log(news);
       return news;
-    };
+    }
   });
   // TODO: wrapping newsData with first collection so that avoiding any mistakes
   return filteredNewsData;
@@ -92,11 +92,11 @@ const filterNewsDataByCategory = (newsData: any, searchCondition: SearchConditio
 const filterNewsDataByAnnouncerGender = (newsData: any, searchCondition: SearchCondition) => {
   if (searchCondition.announcerGender.length == 0) {
     return newsData;
-  };
+  }
   const filteredNewsData = newsData.filter((news) => {
     if (searchCondition.announcerGender.includes(news.announcerGender)) {
       return news;
-    }    
+    }
   });
   // TODO: wrapping newsData with first collection so that avoiding any mistakes
   return filteredNewsData;
@@ -133,14 +133,12 @@ const searchByConditions = async (
     // TODO: wrapping newsData with first collection so that avoiding any mistakes
     newsData = filteredNewsData;
   }
-  
+
   // pagination offset, listsize에 맞게 슬라이싱하기 전 totalCount, lastPage를 구함
-  console.log(newsData);
   let totalCount = newsData.length;
   let lastPage = getLastPage(12, totalCount);
   let paginationInfo = new PaginationInfo(totalCount, lastPage);
-  
-  console.log('>>>>>>>>>>>>>>>>length', totalCount);
+
   // TODO: wrapping newsData with first collection so that avoiding any mistakes
   newsData = sortByDateAndTitle([newsData]);
   newsData = paginateWithOffsetAndLimit(searchCondition, newsData);
@@ -163,7 +161,7 @@ const searchRecommendNews = async () => {
     newsDataReturn.push(news);
   }
   newsDataReturn = sortByDateAndTitle([newsDataReturn]);
-  return newsDataReturn.slice(0, recommendCount)
+  return newsDataReturn.slice(0, recommendCount);
 };
 
 const findNewsDetail = async (newsId: number): Promise<NewsScriptReturnDTO> => {
@@ -176,9 +174,7 @@ const findNewsDetail = async (newsId: number): Promise<NewsScriptReturnDTO> => {
   for (let i in newsData['scripts']) {
     console.log(newsData['scripts'][i]);
     let script = new ScriptReturnDto(newsData['scripts'][i]);
-    // script.scriptId = (newsData['scripts'][i]['scriptId'];
-    // console.log(script);
-    scriptList.push(script)
+    scriptList.push(script);
   }
   newsScriptData['scripts'] = scriptList;
   return newsScriptData;
@@ -191,15 +187,14 @@ const searchByNewsId = async (newsId: string) => {
   } catch {
     log.debug('meow');
     // TODO: need an another handler for this error
-    throw new CustomError(404, "News Not Found");
+    throw new CustomError(404, 'News Not Found');
   }
 };
 
 export const findScriptIdsByNewsId = async (newsId: string): Promise<number[]> => {
   const newsDetailDTO = await findNewsDetail(Number(newsId));
   return newsDetailDTO.scripts.map((script) => script.id);
-}
-
+};
 
 export default {
   searchAllNews,

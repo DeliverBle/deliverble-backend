@@ -1,12 +1,16 @@
 import { Category } from './shared/common/Category';
-import { convertGenderEnglishToKorean, convertKoreanToGenderObject, Gender } from './shared/common/Gender';
+import {
+  convertGenderEnglishToKorean,
+  convertKoreanToGenderObject,
+  Gender,
+} from './shared/common/Gender';
 import { Time } from './vo/Time';
 import { Suitability } from './shared/common/Suitability';
 import { Tag } from './entity/Tag';
 import { Channel } from './shared/common/Channel';
 import { User } from './entity/User';
 import { Logger } from 'tslog';
-import {IsNotEmpty} from "class-validator";
+import { IsNotEmpty } from 'class-validator';
 import { Highlight } from './entity/Highlight';
 import { Spacing } from './entity/Spacing';
 
@@ -253,14 +257,20 @@ export interface UserFavoriteNewsReturnDTO {
 
 export class CreateHighlight {
   constructor(
-    _userId: string, _scriptId: number, _startingIndex: number, _endingIndex: number
-    ) {
-    this.userId = _userId;
+    _accessToken: string,
+    _kakaoId: string,
+    _scriptId: number,
+    _startingIndex: number,
+    _endingIndex: number,
+  ) {
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
     this.scriptId = _scriptId;
     this.startingIndex = _startingIndex;
     this.endingIndex = _endingIndex;
-  }  
-  userId: string;
+  }
+  accessToken: string;
+  kakaoId: string;
   scriptId: number;
   startingIndex: number;
   endingIndex: number;
@@ -278,27 +288,52 @@ export interface HighlightInfo {
   endingIndex: number;
 }
 
+export class HighlightReturnCollectionDTO {
+  constructor(_highlightReturnCollection: HighlightReturnDTO[]) {
+    this.highlightReturnCollection = _highlightReturnCollection;
+    this.sortByScriptIdFirstAndStartingIndexWhenScriptIdEquals();
+  }
+  highlightReturnCollection: HighlightReturnDTO[];
+  sortByScriptIdFirstAndStartingIndexWhenScriptIdEquals(): HighlightReturnCollectionDTO {
+    this.highlightReturnCollection = this.highlightReturnCollection.sort((a, b) => {
+      if (a.scriptId === b.scriptId) {
+        return a.startingIndex - b.startingIndex;
+      }
+      return a.scriptId - b.scriptId;
+    });
+    return this;
+  }
+}
+
 export class HighlightReturnDTO {
   constructor(highlight: Highlight) {
-    this.scriptId = highlight['scriptId'];
-    const { startingIndex, endingIndex } = highlight;
-    const _highlightIdx = [Number(startingIndex), Number(endingIndex)];
-    this.highlightIdx = [_highlightIdx]
+    this.scriptId = highlight.scriptId;
+    this.highlightId = highlight.id;
+    this.startingIndex = highlight.startingIndex;
+    this.endingIndex = highlight.endingIndex;
   }
   scriptId: number;
-  highlightIdx: [number[]];
+  startingIndex: number;
+  endingIndex: number;
+  highlightId: number;
 }
 
 export class CreateSpacing {
   constructor(
-    _userId: string, _scriptId: number, _newsId: number, _index: number
+    _accessToken: string,
+    _kakaoId: string,
+    _scriptId: number,
+    _newsId: number,
+    _index: number
     ) {
-    this.userId = _userId;
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
     this.scriptId = _scriptId;
     this.newsId = _newsId;
     this.index = _index;
   }  
-  userId: string;
+  accessToken: string;
+  kakaoId: string;
   scriptId: number;
   newsId: number;
   index: number;

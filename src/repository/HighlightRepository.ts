@@ -18,5 +18,11 @@ export class HighlightQueryRepository extends Repository<Highlight> {
     return await this.createQueryBuilder('highlight')
       .where('highlight.user_id = :user_id', { user_id })
       .getMany();
-  }
-};
+  };
+
+  findHighlightByHighlightId = async (highlight_id: number) => {
+    return await this.createQueryBuilder('highlight')
+      .where('highlight.id = :highlight_id', { highlight_id })
+      .getOne();
+  };
+}

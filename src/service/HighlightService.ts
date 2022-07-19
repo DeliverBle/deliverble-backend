@@ -1,9 +1,9 @@
 import { getConnection } from 'typeorm';
 
 import { Logger } from 'tslog';
-import { CreateHighlight, HighlightReturnDTO } from '../types';
+import { CreateHighlight, HighlightReturnCollectionDTO, HighlightReturnDTO } from '../types';
 import { HighlightQueryRepository } from '../repository/HighlightRepository';
-import UserService, { findUserByKakaoId } from './UserService';
+import UserService, { doesAccessTokenExpire, findUserByKakaoId } from './UserService';
 import { HighlightCommandRepository } from '../repository/HighlightCommandRepository';
 import CustomError from '../error/CustomError';
 import statusCode from '../modules/statusCode';
@@ -11,6 +11,8 @@ import message from '../modules/responseMessage';
 import { Highlight } from '../entity/Highlight';
 import NewsService from './NewsService';
 import { ScriptQueryRepository } from '../repository/ScriptQueryRepository';
+import DuplicateStartingIndexAndEndingIndex from '../error/DuplicateStartingIndexAndEndingIndex';
+import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -28,9 +30,16 @@ const getConnectionToScriptQueryRepository = async () => {
   return connection.getCustomRepository(ScriptQueryRepository);
 };
 
-const getHighlightByKakaoIdAndNewsId = async (kakaoId: number, newsId: number): Promise<any> => {
+const getHighlightByKakaoIdAndNewsId = async (
+  accessToken: string,
+  kakaoId: string,
+  newsId: number,
+): Promise<any> => {
   const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
-
+  log.debug('accessToken', accessToken);
+  if (await doesAccessTokenExpire(accessToken, kakaoId)) {
+    throw new AccessTokenExpiredError();
+  }
   const user = await UserService.findUserByKakaoId(kakaoId.toString());
   const userId = user.id;
 
@@ -43,39 +52,9 @@ const getHighlightByKakaoIdAndNewsId = async (kakaoId: number, newsId: number): 
     scriptIdsOfNewsId.includes(highlight.scriptId),
   );
 
-  const scriptIdsOnReturnHighlights = [
-    ...new Set(returnHighlights.map((highlight) => highlight['scriptId'])),
-  ];
-
-  log.debug('scriptIdsOnReturnHighlights', scriptIdsOnReturnHighlights);
-  log.debug('returnHighlights', returnHighlights);
-
-  const objectsByScriptIds = scriptIdsOnReturnHighlights.map((cur, idx, acc) => {
-    if (acc.find((obj) => obj['scriptId'] === cur)) {
-      return acc.find((obj) => obj['scriptId'] === cur);
-    }
-    const newObject = Object.create({});
-    newObject.scriptId = cur;
-    newObject.highlightIdx = [];
-    return newObject;
-  }, []);
-
-  log.debug('objectsByScriptIds', objectsByScriptIds);
-
-  objectsByScriptIds.map((cur, idx, acc) => {
-    // filter by current scriptIds
-    const filteredHighlights = returnHighlights.filter(
-      (highlight) => highlight['scriptId'] === cur.scriptId,
-    );
-    // push highlightIdx
-    filteredHighlights.map((highlight) => {
-      acc[idx].highlightIdx.push([highlight.startingIndex, highlight.endingIndex]);
-    });
-    return acc;
-  }, []);
-
-  log.debug('objectsByScriptIds ', objectsByScriptIds);
-  return objectsByScriptIds;
+  return new HighlightReturnCollectionDTO(
+    returnHighlights.map((highlight) => new HighlightReturnDTO(highlight)),
+  );
 };
 
 const findNewsIdOfScriptId = async (scriptId: number): Promise<number> => {
@@ -84,11 +63,17 @@ const findNewsIdOfScriptId = async (scriptId: number): Promise<number> => {
 };
 
 const createHighlight = async (createHighlight: CreateHighlight): Promise<HighlightReturnDTO> => {
+  const accessToken = createHighlight.accessToken;
+  const kakaoId = createHighlight.kakaoId;
+  const scriptId = createHighlight.scriptId;
+  if (await doesAccessTokenExpire(accessToken, kakaoId)) {
+    throw new AccessTokenExpiredError();
+  }
   const highlightCommandRepository = await getConnectionToHighlightCommandRepository();
 
-  const user = await UserService.searchByUserId(createHighlight.userId);
+  const user = await UserService.searchByUserId(kakaoId);
   const highlight = createHighlight.toEntity(user);
-  log.debug(' createHighlight.scriptId ', createHighlight.scriptId);
+  log.debug(' createHighlight.scriptId ', scriptId);
 
   try {
     // save highlight
@@ -96,17 +81,38 @@ const createHighlight = async (createHighlight: CreateHighlight): Promise<Highli
     log.debug('savedHighlight ', savedHighlight);
 
     // get newsId of highlight
-    const newsId = await findNewsIdOfScriptId(savedHighlight.scriptId);
-
-    return await new HighlightReturnDTO(savedHighlight);
+    const newsId = await findNewsIdOfScriptId(scriptId);
+    return await getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId);
   } catch (error) {
     log.error('error', error);
-    // TODO: make new custom error
+    if (error.errno === 1062) {
+      throw new DuplicateStartingIndexAndEndingIndex();
+    }
     throw new CustomError(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
   }
+};
+
+const removeHighlightByHighlightId = async (
+  accessToken: string,
+  kakaoId: string,
+  highlight_id: number,
+): Promise<HighlightReturnDTO> => {
+  const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
+  const highlightCommandRepository = await getConnectionToHighlightCommandRepository();
+  const toBeDeletedHighlight = await highlightQueryRepository.findHighlightByHighlightId(
+    highlight_id,
+  );
+  const scriptId = toBeDeletedHighlight.scriptId;
+  const isHighlightDeleted = await highlightCommandRepository.removeHighlight(toBeDeletedHighlight);
+  if (!isHighlightDeleted) {
+    throw new CustomError(statusCode.NOT_FOUND, message.NOT_FOUND);
+  }
+  const newsId = await findNewsIdOfScriptId(scriptId);
+  return await getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId);
 };
 
 export default {
   createHighlight,
   getHighlightByKakaoIdAndNewsId,
+  removeHighlightByHighlightId
 };
