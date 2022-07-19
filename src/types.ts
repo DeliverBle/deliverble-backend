@@ -276,3 +276,14 @@ export interface HighlightInfo {
   startingIndex: number;
   endingIndex: number;
 }
+
+export class HighlightReturnDTO {
+  constructor(highlight: Highlight) {
+    this.scriptId = highlight['scriptId'];
+    const { startingIndex, endingIndex } = highlight;
+    const _highlightIdx = [Number(startingIndex), Number(endingIndex)];
+    this.highlightIdx = [_highlightIdx]
+  }
+  scriptId: number;
+  highlightIdx: [number[]];
+}
