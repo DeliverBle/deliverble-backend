@@ -356,10 +356,10 @@ export const removeFavoriteNews = async (kakaoId: string, newsId: string): Promi
   return await updateExistingUser(toAfterUpdatedUser);
 };
 
-const searchByUserId = async (userId: string) => {
+const searchByKakaoId = async (kakaoId: string) => {
   const userQueryRepository = await getConnectionToUserQueryRepository();
   try {
-    return await userQueryRepository.findByKakaoId(userId);
+    return await userQueryRepository.findByKakaoId(kakaoId);
   } catch {
     log.debug('meow');
     // TODO: need an another handler for this error
@@ -381,5 +381,7 @@ export default {
   getAllFavoriteNewsList,
   addNewFavoriteNews,
   removeFavoriteNews,
-  searchByUserId,
+  findUserByKakaoId,
+  searchByUserId: searchByKakaoId,
+  updateExistingUser
 };
