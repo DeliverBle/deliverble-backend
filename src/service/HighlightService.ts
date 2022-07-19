@@ -34,7 +34,7 @@ const getHighlightByKakaoIdAndNewsId = async (
   accessToken: string,
   kakaoId: string,
   newsId: number,
-): Promise<any> => {
+): Promise<HighlightReturnCollectionDTO> => {
   const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
   log.debug('accessToken', accessToken);
   if (await doesAccessTokenExpire(accessToken, kakaoId)) {
@@ -62,7 +62,7 @@ const findNewsIdOfScriptId = async (scriptId: number): Promise<number> => {
   return await scriptQueryRepository.findNewsIdOfScriptId(scriptId);
 };
 
-const createHighlight = async (createHighlight: CreateHighlight): Promise<HighlightReturnDTO> => {
+const createHighlight = async (createHighlight: CreateHighlight): Promise<HighlightReturnCollectionDTO> => {
   const accessToken = createHighlight.accessToken;
   const kakaoId = createHighlight.kakaoId;
   const scriptId = createHighlight.scriptId;
@@ -96,7 +96,7 @@ const removeHighlightByHighlightId = async (
   accessToken: string,
   kakaoId: string,
   highlight_id: number,
-): Promise<HighlightReturnDTO> => {
+): Promise<HighlightReturnCollectionDTO> => {
   const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
   const highlightCommandRepository = await getConnectionToHighlightCommandRepository();
   const toBeDeletedHighlight = await highlightQueryRepository.findHighlightByHighlightId(
