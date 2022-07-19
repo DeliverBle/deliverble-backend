@@ -57,7 +57,7 @@ export const getHighlightByKakaoIdAndNewsId = async (req: Request, res: Response
     const data = await HighlightService.getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId);
     res
       .status(statusCode.OK)
-      .send(util.success(statusCode.OK, message.GET_HIGHLIGHT_SUCCESS, data));
+      .send(util.success(statusCode.OK, message.GET_HIGHLIGHT_SUCCESS, data.highlightReturnCollection));
   } catch (err) {
     log.error(err);
     if (err.response !== undefined) {
