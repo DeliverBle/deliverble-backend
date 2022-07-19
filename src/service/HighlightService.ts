@@ -92,7 +92,27 @@ const createHighlight = async (createHighlight: CreateHighlight): Promise<Highli
   }
 };
 
+const removeHighlightByHighlightId = async (
+  accessToken: string,
+  kakaoId: string,
+  highlight_id: number,
+): Promise<HighlightReturnDTO> => {
+  const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
+  const highlightCommandRepository = await getConnectionToHighlightCommandRepository();
+  const toBeDeletedHighlight = await highlightQueryRepository.findHighlightByHighlightId(
+    highlight_id,
+  );
+  const scriptId = toBeDeletedHighlight.scriptId;
+  const isHighlightDeleted = await highlightCommandRepository.removeHighlight(toBeDeletedHighlight);
+  if (!isHighlightDeleted) {
+    throw new CustomError(statusCode.NOT_FOUND, message.NOT_FOUND);
+  }
+  const newsId = await findNewsIdOfScriptId(scriptId);
+  return await getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId);
+};
+
 export default {
   createHighlight,
   getHighlightByKakaoIdAndNewsId,
+  removeHighlightByHighlightId
 };

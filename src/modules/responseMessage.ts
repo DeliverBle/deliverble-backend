@@ -19,7 +19,8 @@ const message = {
   // 하이라이트
   CREATE_HIGHLIGHT_SUCCESS: '하이라이트 생성 성공',
   GET_HIGHLIGHT_SUCCESS: '하이라이트 조회 성공',
-  DUPLICATE_INDEX_FAIL: '동일한 시작 인덱스와 종료 인덱스를 갖고 있는 하이라이트가 이미 존재합니다.'
+  DUPLICATE_INDEX_FAIL: '동일한 시작 인덱스와 종료 인덱스를 갖고 있는 하이라이트가 이미 존재합니다.',
+  REMOVE_HIGHLIGHT_SUCCESS: '하이라이트 삭제 성공',
 };
 
 export default message;
