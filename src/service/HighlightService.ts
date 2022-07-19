@@ -1,15 +1,15 @@
-import {getConnection} from 'typeorm';
+import { getConnection } from 'typeorm';
 
-import {Logger} from 'tslog';
-import {CreateHighlight} from '../types';
-import {HighlightQueryRepository} from '../repository/HighlightRepository';
-import UserService, {findUserByKakaoId} from './UserService';
-import {HighlightCommandRepository} from "../repository/HighlightCommandRepository";
-import CustomError from "../error/CustomError";
-import statusCode from "../modules/statusCode";
-import message from "../modules/responseMessage";
-import {Highlight} from "../entity/Highlight";
-import NewsService from "./NewsService";
+import { Logger } from 'tslog';
+import { CreateHighlight } from '../types';
+import { HighlightQueryRepository } from '../repository/HighlightRepository';
+import UserService, { findUserByKakaoId } from './UserService';
+import { HighlightCommandRepository } from '../repository/HighlightCommandRepository';
+import CustomError from '../error/CustomError';
+import statusCode from '../modules/statusCode';
+import message from '../modules/responseMessage';
+import { Highlight } from '../entity/Highlight';
+import NewsService from './NewsService';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -33,10 +33,44 @@ const getHighlightByKakaoIdAndNewsId = async (kakaoId: number, newsId: number): 
   const highlightOfAllUserId = await highlightQueryRepository.findAllHighlightByUserId(userId);
   const scriptIdsOfNewsId = await NewsService.findScriptIdsByNewsId(newsId.toString());
 
-  const returnHighlights = highlightOfAllUserId.filter(highlight => scriptIdsOfNewsId.includes(highlight.scriptId));
-  returnHighlights.forEach((highlight) => log.debug(" highlight", highlight))
-  return returnHighlights;
-}
+  const returnHighlights = highlightOfAllUserId.filter((highlight) =>
+    scriptIdsOfNewsId.includes(highlight.scriptId),
+  );
+
+  const scriptIdsOnReturnHighlights = [
+    ...new Set(returnHighlights.map((highlight) => highlight['scriptId'])),
+  ];
+
+  log.debug('scriptIdsOnReturnHighlights', scriptIdsOnReturnHighlights);
+  log.debug('returnHighlights', returnHighlights);
+
+  const objectsByScriptIds = scriptIdsOnReturnHighlights.map((cur, idx, acc) => {
+    if (acc.find((obj) => obj['scriptId'] === cur)) {
+      return acc.find((obj) => obj['scriptId'] === cur);
+    }
+    const newObject = Object.create({});
+    newObject.scriptId = cur;
+    newObject.highlightIdx = [];
+    return newObject;
+  }, []);
+
+  log.debug('objectsByScriptIds', objectsByScriptIds);
+
+  objectsByScriptIds.map((cur, idx, acc) => {
+    // filter by current scriptIds
+    const filteredHighlights = returnHighlights.filter(
+      (highlight) => highlight['scriptId'] === cur.scriptId,
+    );
+    // push highlightIdx
+    filteredHighlights.map((highlight) => {
+      acc[idx].highlightIdx.push([highlight.startingIndex, highlight.endingIndex]);
+    });
+    return acc;
+  }, []);
+
+  log.debug('objectsByScriptIds ', objectsByScriptIds);
+  return objectsByScriptIds;
+};
 
 const createHighlight = async (createHighlight: CreateHighlight): Promise<Highlight> => {
   const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
@@ -60,5 +94,5 @@ const createHighlight = async (createHighlight: CreateHighlight): Promise<Highli
 
 export default {
   createHighlight,
-  getHighlightByKakaoIdAndNewsId
+  getHighlightByKakaoIdAndNewsId,
 };
