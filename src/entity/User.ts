@@ -5,13 +5,15 @@ import {
   Entity,
   JoinTable,
   ManyToMany,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { determineGenderByGivenString, Gender } from '../shared/common/Gender';
 import { News } from './News';
-import {KakaoRawInfo} from "../types";
-import {Logger} from "tslog";
-import {IsEmail, Length} from "class-validator";
+import { KakaoRawInfo } from '../types';
+import { Logger } from 'tslog';
+import { IsEmail, Length } from 'class-validator';
+import { Highlight } from './Highlight';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -31,7 +33,7 @@ export class User extends BaseEntity {
 
   @Column({
     type: 'bigint',
-    unique: true
+    unique: true,
   })
   kakaoId: string;
 
@@ -41,14 +43,14 @@ export class User extends BaseEntity {
 
   @IsEmail()
   @Column({
-    unique: true
+    unique: true,
   })
   email: string;
 
   @Column({
-    type: "enum",
+    type: 'enum',
     enum: Gender,
-    default: Gender.UNSPECIFIED
+    default: Gender.UNSPECIFIED,
   })
   gender: Gender;
 
@@ -66,12 +68,15 @@ export class User extends BaseEntity {
   })
   favoriteNews: Promise<News[]>;
 
+  @OneToMany(() => Highlight, (highlight) => highlight.user, { eager: false })
+  highlights: Promise<Highlight[]>;
+
   @AfterLoad()
   async nullChecks() {
-    const NO_EMAIL = "NO_EMAIL";
+    const NO_EMAIL = 'NO_EMAIL';
     if (!this.email) {
-      log.info("User denied to provide email information")
-      this.email = NO_EMAIL
+      log.info('User denied to provide email information');
+      this.email = NO_EMAIL;
     }
   }
 
@@ -83,17 +88,40 @@ export class User extends BaseEntity {
 
   public removeFavoriteNews = async (toBeDeletedNews: News) => {
     const favoriteNewsList = await this.favoriteNews;
-    this.favoriteNews = Promise.resolve(favoriteNewsList.filter((nowIteratedNews) => {
-      return nowIteratedNews.id !== toBeDeletedNews.id;
-    }));
+    this.favoriteNews = Promise.resolve(
+      favoriteNewsList.filter((nowIteratedNews) => {
+        return nowIteratedNews.id !== toBeDeletedNews.id;
+      }),
+    );
     return this;
   };
 
-  public getFavoriteNews = async () => {
-    return await this.favoriteNews;
+  public addNewHighlight = async (highlight: Highlight) => {
+    const highlights = await this.highlights;
+    highlights.push(highlight);
+    return this;
   }
 
+  public removeExistingHighlight = async (toBeDeletedHighlight: Highlight) => {
+    const highlights = await this.highlights;
+    this.highlights = Promise.resolve(
+        highlights.filter((highlight) => {
+          return highlight.id !== toBeDeletedHighlight.id;
+        }),
+    );
+    return this;
+  }
+
+  public getFavoriteNews = async () => {
+    return await this.favoriteNews;
+  };
+
   static fromKakaoRawInfo(kakaoRawInfo: KakaoRawInfo): User {
-    return new User(kakaoRawInfo.kakaoId, kakaoRawInfo.nickname, kakaoRawInfo.email, kakaoRawInfo.gender);
+    return new User(
+      kakaoRawInfo.kakaoId,
+      kakaoRawInfo.nickname,
+      kakaoRawInfo.email,
+      kakaoRawInfo.gender,
+    );
   }
 }
