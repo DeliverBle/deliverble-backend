@@ -12,7 +12,8 @@ const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 export const createHighlight = async (req: Request, res: Response): Promise<void | Response> => {
   const tokensAndUserId = await UserController.getTokensParsedFromBody(req.body);
   const accessToken = tokensAndUserId.accessToken;
-  const kakaoId = tokensAndUserId.userId;
+  let kakaoId = tokensAndUserId.userId;
+  kakaoId = kakaoId.replace(/['"]+/g, '');
   const scriptId = req.body.script_id;
   const startingIndex = req.body.starting_index;
   const endingIndex = req.body.ending_index;
@@ -47,7 +48,8 @@ export const createHighlight = async (req: Request, res: Response): Promise<void
 
 export const getHighlightByKakaoIdAndNewsId = async (req: Request, res: Response): Promise<void | Response> => {
   const accessToken = req.body['access_token'];
-  const kakaoId = req.body['user_id'];
+  let kakaoId = req.body['user_id'];
+  kakaoId = kakaoId.replace(/['"]+/g, '');
   const newsId = req.body['news_id'];
   log.debug('hello', kakaoId, newsId);
 
