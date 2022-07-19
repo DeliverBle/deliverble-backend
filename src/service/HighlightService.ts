@@ -1,7 +1,7 @@
 import { getConnection } from 'typeorm';
 
 import { Logger } from 'tslog';
-import { CreateHighlight, HighlightReturnDTO } from '../types';
+import { CreateHighlight, HighlightReturnCollectionDTO, HighlightReturnDTO } from '../types';
 import { HighlightQueryRepository } from '../repository/HighlightRepository';
 import UserService, { doesAccessTokenExpire, findUserByKakaoId } from './UserService';
 import { HighlightCommandRepository } from '../repository/HighlightCommandRepository';
@@ -52,41 +52,9 @@ const getHighlightByKakaoIdAndNewsId = async (
     scriptIdsOfNewsId.includes(highlight.scriptId),
   );
 
-  return returnHighlights.map((highlight) => new HighlightReturnDTO(highlight));
-  //
-  // const scriptIdsOnReturnHighlights = [
-  //   ...new Set(returnHighlights.map((highlight) => highlight['scriptId'])),
-  // ];
-  //
-  // log.debug('scriptIdsOnReturnHighlights', scriptIdsOnReturnHighlights);
-  // log.debug('returnHighlights', returnHighlights);
-  //
-  // const objectsByScriptIds = scriptIdsOnReturnHighlights.map((cur, idx, acc) => {
-  //   if (acc.find((obj) => obj['scriptId'] === cur)) {
-  //     return acc.find((obj) => obj['scriptId'] === cur);
-  //   }
-  //   const newObject = Object.create({});
-  //   newObject.scriptId = cur;
-  //   newObject.highlightIdx = [];
-  //   return newObject;
-  // }, []);
-  //
-  // log.debug('objectsByScriptIds', objectsByScriptIds);
-  //
-  // objectsByScriptIds.map((cur, idx, acc) => {
-  //   // filter by current scriptIds
-  //   const filteredHighlights = returnHighlights.filter(
-  //     (highlight) => highlight['scriptId'] === cur.scriptId,
-  //   );
-  //   // push highlightIdx
-  //   filteredHighlights.map((highlight) => {
-  //     acc[idx].highlightIdx.push([highlight.startingIndex, highlight.endingIndex]);
-  //   });
-  //   return acc;
-  // }, []);
-  //
-  // log.debug('objectsByScriptIds ', objectsByScriptIds);
-  // return objectsByScriptIds;
+  return new HighlightReturnCollectionDTO(
+    returnHighlights.map((highlight) => new HighlightReturnDTO(highlight)),
+  );
 };
 
 const findNewsIdOfScriptId = async (scriptId: number): Promise<number> => {
