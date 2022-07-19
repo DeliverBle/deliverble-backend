@@ -14,19 +14,9 @@ export class HighlightQueryRepository extends Repository<Highlight> {
     return await this.createQueryBuilder('highlight').getMany();
   };
 
-  createHighlight = async (createHighlight: CreateHighlight) => {
-    // const channels = createHighlight.channels;
-    return this.createQueryBuilder('highlight')
-      .insert()
-      .into(Highlight)
-      .values([
-          { 
-            // userId: createHighlight.userId,
-            scriptId: createHighlight.scriptId,
-            startingIndex: createHighlight.startingIndex,
-            endingIndex: createHighlight.endingIndex,
-          }
-      ])
-      .execute()
+  findAllHighlightByUserId = async (user_id: number) => {
+    return await this.createQueryBuilder('highlight')
+      .where('highlight.user_id = :user_id', { user_id })
+      .getMany();
   }
 };
