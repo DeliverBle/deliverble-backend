@@ -195,6 +195,11 @@ const searchByNewsId = async (newsId: string) => {
   }
 };
 
+export const findScriptIdsByNewsId = async (newsId: string): Promise<number[]> => {
+  const newsDetailDTO = await findNewsDetail(Number(newsId));
+  return newsDetailDTO.scripts.map((script) => script.id);
+}
+
 
 export default {
   searchAllNews,
@@ -204,5 +209,6 @@ export default {
   searchByConditions,
   searchRecommendNews,
   findNewsDetail,
-  searchByNewsId
+  searchByNewsId,
+  findScriptIdsByNewsId
 };
