@@ -334,4 +334,5 @@ export default {
   getAllFavoriteNewsList,
   addFavoriteNews,
   removeFavoriteNews,
+  getTokensParsedFromBody,
 };

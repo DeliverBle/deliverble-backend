@@ -24,6 +24,7 @@ import AlreadyLoggedOutError from '../error/AlreadyLoggedOutError';
 import AlreadySignedUpError from '../error/AlreadySignedUpError';
 import NewsService from './NewsService';
 import ResourceNotFoundError from '../error/ResourceNotFoundError';
+import CustomError from '../error/CustomError';
 
 const redisClient = require('../util/redis');
 
@@ -355,6 +356,17 @@ export const removeFavoriteNews = async (kakaoId: string, newsId: string): Promi
   return await updateExistingUser(toAfterUpdatedUser);
 };
 
+const searchByUserId = async (userId: string) => {
+  const userQueryRepository = await getConnectionToUserQueryRepository();
+  try {
+    return await userQueryRepository.findByKakaoId(userId);
+  } catch {
+    log.debug('meow');
+    // TODO: need an another handler for this error
+    throw new CustomError(404, "News Not Found");
+  }
+};
+
 export default {
   loginUserWithKakao,
   signUpUserWithKakao,
@@ -369,4 +381,5 @@ export default {
   getAllFavoriteNewsList,
   addNewFavoriteNews,
   removeFavoriteNews,
+  searchByUserId,
 };
