@@ -11,11 +11,12 @@ const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 export const createHighlight = async (req: Request, res: Response): Promise<void | Response> => {
   const tokensAndUserId = await UserController.getTokensParsedFromBody(req.body);
-  const userId = tokensAndUserId.userId;
+  const accessToken = tokensAndUserId.accessToken;
+  const kakaoId = tokensAndUserId.userId;
   const scriptId = req.body.script_id;
   const startingIndex = req.body.starting_index;
   const endingIndex = req.body.ending_index;
-  const createHighlight = new CreateHighlight(userId, scriptId, startingIndex, endingIndex);
+  const createHighlight = new CreateHighlight(accessToken, kakaoId, scriptId, startingIndex, endingIndex);
 
   try {
     const data = await HighlightService.createHighlight(createHighlight);
@@ -45,12 +46,13 @@ export const createHighlight = async (req: Request, res: Response): Promise<void
 };
 
 export const getHighlightByKakaoIdAndNewsId = async (req: Request, res: Response): Promise<void | Response> => {
-  const kakaoId = req.body['kakao_id'];
+  const accessToken = req.body['access_token'];
+  const kakaoId = req.body['user_id'];
   const newsId = req.body['news_id'];
   log.debug('hello', kakaoId, newsId);
 
   try {
-    const data = await HighlightService.getHighlightByKakaoIdAndNewsId(kakaoId, newsId);
+    const data = await HighlightService.getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId);
     res
       .status(statusCode.OK)
       .send(util.success(statusCode.OK, message.GET_HIGHLIGHT_SUCCESS, data));
