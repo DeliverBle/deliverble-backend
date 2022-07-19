@@ -112,8 +112,7 @@ const createHighlight = async (createHighlight: CreateHighlight): Promise<Highli
 
     // get newsId of highlight
     const newsId = await findNewsIdOfScriptId(scriptId);
-
-    return await new HighlightReturnDTO(savedHighlight);
+    return await getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId);
   } catch (error) {
     log.error('error', error);
     if (error.errno === 1062) {
