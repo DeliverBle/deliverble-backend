@@ -15,6 +15,11 @@ const message = {
   SEARCH_NEWS_SUCCESS: '영상 검색 결과 조회 성공',
   RECOMMEND_NEWS_SUCCESS: '추천 영상 조회 성공',
   DETAIL_NEWS_SUCCESS: '영상 조회 성공',
+  
+  // 하이라이트
+  CREATE_HIGHLIGHT_SUCCESS: '하이라이트 생성 성공',
+  GET_HIGHLIGHT_SUCCESS: '하이라이트 조회 성공',
+  DUPLICATE_INDEX_FAIL: '동일한 시작 인덱스와 종료 인덱스를 갖고 있는 하이라이트가 이미 존재합니다.'
 };
 
 export default message;

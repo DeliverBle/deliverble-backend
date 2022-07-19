@@ -17,10 +17,14 @@ export class Script extends BaseEntity {
   id!: number;
 
   @ManyToOne((type) => News, {
-    onDelete: "CASCADE"
+    onDelete: "CASCADE",
+    eager: true
   })
   @JoinColumn({ name: 'news_id', referencedColumnName: 'id' })
   news!: News;
+
+  @Column({ name: 'news_id' })
+  newsId: number;
 
   @Column(() => Time, )
   startTime: Time;

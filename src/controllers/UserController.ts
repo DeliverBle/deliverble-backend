@@ -10,6 +10,7 @@ const getTokensParsedFromBody = async (body: string) => {
   const accessToken = body['access_token'];
   const refreshToken = body['refresh_token'];
   const userId = body['user_id'];
+  log.debug(userId);
   return {
     accessToken,
     refreshToken,
@@ -23,7 +24,8 @@ const getTokensAndUserIdParsedFromBody = async (body: string) => {
   const refreshToken = body['refresh_token'];
   const newsId = body['news_id'];
   // TODO: 생각보다 컨트롤러가 비대한데... 책임을 분리할 방법은 없을까...
-  const userId = body['user_id'];
+  let userId = body['user_id'];
+  userId = userId.replace(/['"]+/g, '');
   // const userId = (await getKakaoRawInfo(accessToken)).kakaoId;
   log.debug(accessToken, refreshToken, newsId, userId);
   return {
@@ -37,7 +39,7 @@ const getTokensAndUserIdParsedFromBody = async (body: string) => {
 const getTokensAndIdCallbackFromKakao = async (req: Request) => {
   const accessToken = req['user'][0];
   const refreshToken = req['user'][1];
-  const kakaoId = req['user'][2];
+  const kakaoId = req['user'][2].toString();
   return {
     accessToken,
     refreshToken,
@@ -45,8 +47,9 @@ const getTokensAndIdCallbackFromKakao = async (req: Request) => {
   };
 };
 
-const getUserIdParsedFromBody = (body: string): string => {
-  return body['user_id'].toString();
+const getUserIdParsedFromBody = (body: string) => {
+  log.debug(" >>>>>>>>>>>>>>>> ", body['user_id'])
+  return body['user_id'];
 };
 
 export const callbackKakao = async (req: Request, res: Response): Promise<void | Response> => {
@@ -54,20 +57,14 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
   const accessToken = tokensAndUserId.accessToken;
   const refreshToken = tokensAndUserId.refreshToken;
   const userId = tokensAndUserId.kakaoId;
-  const accessTokenExpiresIn = await UserService.checkAccessTokenExpiryTTLToRedisServer(
-    accessToken,
-    userId,
-  );
   // TODO: initial callback to save refreshToken at Redis with userId
   await UserService.saveTokensAtRedisWithUserId(userId, accessToken, refreshToken);
-
-  log.debug(accessToken, refreshToken, accessTokenExpiresIn, userId);
 
   res.status(StatusCode.OK).send({
     status: StatusCode.OK,
     message: {
       accessToken: accessToken,
-      expired_in: accessTokenExpiresIn,
+      expired_in: 21600,
       userId,
     },
   });
@@ -76,7 +73,8 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
 const loginUserWithKakao = async (req: Request, res: Response) => {
   const tokensAndUserId = await getTokensAndUserIdParsedFromBody(req.body);
   const accessToken = tokensAndUserId.accessToken;
-  const userId = tokensAndUserId.userId;
+  let userId = tokensAndUserId.userId;
+  userId = userId.replace(/['"]+/g, '');
 
   log.debug(accessToken);
 
@@ -186,7 +184,9 @@ const signUpUserWithKakao = async (req: Request, res: Response) => {
 
 const refreshAccessToken = async (req: Request, res: Response) => {
   const accessToken = (await getTokensAndUserIdParsedFromBody(req.body)).accessToken;
-  const userId = getUserIdParsedFromBody(req.body);
+  let userId = getUserIdParsedFromBody(req.body);
+  log.debug("userId >>>>>>>>>>>>>>>>>> ", userId);
+  userId = userId.replace(/['"]+/g, '');
 
   try {
     const retrievedAccessToken = await UserService.updateAccessTokenByRefreshToken(
@@ -334,4 +334,5 @@ export default {
   getAllFavoriteNewsList,
   addFavoriteNews,
   removeFavoriteNews,
+  getTokensParsedFromBody,
 };

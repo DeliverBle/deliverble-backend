@@ -1,12 +1,17 @@
 import { Category } from './shared/common/Category';
-import { convertGenderEnglishToKorean, convertKoreanToGenderObject, Gender } from './shared/common/Gender';
+import {
+  convertGenderEnglishToKorean,
+  convertKoreanToGenderObject,
+  Gender,
+} from './shared/common/Gender';
 import { Time } from './vo/Time';
 import { Suitability } from './shared/common/Suitability';
 import { Tag } from './entity/Tag';
 import { Channel } from './shared/common/Channel';
 import { User } from './entity/User';
 import { Logger } from 'tslog';
-import {IsNotEmpty} from "class-validator";
+import { IsNotEmpty } from 'class-validator';
+import { Highlight } from './entity/Highlight';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -249,3 +254,59 @@ export interface UserFavoriteNewsReturnDTO {
   readonly favoriteNews: NewsInfo[] | Promise<NewsInfo[]>;
 }
 
+export class CreateHighlight {
+  constructor(
+    _accessToken: string,
+    _kakaoId: string,
+    _scriptId: number,
+    _startingIndex: number,
+    _endingIndex: number,
+  ) {
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
+    this.scriptId = _scriptId;
+    this.startingIndex = _startingIndex;
+    this.endingIndex = _endingIndex;
+  }
+  accessToken: string;
+  kakaoId: string;
+  scriptId: number;
+  startingIndex: number;
+  endingIndex: number;
+
+  toEntity(user: User): Highlight {
+    return new Highlight(user, this.scriptId, this.startingIndex, this.endingIndex);
+  }
+}
+
+export interface HighlightInfo {
+  id: number;
+  userId: string;
+  scriptId: number;
+  startingIndex: number;
+  endingIndex: number;
+}
+
+export class HighlightReturnDTO {
+  constructor(highlight: Highlight) {
+    this.highlightId = highlight.id;
+    this.scriptId = highlight.scriptId;
+    this.startingIndex = highlight.startingIndex;
+    this.endingIndex = highlight.endingIndex;
+  }
+  scriptId: number;
+  startingIndex: number;
+  endingIndex: number;
+  highlightId: number;
+}
+
+// export class HighlightReturnDTO {
+//   constructor(highlight: Highlight) {
+//     this.scriptId = highlight['scriptId'];
+//     const { startingIndex, endingIndex } = highlight;
+//     const _highlightIdx = [Number(startingIndex), Number(endingIndex)];
+//     this.highlightIdx = [_highlightIdx]
+//   }
+//   scriptId: number;
+//   highlightIdx: [number[]];
+// }
