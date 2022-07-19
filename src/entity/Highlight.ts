@@ -2,7 +2,7 @@ import {BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColum
 import { User } from './User';
 
 @Entity()
-@Index(["startingIndex", "endingIndex"], { unique: true })
+@Index(["scriptId", "startingIndex", "endingIndex"], { unique: true })
 export class Highlight extends BaseEntity {
   constructor(_user: User, _scriptId: number, _startingIndex: number, _endingIndex: number) {
     super();
