@@ -37,7 +37,7 @@ const getTokensAndUserIdParsedFromBody = async (body: string) => {
 const getTokensAndIdCallbackFromKakao = async (req: Request) => {
   const accessToken = req['user'][0];
   const refreshToken = req['user'][1];
-  const kakaoId = req['user'][2];
+  const kakaoId = req['user'][2].toString();
   return {
     accessToken,
     refreshToken,
