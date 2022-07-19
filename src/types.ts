@@ -263,6 +263,10 @@ export class CreateHighlight {
   scriptId: number;
   startingIndex: number;
   endingIndex: number;
+
+  toEntity(user: User): Highlight {
+    return new Highlight(user, this.scriptId, this.startingIndex, this.endingIndex);
+  }
 }
 
 export interface HighlightInfo {
