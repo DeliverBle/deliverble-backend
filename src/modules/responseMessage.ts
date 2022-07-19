@@ -17,7 +17,8 @@ const message = {
   DETAIL_NEWS_SUCCESS: '영상 조회 성공',
   
   // 하이라이트
-  CREATE_HIGHLIGHT_SUCCESS: '하이라이트 생성 성공'
+  CREATE_HIGHLIGHT_SUCCESS: '하이라이트 생성 성공',
+  GET_HIGHLIGHT_SUCCESS: '하이라이트 조회 성공'
 };
 
 export default message;
