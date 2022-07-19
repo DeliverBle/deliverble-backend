@@ -287,10 +287,27 @@ export interface HighlightInfo {
   endingIndex: number;
 }
 
+export class HighlightReturnCollectionDTO {
+  constructor(_highlightReturnCollection: HighlightReturnDTO[]) {
+    this.highlightReturnCollection = _highlightReturnCollection;
+    this.sortByScriptIdFirstAndStartingIndexWhenScriptIdEquals();
+  }
+  highlightReturnCollection: HighlightReturnDTO[];
+  sortByScriptIdFirstAndStartingIndexWhenScriptIdEquals(): HighlightReturnCollectionDTO {
+    this.highlightReturnCollection = this.highlightReturnCollection.sort((a, b) => {
+      if (a.scriptId === b.scriptId) {
+        return a.startingIndex - b.startingIndex;
+      }
+      return a.scriptId - b.scriptId;
+    });
+    return this;
+  }
+}
+
 export class HighlightReturnDTO {
   constructor(highlight: Highlight) {
-    this.highlightId = highlight.id;
     this.scriptId = highlight.scriptId;
+    this.highlightId = highlight.id;
     this.startingIndex = highlight.startingIndex;
     this.endingIndex = highlight.endingIndex;
   }
@@ -299,14 +316,3 @@ export class HighlightReturnDTO {
   endingIndex: number;
   highlightId: number;
 }
-
-// export class HighlightReturnDTO {
-//   constructor(highlight: Highlight) {
-//     this.scriptId = highlight['scriptId'];
-//     const { startingIndex, endingIndex } = highlight;
-//     const _highlightIdx = [Number(startingIndex), Number(endingIndex)];
-//     this.highlightIdx = [_highlightIdx]
-//   }
-//   scriptId: number;
-//   highlightIdx: [number[]];
-// }

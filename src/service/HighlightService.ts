@@ -1,7 +1,7 @@
 import { getConnection } from 'typeorm';
 
 import { Logger } from 'tslog';
-import { CreateHighlight, HighlightReturnDTO } from '../types';
+import { CreateHighlight, HighlightReturnCollectionDTO, HighlightReturnDTO } from '../types';
 import { HighlightQueryRepository } from '../repository/HighlightRepository';
 import UserService, { doesAccessTokenExpire, findUserByKakaoId } from './UserService';
 import { HighlightCommandRepository } from '../repository/HighlightCommandRepository';
@@ -52,7 +52,9 @@ const getHighlightByKakaoIdAndNewsId = async (
     scriptIdsOfNewsId.includes(highlight.scriptId),
   );
 
-  return returnHighlights.map((highlight) => new HighlightReturnDTO(highlight));
+  return new HighlightReturnCollectionDTO(
+    returnHighlights.map((highlight) => new HighlightReturnDTO(highlight)),
+  );
 };
 
 const findNewsIdOfScriptId = async (scriptId: number): Promise<number> => {
