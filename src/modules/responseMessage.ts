@@ -18,7 +18,12 @@ const message = {
   
   // 하이라이트
   CREATE_HIGHLIGHT_SUCCESS: '하이라이트 생성 성공',
-  GET_HIGHLIGHT_SUCCESS: '하이라이트 조회 성공'
+  GET_HIGHLIGHT_SUCCESS: '하이라이트 조회 성공',
+
+  // 스페이싱
+  CREATE_SPACING_SUCCESS: '스페이싱 생성 성공',
+  GET_SPACING_SUCCESS: '스페이싱 조회 성공'
+  // 마지막 ',' 붙이면 작동하지 않음
 };
 
 export default message;
