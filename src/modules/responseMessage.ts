@@ -15,6 +15,9 @@ const message = {
   SEARCH_NEWS_SUCCESS: '영상 검색 결과 조회 성공',
   RECOMMEND_NEWS_SUCCESS: '추천 영상 조회 성공',
   DETAIL_NEWS_SUCCESS: '영상 조회 성공',
+  
+  // 하이라이트
+  CREATE_HIGHLIGHT_SUCCESS: '하이라이트 생성 성공'
 };
 
 export default message;
