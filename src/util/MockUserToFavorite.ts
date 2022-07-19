@@ -14,6 +14,18 @@ const userInfo = {
   gender: '남자',
 };
 
+const userInfo3 = {
+  nickname: 'JK',
+  email: 'JK@gmail.com',
+  gender: '남자',
+};
+
+const userInfo9 = {
+  nickname: 'crong',
+  email: 'crong@gmail.com',
+  gender: '남자',
+};
+
 // let tagTest1_1 = new Tag();
 // tagTest1_1.name = '경제';
 // let tagTest1_2 = new Tag();
@@ -62,6 +74,12 @@ export const MockUserToFavorite = async (connection) => {
   // save user1
   let userMock1 = new User("2323", userInfo.nickname, userInfo.email, userInfo.gender);
   await userRepository.save(userMock1);
+
+  let userMock3 = new User("6565", userInfo3.nickname, userInfo3.email, userInfo3.gender);
+  await userRepository.save(userMock3);
+
+  let userMock9 = new User("9832", userInfo9.nickname, userInfo9.email, userInfo9.gender);
+  await userRepository.save(userMock9);
 
   let user1 = await userRepository.findOne({
     where: {
