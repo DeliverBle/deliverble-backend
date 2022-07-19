@@ -1,7 +1,8 @@
-import { BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
+import {BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index} from 'typeorm';
 import { User } from './User';
 
 @Entity()
+@Index(["startingIndex", "endingIndex"], { unique: true })
 export class Highlight extends BaseEntity {
   constructor(_user: User, _scriptId: number, _startingIndex: number, _endingIndex: number) {
     super();
