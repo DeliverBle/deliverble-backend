@@ -8,6 +8,7 @@ import { User } from './entity/User';
 import { Logger } from 'tslog';
 import {IsNotEmpty} from "class-validator";
 import { Highlight } from './entity/Highlight';
+import { Spacing } from './entity/Spacing';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -286,4 +287,23 @@ export class HighlightReturnDTO {
   }
   scriptId: number;
   highlightIdx: [number[]];
+}
+
+export class CreateSpacing {
+  constructor(
+    _userId: string, _scriptId: number, _newsId: number, _index: number
+    ) {
+    this.userId = _userId;
+    this.scriptId = _scriptId;
+    this.newsId = _newsId;
+    this.index = _index;
+  }  
+  userId: string;
+  scriptId: number;
+  newsId: number;
+  index: number;
+
+  toEntity(user: User): Spacing {
+    return new Spacing(user, this.scriptId, this.index);
+  }
 }
