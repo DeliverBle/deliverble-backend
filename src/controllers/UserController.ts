@@ -54,20 +54,14 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
   const accessToken = tokensAndUserId.accessToken;
   const refreshToken = tokensAndUserId.refreshToken;
   const userId = tokensAndUserId.kakaoId;
-  const accessTokenExpiresIn = await UserService.checkAccessTokenExpiryTTLToRedisServer(
-    accessToken,
-    userId,
-  );
   // TODO: initial callback to save refreshToken at Redis with userId
   await UserService.saveTokensAtRedisWithUserId(userId, accessToken, refreshToken);
-
-  log.debug(accessToken, refreshToken, accessTokenExpiresIn, userId);
 
   res.status(StatusCode.OK).send({
     status: StatusCode.OK,
     message: {
       accessToken: accessToken,
-      expired_in: accessTokenExpiresIn,
+      expired_in: 21600,
       userId,
     },
   });
