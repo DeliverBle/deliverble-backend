@@ -3,7 +3,7 @@ import { getConnection } from 'typeorm';
 import { Logger } from 'tslog';
 import { CreateHighlight, HighlightReturnDTO } from '../types';
 import { HighlightQueryRepository } from '../repository/HighlightRepository';
-import UserService, { findUserByKakaoId } from './UserService';
+import UserService, { doesAccessTokenExpire, findUserByKakaoId } from './UserService';
 import { HighlightCommandRepository } from '../repository/HighlightCommandRepository';
 import CustomError from '../error/CustomError';
 import statusCode from '../modules/statusCode';
@@ -11,7 +11,8 @@ import message from '../modules/responseMessage';
 import { Highlight } from '../entity/Highlight';
 import NewsService from './NewsService';
 import { ScriptQueryRepository } from '../repository/ScriptQueryRepository';
-import DuplicateStartingIndexAndEndingIndex from "../error/DuplicateStartingIndexAndEndingIndex";
+import DuplicateStartingIndexAndEndingIndex from '../error/DuplicateStartingIndexAndEndingIndex';
+import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -29,9 +30,16 @@ const getConnectionToScriptQueryRepository = async () => {
   return connection.getCustomRepository(ScriptQueryRepository);
 };
 
-const getHighlightByKakaoIdAndNewsId = async (kakaoId: number, newsId: number): Promise<any> => {
+const getHighlightByKakaoIdAndNewsId = async (
+  accessToken: string,
+  kakaoId: string,
+  newsId: number,
+): Promise<any> => {
   const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
-
+  log.debug('accessToken', accessToken);
+  if (await doesAccessTokenExpire(accessToken, kakaoId)) {
+    throw new AccessTokenExpiredError();
+  }
   const user = await UserService.findUserByKakaoId(kakaoId.toString());
   const userId = user.id;
 
@@ -85,11 +93,17 @@ const findNewsIdOfScriptId = async (scriptId: number): Promise<number> => {
 };
 
 const createHighlight = async (createHighlight: CreateHighlight): Promise<HighlightReturnDTO> => {
+  const accessToken = createHighlight.accessToken;
+  const kakaoId = createHighlight.kakaoId;
+  const scriptId = createHighlight.scriptId;
+  if (await doesAccessTokenExpire(accessToken, kakaoId)) {
+    throw new AccessTokenExpiredError();
+  }
   const highlightCommandRepository = await getConnectionToHighlightCommandRepository();
 
-  const user = await UserService.searchByUserId(createHighlight.userId);
+  const user = await UserService.searchByUserId(kakaoId);
   const highlight = createHighlight.toEntity(user);
-  log.debug(' createHighlight.scriptId ', createHighlight.scriptId);
+  log.debug(' createHighlight.scriptId ', scriptId);
 
   try {
     // save highlight
@@ -97,7 +111,7 @@ const createHighlight = async (createHighlight: CreateHighlight): Promise<Highli
     log.debug('savedHighlight ', savedHighlight);
 
     // get newsId of highlight
-    const newsId = await findNewsIdOfScriptId(savedHighlight.scriptId);
+    const newsId = await findNewsIdOfScriptId(scriptId);
 
     return await new HighlightReturnDTO(savedHighlight);
   } catch (error) {
