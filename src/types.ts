@@ -7,6 +7,7 @@ import { Channel } from './shared/common/Channel';
 import { User } from './entity/User';
 import { Logger } from 'tslog';
 import {IsNotEmpty} from "class-validator";
+import { Highlight } from './entity/Highlight';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -249,3 +250,25 @@ export interface UserFavoriteNewsReturnDTO {
   readonly favoriteNews: NewsInfo[] | Promise<NewsInfo[]>;
 }
 
+export class CreateHighlight {
+  constructor(
+    _userId: string, _scriptId: number, _startingIndex: number, _endingIndex: number
+    ) {
+    this.userId = _userId;
+    this.scriptId = _scriptId;
+    this.startingIndex = _startingIndex;
+    this.endingIndex = _endingIndex;
+  }  
+  userId: string;
+  scriptId: number;
+  startingIndex: number;
+  endingIndex: number;
+}
+
+export interface HighlightInfo {
+  id: number;
+  userId: string;
+  scriptId: number;
+  startingIndex: number;
+  endingIndex: number;
+}
