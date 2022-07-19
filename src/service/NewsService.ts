@@ -210,5 +210,5 @@ export default {
   searchRecommendNews,
   findNewsDetail,
   searchByNewsId,
-  findScriptIdsByNewsId
+  findScriptIdsByNewsId,
 };
