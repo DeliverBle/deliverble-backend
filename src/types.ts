@@ -252,14 +252,16 @@ export interface UserFavoriteNewsReturnDTO {
 
 export class CreateHighlight {
   constructor(
-    _userId: string, _scriptId: number, _startingIndex: number, _endingIndex: number
+    _accessToken: string, _kakaoId: string, _scriptId: number, _startingIndex: number, _endingIndex: number
     ) {
-    this.userId = _userId;
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
     this.scriptId = _scriptId;
     this.startingIndex = _startingIndex;
     this.endingIndex = _endingIndex;
-  }  
-  userId: string;
+  }
+  accessToken: string;
+  kakaoId: string;
   scriptId: number;
   startingIndex: number;
   endingIndex: number;
