@@ -68,7 +68,6 @@ export const doesAccessTokenExpire = async (
 ): Promise<boolean> => {
   log.debug(' before expiry seconds validation ', accessToken);
   const expire_in: number = await checkAccessTokenExpiryTTLToRedisServer(accessToken, userId);
-  log.debug(' expire_in ', expire_in);
   return expire_in < 0;
 };
 
