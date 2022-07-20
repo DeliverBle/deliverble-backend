@@ -79,21 +79,19 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
   const USER_ID = "UD " + code;
   promisify(redisClient.get).bind(redisClient);
   // TODO: move validation logic to other class
-  if (accessToken !== 'NONE') {
-    await redisClient.setex(
+  log.debug("82 >>>>> ", ACCESS_TOKEN, USER_ID);
+  await redisClient.setex(
         ACCESS_TOKEN,
         DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
         accessToken,
-    );
-  }
-  if (userId !== 'NONE') {
-    await redisClient.setex(
+  );
+  log.debug("88 >>>>> ", ACCESS_TOKEN, USER_ID);
+  await redisClient.setex(
         USER_ID,
         DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
         userId,
-    );
-  }
-
+  );
+  log.debug("94 >>>>> ", ACCESS_TOKEN, USER_ID);
   res.status(StatusCode.OK).send({
     status: StatusCode.OK,
     message: {
