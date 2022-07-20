@@ -30,4 +30,14 @@ export class HighlightCommandRepository extends Repository<Highlight> {
       return false;
     }
   }
+
+  updateHighlight = async (highlight: Highlight): Promise<Highlight> => {
+    try {
+      await this.save(highlight);
+      return highlight;
+    } catch (err) {
+      log.error(err);
+      throw err;
+    }
+  }
 }

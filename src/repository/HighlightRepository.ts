@@ -23,6 +23,6 @@ export class HighlightQueryRepository extends Repository<Highlight> {
   findHighlightByHighlightId = async (highlight_id: number) => {
     return await this.createQueryBuilder('highlight')
       .where('highlight.id = :highlight_id', { highlight_id })
-      .getOne();
+      .getOneOrFail();
   };
 }
