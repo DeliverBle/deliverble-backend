@@ -13,8 +13,9 @@ export const createSpacing = async (req: Request, res: Response): Promise<void |
   log.debug('req.query', req.query);
   const tokensAndUserId = await UserController.getTokensParsedFromBody(req.body);
   const accessToken = tokensAndUserId.accessToken;
-  const kakaoId = String(req.query.user_id);
-  const newsId = Number(req.query.news_id);
+  let kakaoId = tokensAndUserId.userId;
+  kakaoId = kakaoId.replace(/['"]+/g, '');
+  const newsId = req.body.news_id;
   const scriptId = req.body.script_id;
   const index = req.body.index;
   const createSpacing = new CreateSpacing(accessToken, kakaoId, scriptId, newsId, index);
@@ -49,8 +50,9 @@ export const createSpacing = async (req: Request, res: Response): Promise<void |
 export const getSpacing = async (req: Request, res: Response): Promise<void | Response> => {
   const tokensAndUserId = await UserController.getTokensParsedFromBody(req.body);
   const accessToken = tokensAndUserId.accessToken;
-  const kakaoId = String(req.query.user_id);
-  const newsId = Number(req.query.news_id);
+  let kakaoId = tokensAndUserId.userId;
+  kakaoId = kakaoId.replace(/['"]+/g, '');
+  const newsId = req.body.news_id;
   const getSpacing = new GetSpacing(accessToken, kakaoId, newsId);
 
   try {
@@ -84,8 +86,9 @@ export const removeSpacing = async (req: Request, res: Response): Promise<void |
   log.debug('req.query', req.query);
   const tokensAndUserId = await UserController.getTokensParsedFromBody(req.body);
   const accessToken = tokensAndUserId.accessToken;
-  const kakaoId = String(req.query.user_id);
-  const newsId = Number(req.query.news_id);
+  let kakaoId = tokensAndUserId.userId;
+  kakaoId = kakaoId.replace(/['"]+/g, '');
+  const newsId = req.body.news_id;
   const spacingId = req.body.spacing_id;
   const removeSpacing = new RemoveSpacing(accessToken, kakaoId, newsId, spacingId);
 
