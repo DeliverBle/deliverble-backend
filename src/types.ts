@@ -10,9 +10,11 @@ import { Tag } from './entity/Tag';
 import { Channel } from './shared/common/Channel';
 import { User } from './entity/User';
 import { Logger } from 'tslog';
-import { IsNotEmpty } from 'class-validator';
+import { IsDefined, IsNotEmpty } from 'class-validator';
 import { Highlight } from './entity/Highlight';
 import { Spacing } from './entity/Spacing';
+import { Memo } from './entity/Memo';
+import { createMemoArrayWrappedObject, MemoReturnDto } from './vo/MemoArrayWrappedObject';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -55,6 +57,30 @@ export interface NewsInfo {
   reportDate: Date;
 }
 
+export class NewsReturnDTOCollection {
+  constructor(newsInfoList: NewsInfo[], favoriteNewsTagList: TagOfNewsReturnDtoCollection) {
+    this.newsInfoList = newsInfoList;
+    this.favoriteNewsTagList = favoriteNewsTagList;
+  }
+
+  newsInfoList: NewsInfo[] | [];
+  favoriteNewsTagList: TagOfNewsReturnDtoCollection | [];
+
+  toNewsReturnDTOList(): NewsReturnDTO[] {
+    return this.newsInfoList.map((acc: NewsInfo, cur, idx) => {
+      const nowReturnNewsDto = new NewsReturnDTO(acc);
+      log.debug('get set 막 쓰고 있네 망했다~~: ', nowReturnNewsDto, this.favoriteNewsTagList, cur);
+
+      // TODO: ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ
+      if (this.favoriteNewsTagList instanceof TagOfNewsReturnDtoCollection) {
+        const nowTagOfEachNewsDto = this.favoriteNewsTagList.getCollectionById(cur).getTags();
+        nowReturnNewsDto.setTag(nowTagOfEachNewsDto);
+      }
+      return nowReturnNewsDto;
+    });
+  }
+}
+
 export class NewsReturnDTO {
   constructor(newsInfo: NewsInfo) {
     this.id = newsInfo.id;
@@ -84,6 +110,10 @@ export class NewsReturnDTO {
   startTime: number;
   endTime: number;
   tags: Tag[];
+
+  setTag(tagOfEachNewsReturnDto: Tag[]) {
+    this.tags = tagOfEachNewsReturnDto;
+  }
 }
 
 export class NewsScriptReturnDTO {
@@ -252,7 +282,7 @@ export class UserInfo {
 export interface UserFavoriteNewsReturnDTO {
   readonly kakaoId: string;
   // EAGER LOADING | LAZY LOADING
-  readonly favoriteNews: NewsInfo[] | Promise<NewsInfo[]>;
+  readonly favoriteNews: NewsInfo[] | Promise<NewsInfo[]> | NewsReturnDTO[];
 }
 
 export class CreateHighlight {
@@ -289,10 +319,15 @@ export interface HighlightInfo {
 }
 
 export class HighlightReturnCollectionDTO {
+  static createCollection(_highlightReturnCollection: HighlightReturnDTO[]) {
+    return new HighlightReturnCollectionDTO(_highlightReturnCollection);
+  }
+
   constructor(_highlightReturnCollection: HighlightReturnDTO[]) {
     this.highlightReturnCollection = _highlightReturnCollection;
     this.sortByScriptIdFirstAndStartingIndexWhenScriptIdEquals();
   }
+
   highlightReturnCollection: HighlightReturnDTO[];
   sortByScriptIdFirstAndStartingIndexWhenScriptIdEquals(): HighlightReturnCollectionDTO {
     this.highlightReturnCollection = this.highlightReturnCollection.sort((a, b) => {
@@ -316,6 +351,137 @@ export class HighlightReturnDTO {
   startingIndex: number;
   endingIndex: number;
   highlightId: number;
+  memo: MemoReturnDto;
+
+  static async createHighlightReturnDTOWithMemo(highlight: Highlight): Promise<HighlightReturnDTO> {
+    const newHighlight = new HighlightReturnDTO(highlight);
+    const toReturnMemo = await highlight.getMemo();
+    const toWrappedMemo = createMemoArrayWrappedObject(await highlight.getMemo());
+    newHighlight.memo = toWrappedMemo;
+    return newHighlight;
+  }
+}
+
+export class AddMemoDTO {
+  constructor(
+    _accessToken: string,
+    _kakaoId: string,
+    _highlightId: number,
+    _keyword: string,
+    _content: string,
+  ) {
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
+    this.highlightId = _highlightId;
+    this.keyword = _keyword;
+    this.content = _content;
+  }
+
+  @IsNotEmpty()
+  @IsDefined()
+  accessToken: string;
+
+  @IsNotEmpty()
+  @IsDefined()
+  kakaoId: string;
+
+  @IsNotEmpty()
+  @IsDefined()
+  highlightId: number;
+
+  @IsNotEmpty()
+  @IsDefined()
+  keyword: string;
+
+  @IsNotEmpty()
+  @IsDefined()
+  content: string;
+
+  toEntity(): Memo {
+    return new Memo(this.keyword, this.content);
+  }
+}
+
+export class RemoveExistingMemoDTO {
+  constructor(_accessToken: string, _kakaoId: string, _highlightId: number) {
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
+    this.highlightId = _highlightId;
+  }
+
+  @IsNotEmpty()
+  @IsDefined()
+  accessToken: string;
+
+  @IsNotEmpty()
+  @IsDefined()
+  kakaoId: string;
+
+  @IsNotEmpty()
+  @IsDefined()
+  highlightId: number;
+}
+
+export class UpdateExistingMemoDTO {
+  constructor(
+    _accessToken: string,
+    _kakaoId: string,
+    _highlightId: number,
+    _keyword: string,
+    _content: string,
+  ) {
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
+    this.highlightId = _highlightId;
+    this.keyword = _keyword;
+    this.content = _content;
+  }
+
+  @IsNotEmpty()
+  @IsDefined()
+  accessToken: string;
+
+  @IsNotEmpty()
+  @IsDefined()
+  kakaoId: string;
+
+  @IsNotEmpty()
+  @IsDefined()
+  highlightId: number;
+
+  @IsNotEmpty()
+  @IsDefined()
+  keyword: string;
+
+  @IsNotEmpty()
+  @IsDefined()
+  content: string;
+
+  toEntity(): Memo {
+    return new Memo(this.keyword, this.content);
+  }
+}
+
+export class TagOfNewsReturnDtoCollection {
+  constructor(_tagOfNewsReturnDtoCollection: TagOfEachNewsReturnDto[]) {
+    this.tagDataOfEachNewsCollection = _tagOfNewsReturnDtoCollection;
+  }
+  tagDataOfEachNewsCollection: TagOfEachNewsReturnDto[];
+
+  getCollectionById(id: number): TagOfEachNewsReturnDto {
+    return this.tagDataOfEachNewsCollection[id];
+  }
+}
+
+export class TagOfEachNewsReturnDto {
+  constructor(tags: Tag[]) {
+    this.tags = tags;
+  }
+  tags: Tag[];
+
+  getTags(): Tag[] {
+    return this.tags;
+  }
 }
 
 export class CreateSpacing {

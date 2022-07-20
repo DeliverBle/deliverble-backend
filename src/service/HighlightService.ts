@@ -1,9 +1,16 @@
 import { getConnection } from 'typeorm';
 
 import { Logger } from 'tslog';
-import { CreateHighlight, HighlightReturnCollectionDTO, HighlightReturnDTO } from '../types';
+import {
+  AddMemoDTO,
+  CreateHighlight,
+  HighlightReturnCollectionDTO,
+  HighlightReturnDTO,
+  RemoveExistingMemoDTO,
+  UpdateExistingMemoDTO,
+} from '../types';
 import { HighlightQueryRepository } from '../repository/HighlightRepository';
-import UserService, { doesAccessTokenExpire, findUserByKakaoId } from './UserService';
+import UserService, { doesAccessTokenExpire } from './UserService';
 import { HighlightCommandRepository } from '../repository/HighlightCommandRepository';
 import CustomError from '../error/CustomError';
 import statusCode from '../modules/statusCode';
@@ -13,6 +20,8 @@ import NewsService from './NewsService';
 import { ScriptQueryRepository } from '../repository/ScriptQueryRepository';
 import DuplicateStartingIndexAndEndingIndex from '../error/DuplicateStartingIndexAndEndingIndex';
 import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
+import ResourceNotFoundError from '../error/ResourceNotFoundError';
+import { MemoCommandRepository, MemoQueryRepository } from '../repository/MemoRepository';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -20,9 +29,20 @@ const getConnectionToHighlightQueryRepository = async () => {
   const connection = getConnection();
   return connection.getCustomRepository(HighlightQueryRepository);
 };
+
 const getConnectionToHighlightCommandRepository = async () => {
   const connection = getConnection();
   return connection.getCustomRepository(HighlightCommandRepository);
+};
+
+const getConnectionToMemoQueryRepository = async () => {
+  const connection = getConnection();
+  return connection.getCustomRepository(MemoQueryRepository);
+};
+
+const getConnectionToMemoCommandRepository = async () => {
+  const connection = getConnection();
+  return connection.getCustomRepository(MemoCommandRepository);
 };
 
 const getConnectionToScriptQueryRepository = async () => {
@@ -34,13 +54,14 @@ const getHighlightByKakaoIdAndNewsId = async (
   accessToken: string,
   kakaoId: string,
   newsId: number,
-): Promise<any> => {
+): Promise<HighlightReturnCollectionDTO> => {
   const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
   log.debug('accessToken', accessToken);
   if (await doesAccessTokenExpire(accessToken, kakaoId)) {
     throw new AccessTokenExpiredError();
   }
   const user = await UserService.findUserByKakaoId(kakaoId.toString());
+  log.debug('user >>> ', user);
   const userId = user.id;
 
   log.debug('userId', userId);
@@ -52,9 +73,11 @@ const getHighlightByKakaoIdAndNewsId = async (
     scriptIdsOfNewsId.includes(highlight.scriptId),
   );
 
-  return new HighlightReturnCollectionDTO(
-    returnHighlights.map((highlight) => new HighlightReturnDTO(highlight)),
+  const highlightReturnDTOArray = returnHighlights.map(
+    async (highlight) => await HighlightReturnDTO.createHighlightReturnDTOWithMemo(highlight),
   );
+
+  return HighlightReturnCollectionDTO.createCollection(await Promise.all(highlightReturnDTOArray));
 };
 
 const findNewsIdOfScriptId = async (scriptId: number): Promise<number> => {
@@ -62,7 +85,9 @@ const findNewsIdOfScriptId = async (scriptId: number): Promise<number> => {
   return await scriptQueryRepository.findNewsIdOfScriptId(scriptId);
 };
 
-const createHighlight = async (createHighlight: CreateHighlight): Promise<HighlightReturnDTO> => {
+const createHighlight = async (
+  createHighlight: CreateHighlight,
+): Promise<HighlightReturnCollectionDTO> => {
   const accessToken = createHighlight.accessToken;
   const kakaoId = createHighlight.kakaoId;
   const scriptId = createHighlight.scriptId;
@@ -96,12 +121,15 @@ const removeHighlightByHighlightId = async (
   accessToken: string,
   kakaoId: string,
   highlight_id: number,
-): Promise<HighlightReturnDTO> => {
+): Promise<HighlightReturnCollectionDTO> => {
   const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
   const highlightCommandRepository = await getConnectionToHighlightCommandRepository();
-  const toBeDeletedHighlight = await highlightQueryRepository.findHighlightByHighlightId(
-    highlight_id,
-  );
+  let toBeDeletedHighlight;
+  try {
+    toBeDeletedHighlight = await highlightQueryRepository.findHighlightByHighlightId(highlight_id);
+  } catch (err) {
+    throw new ResourceNotFoundError();
+  }
   const scriptId = toBeDeletedHighlight.scriptId;
   const isHighlightDeleted = await highlightCommandRepository.removeHighlight(toBeDeletedHighlight);
   if (!isHighlightDeleted) {
@@ -111,8 +139,128 @@ const removeHighlightByHighlightId = async (
   return await getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId);
 };
 
+const addMemoOfHighlight = async (
+  addMemoDTO: AddMemoDTO,
+): Promise<HighlightReturnCollectionDTO> => {
+  const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
+  const highlightCommandRepository = await getConnectionToHighlightCommandRepository();
+  const memoCommandRepository = await getConnectionToMemoCommandRepository();
+
+  let highlight;
+
+  try {
+    log.debug('addMemoDTO.highlightId >>>> ', addMemoDTO.highlightId);
+    highlight = await highlightQueryRepository.findByHighlightByHighlightIdInActiveRecordManner(
+      addMemoDTO.highlightId,
+    );
+    log.debug(' HIGHLIGHT >>>>>>>>>>>>>>>>>>>>>>>>> ', highlight);
+  } catch (err) {
+    throw new ResourceNotFoundError();
+  }
+
+  const scriptId = highlight.scriptId;
+
+  const memo = addMemoDTO.toEntity();
+  const memoSaved = await memoCommandRepository.registerOrSaveMemo(memo);
+  log.debug('memoSaved : >>>>>>>>>>>>> ', memoSaved);
+
+  const addedMemoHighlight = await highlight.addNewMemo(memo);
+  const isHighlightUpdated = await highlightCommandRepository.registerOrSaveHighlight(
+    addedMemoHighlight,
+  );
+  log.debug(' HIGHLIGHT UPDATED ', isHighlightUpdated);
+
+  const newsId = await findNewsIdOfScriptId(scriptId);
+
+  return await getHighlightByKakaoIdAndNewsId(addMemoDTO.accessToken, addMemoDTO.kakaoId, newsId);
+};
+
+const removeExistingMemoOfHighlight = async (
+  removeExistingMemoDTO: RemoveExistingMemoDTO,
+): Promise<HighlightReturnCollectionDTO> => {
+  const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
+  const highlightCommandRepository = await getConnectionToHighlightCommandRepository();
+  let highlight;
+
+  try {
+    highlight = await highlightQueryRepository.findByHighlightByHighlightIdInActiveRecordManner(
+      removeExistingMemoDTO.highlightId,
+    );
+  } catch (err) {
+    throw new ResourceNotFoundError();
+  }
+
+  const scriptId = highlight.scriptId;
+
+  const removedMemoHighlight = await highlight.removeExistingMemo();
+  log.debug(' REMOVED MEMO HIGHLIGHT ', removedMemoHighlight);
+  const isHighlightUpdated = await highlightCommandRepository.updateHighlight(removedMemoHighlight);
+  log.debug(' HIGHLIGHT MEMO DELETED ', isHighlightUpdated);
+
+  const newsId = await findNewsIdOfScriptId(scriptId);
+
+  return await getHighlightByKakaoIdAndNewsId(
+    removeExistingMemoDTO.accessToken,
+    removeExistingMemoDTO.kakaoId,
+    newsId,
+  );
+};
+
+const updateMemoOfHighlight = async (
+  updateMemoDTO: UpdateExistingMemoDTO,
+): Promise<HighlightReturnCollectionDTO> => {
+  const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
+  const highlightCommandRepository = await getConnectionToHighlightCommandRepository();
+
+  // TODO: 이렇게 접근하는 것은 DDD 원칙에 위배된다는 것은 알아두자. 어떻게 해야 리팩토링할 수 있을까 추후 고민해보자.
+  // TODO: memo_id만 주어졌을 때, highlight DB를 뒤져서 memo_id에 해당하는 highlight_id를 반환해야 한다.
+  const memoQueryRepository = await getConnectionToMemoQueryRepository();
+  const memoCommandRepository = await getConnectionToMemoCommandRepository();
+
+  let toBeUpdatedHighlight: Highlight;
+
+  try {
+    toBeUpdatedHighlight =
+      await highlightQueryRepository.findByHighlightByHighlightIdInActiveRecordManner(
+        updateMemoDTO.highlightId,
+      );
+  } catch (err) {
+    log.error('err', err);
+    throw new ResourceNotFoundError();
+  }
+
+  let toBeUpdatedMemo;
+
+  try {
+    // TODO: how to wrap this?
+    toBeUpdatedMemo = (await toBeUpdatedHighlight.getMemo())[0];
+  } catch {
+    throw new ResourceNotFoundError();
+  }
+
+  const toUpdateMemo = toBeUpdatedMemo.updateMemo(updateMemoDTO);
+  const afterUpdateMemo = await memoCommandRepository.updateExistingMemo(toUpdateMemo);
+  log.debug(' MEMO UPDATED ', afterUpdateMemo);
+
+  toBeUpdatedHighlight = await toBeUpdatedHighlight.updateExistingMemo(afterUpdateMemo);
+  const isHighlightUpdated = await highlightCommandRepository.updateHighlight(toBeUpdatedHighlight);
+  log.debug(' HIGHLIGHT MEMO UPDATED ', isHighlightUpdated);
+
+  const scriptId = toBeUpdatedHighlight.scriptId;
+  const newsId = await findNewsIdOfScriptId(scriptId);
+
+  return await getHighlightByKakaoIdAndNewsId(
+    updateMemoDTO.accessToken,
+    updateMemoDTO.kakaoId,
+    newsId,
+  );
+};
+
 export default {
   createHighlight,
   getHighlightByKakaoIdAndNewsId,
-  removeHighlightByHighlightId
+  removeHighlightByHighlightId,
+  addMemoOfHighlight,
+  removeExistingMemoOfHighlight,
+  updateMemoOfHighlight,
 };

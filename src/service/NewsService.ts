@@ -11,22 +11,37 @@ import {
   NewsReturnDTO,
   NewsScriptReturnDTO,
   PaginationInfo,
-  Script,
   ScriptReturnDto,
   SearchCondition,
+  TagOfEachNewsReturnDto,
+  TagOfNewsReturnDtoCollection,
 } from '../types';
 import { News } from '../entity/News';
 import { Logger } from 'tslog';
 import message from '../modules/responseMessage';
-import ResourceNotFoundError from '../error/ResourceNotFoundError';
 import CustomError from '../error/CustomError';
 import { getLastPage } from '../util/pagination';
+import { Tag } from '../entity/Tag';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 const getConnectionToMySql = async () => {
   const connection = getConnection();
   return connection.getCustomRepository(NewsQueryRepository);
+};
+
+const searchTagsByNewsIds = async (newsList: News[]): Promise<TagOfNewsReturnDtoCollection> => {
+  const newsRepository = await getConnectionToMySql();
+  let newsIdList = newsList.map((news) => news.id);
+  // TODO: 추후 Active Record 사용 하지 말 것
+  let newsData: News[] = await newsRepository.findByIds(newsIdList, {
+    relations: ['tags'],
+  });
+  let tagDataOfEachNews: Tag[][] = newsData.map((news) => news.tags);
+  const tagDataOfEachNewsMappedList = tagDataOfEachNews.map((acc, cur, idx) => {
+    return new TagOfEachNewsReturnDto(acc);
+  }, []);
+  return new TagOfNewsReturnDtoCollection(tagDataOfEachNewsMappedList);
 };
 
 const searchAllNews = async (): Promise<any> => {
@@ -206,4 +221,5 @@ export default {
   findNewsDetail,
   searchByNewsId,
   findScriptIdsByNewsId,
+  searchTagsByNewsIds,
 };

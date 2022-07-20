@@ -9,7 +9,7 @@ const message = {
   ALREADY_LOGGED_OUT: '이미 로그아웃을 하였습니다.',
   ACCESS_TOKEN_EXPIRED: '액세스 토큰이 만료되었습니다.',
   ALREADY_SIGNED_UP: '이미 회원가입을 하였습니다.',
-  RESOURCE_NOT_FOUND_ERROR: '필요한 정보를 보내지 않으셨습니다.',
+  RESOURCE_NOT_FOUND_ERROR: '필요한 정보를 보내지 않으셨거나, 존재하지 않는 하이라이트 또는 메모입니다.',
 
   // 뉴스
   SEARCH_NEWS_SUCCESS: '영상 검색 결과 조회 성공',
@@ -28,7 +28,12 @@ const message = {
   
   // 마지막 ',' 붙이면 작동하지 않음
   DUPLICATE_INDEX_FAIL: '동일한 시작 인덱스와 종료 인덱스를 갖고 있는 하이라이트가 이미 존재합니다.',
-  REMOVE_HIGHLIGHT_SUCCESS: '하이라이트 삭제 성공'
+  REMOVE_HIGHLIGHT_SUCCESS: '하이라이트 삭제 성공',
+
+  // 메모
+  ADD_MEMO_SUCCESS: '메모 추가 성공',
+  REMOVE_MEMO_SUCCESS: '메모 삭제 성공',
+  UPDATE_MEMO_SUCCESS: '메모 수정 성공',
 };
 
 export default message;
