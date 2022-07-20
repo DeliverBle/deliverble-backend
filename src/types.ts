@@ -12,6 +12,7 @@ import { User } from './entity/User';
 import { Logger } from 'tslog';
 import { IsDefined, IsNotEmpty } from 'class-validator';
 import { Highlight } from './entity/Highlight';
+import { Spacing } from './entity/Spacing';
 import { Memo } from './entity/Memo';
 import { createMemoArrayWrappedObject, MemoReturnDto } from './vo/MemoArrayWrappedObject';
 
@@ -481,4 +482,96 @@ export class TagOfEachNewsReturnDto {
   getTags(): Tag[] {
     return this.tags;
   }
+}
+
+export class CreateSpacing {
+  constructor(
+    _accessToken: string,
+    _kakaoId: string,
+    _scriptId: number,
+    _newsId: number,
+    _index: number
+    ) {
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
+    this.scriptId = _scriptId;
+    this.newsId = _newsId;
+    this.index = _index;
+  }  
+  accessToken: string;
+  kakaoId: string;
+  scriptId: number;
+  newsId: number;
+  index: number;
+
+  toEntity(user: User): Spacing {
+    return new Spacing(user, this.scriptId, this.index);
+  }
+}
+
+export class GetSpacing {
+  constructor(
+    _accessToken: string,
+    _kakaoId: string,
+    _newsId: number,
+    ) {
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
+    this.newsId = _newsId;
+  }    
+  accessToken: string;
+  kakaoId: string;
+  newsId: number;
+}
+
+export interface SpacingInfo {
+  id: number,
+  scriptId: number,
+  index: number,
+}
+
+export class SpacingReturnDTO {
+  constructor(spacing: Spacing) {
+    this.spacingId = spacing.id;
+    this.scriptId = spacing.scriptId;
+    this.index = spacing.index;
+  }
+  spacingId: number;
+  scriptId: number;
+  index: number;
+}
+
+export class SpacingReturnCollectionDTO {
+  constructor(_spacingReturnCollection: SpacingReturnDTO[]) {
+    this.spacingReturnCollection = _spacingReturnCollection;
+    this.sortByScriptIdFirstAndIndexWhenScriptIdEquals();
+  }
+  spacingReturnCollection: SpacingReturnDTO[];
+  sortByScriptIdFirstAndIndexWhenScriptIdEquals(): SpacingReturnCollectionDTO {
+    this.spacingReturnCollection = this.spacingReturnCollection.sort((a, b) => {
+      if (a.scriptId === b.scriptId) {
+        return a.index - b.index;
+      }
+      return a.scriptId - b.scriptId;
+    });
+    return this;
+  }
+}
+
+export class RemoveSpacing {
+  constructor(
+    _accessToken: string,
+    _kakaoId: string,
+    _newsId: number,
+    _spacingId: number,
+    ) {
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
+    this.newsId = _newsId;
+    this.spacingId = _spacingId;
+  }    
+  accessToken: string;
+  kakaoId: string;
+  newsId: number;
+  spacingId: number;
 }

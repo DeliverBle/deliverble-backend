@@ -19,8 +19,18 @@ const message = {
   // 하이라이트
   CREATE_HIGHLIGHT_SUCCESS: '하이라이트 생성 성공',
   GET_HIGHLIGHT_SUCCESS: '하이라이트 조회 성공',
+
+  // 스페이싱
+  CREATE_SPACING_SUCCESS: '스페이싱 생성 성공',
+  GET_SPACING_SUCCESS: '스페이싱 조회 성공',
+  REMOVE_SPACING_SUCCESS: '스페이싱 삭제 성공',
+  NOT_FOUND_SPACING: '없는 스페이싱의 ID입니다.',
+  
+  // 마지막 ',' 붙이면 작동하지 않음
   DUPLICATE_INDEX_FAIL: '동일한 시작 인덱스와 종료 인덱스를 갖고 있는 하이라이트가 이미 존재합니다.',
   REMOVE_HIGHLIGHT_SUCCESS: '하이라이트 삭제 성공',
+
+  // 메모
   ADD_MEMO_SUCCESS: '메모 추가 성공',
   REMOVE_MEMO_SUCCESS: '메모 삭제 성공',
   UPDATE_MEMO_SUCCESS: '메모 수정 성공',
