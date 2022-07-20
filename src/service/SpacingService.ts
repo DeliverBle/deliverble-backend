@@ -7,7 +7,7 @@ import message from "../modules/responseMessage";
 import statusCode from "../modules/statusCode";
 import { SpacingCommandRepository } from "../repository/SpacingCommandRepository";
 import { SpacingQueryRepository } from "../repository/SpacingQueryRepository";
-import { CreateSpacing, GetSpacing, SpacingInfo, SpacingReturnCollectionDTO, SpacingReturnDTO } from "../types";
+import { CreateSpacing, GetSpacing, RemoveSpacing, SpacingInfo, SpacingReturnCollectionDTO, SpacingReturnDTO } from "../types";
 import NewsService from "./NewsService";
 import UserService, { doesAccessTokenExpire } from "./UserService";
 
@@ -63,7 +63,7 @@ const createSpacing = async (createSpacing: CreateSpacing): Promise<SpacingRetur
   }
 	const spacingCommandRepository = await getConnectionToSpacingCommandRepository();
 
-	const user = await UserService.searchByUserId(createSpacing.kakaoId);
+	const user = await UserService.searchByUserId(kakaoId);
 	const spacing = createSpacing.toEntity(user);
 
 	try {
@@ -89,7 +89,35 @@ const getSpacing = async (getSpacing: GetSpacing): Promise<SpacingReturnCollecti
   return await getSpacingByKakaoIdAndNewsId(getSpacing)
 }
 
+const removeSpacing = async (removeSpacing: RemoveSpacing): Promise<SpacingReturnCollectionDTO> => {
+  const accessToken = removeSpacing.accessToken;
+	const kakaoId = removeSpacing.kakaoId;
+	const newsId = removeSpacing.newsId;
+  const spacingId = removeSpacing.spacingId;
+  if (await doesAccessTokenExpire(accessToken, kakaoId)) {
+    throw new AccessTokenExpiredError();
+  }
+
+	const spacingCommandRepository = await getConnectionToSpacingCommandRepository();
+
+	const user = await UserService.searchByUserId(kakaoId);
+	// const spacing = createSpacing.toEntity(user);
+
+	try {
+		// save highlight
+		const removedSpacing = await spacingCommandRepository.removeSpacingBySpacingId(spacingId);
+		log.debug('removedHighlight ', removedSpacing);
+		const getSpacing = new GetSpacing(accessToken, kakaoId, newsId);
+		return await getSpacingByKakaoIdAndNewsId(getSpacing);
+	} catch (error) {
+		log.error('error', error);
+		// TODO: make new custom error
+		throw new CustomError(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
+	}
+};
+
 export default {
   createSpacing,
   getSpacing,
+  removeSpacing,
 };
