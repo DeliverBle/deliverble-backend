@@ -8,5 +8,7 @@ router.post('/create', SpacingController.createSpacing);
 
 router.get('/', SpacingController.getSpacing);
 
+router.post('/remove', SpacingController.removeSpacing);
+
 
 export default router;
