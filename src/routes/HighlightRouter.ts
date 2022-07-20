@@ -5,6 +5,9 @@ import HighlightController, {
 
 const router: express.Router = Router();
 
+const MEMO: string = '/memo';
+
+router.post(MEMO + '/add', HighlightController.addNewMemoOfHighlight);
 router.post('/remove', HighlightController.removeHighlightByKakaoIdAndHighlightId);
 router.post('/create', HighlightController.createHighlight);
 router.get('/', HighlightController.getHighlightByKakaoIdAndNewsId);
