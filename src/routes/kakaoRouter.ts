@@ -17,8 +17,8 @@ router.get(
   passport.authenticate('kakao-login', {
     failureRedirect: '/', session: false
   }),
-  (req, res) => {
-    UserController.callbackKakao(req, res).then((v) => console.log('kakao login succeeded'));
+  async (req, res) => {
+      await UserController.callbackKakao(req, res).then((v) => console.log('kakao login succeeded'));
   },
 );
 
