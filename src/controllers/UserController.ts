@@ -2,6 +2,21 @@ import { Request, Response } from 'express';
 import UserService, { getKakaoRawInfo } from '../service/UserService';
 import { Logger } from 'tslog';
 import StatusCode from '../modules/statusCode';
+import {promisify} from "util";
+// import redisClient from "../util/redis";
+import {DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS, DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS} from "../shared/AuthLink";
+import redis from 'redis';
+
+// redis setting
+const port = 6379;
+const host = 'localhost';
+const password = 'changeme';
+const redisClient = redis.createClient(port, host);
+redisClient.auth(password);
+
+redisClient.on('connect', function () {
+  log.info('Redis plugged in.');
+});
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -59,7 +74,25 @@ export const callbackKakao = async (req: Request, res: Response): Promise<void |
   const refreshToken = tokensAndUserId.refreshToken;
   const userId = tokensAndUserId.kakaoId;
   // TODO: initial callback to save refreshToken at Redis with userId
-  await UserService.saveTokensAtRedisWithUserId(userId, accessToken, refreshToken, code);
+  // await UserService.saveTokensAtRedisWithUserId(userId, accessToken, refreshToken, code);
+  const ACCESS_TOKEN = "AT " + code;
+  const USER_ID = "UD " + code;
+  promisify(redisClient.get).bind(redisClient);
+  // TODO: move validation logic to other class
+  if (accessToken !== 'NONE') {
+    await redisClient.setex(
+        ACCESS_TOKEN,
+        DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
+        accessToken,
+    );
+  }
+  if (userId !== 'NONE') {
+    await redisClient.setex(
+        USER_ID,
+        DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
+        userId,
+    );
+  }
 
   res.status(StatusCode.OK).send({
     status: StatusCode.OK,
