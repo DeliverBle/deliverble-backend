@@ -55,6 +55,12 @@ export class Highlight extends BaseEntity {
     return this;
   }
 
+  public async updateExistingMemo(memo: Memo): Promise<Highlight> {
+    const nowMemo = await this.memo;
+    this.memo = Promise.resolve([memo]);
+    return this;
+  }
+
   public async removeExistingMemo(): Promise<Highlight> {
     const nowMemo = await this.memo;
     this.memo = Promise.resolve([]);
