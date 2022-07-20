@@ -56,6 +56,18 @@ export interface NewsInfo {
   reportDate: Date;
 }
 
+export class NewsReturnDTOCollection {
+  constructor(newsInfoList: NewsInfo[]) {
+    this.newsInfoList = newsInfoList;
+  }
+  newsInfoList: NewsInfo[] | [];
+  toNewsReturnDTOList(): NewsReturnDTO[] {
+    return this.newsInfoList.map((newsInfo: NewsInfo) => {
+      return new NewsReturnDTO(newsInfo);
+    });
+  }
+}
+
 export class NewsReturnDTO {
   constructor(newsInfo: NewsInfo) {
     this.id = newsInfo.id;
@@ -253,7 +265,7 @@ export class UserInfo {
 export interface UserFavoriteNewsReturnDTO {
   readonly kakaoId: string;
   // EAGER LOADING | LAZY LOADING
-  readonly favoriteNews: NewsInfo[] | Promise<NewsInfo[]>;
+  readonly favoriteNews: NewsInfo[] | Promise<NewsInfo[]> | NewsReturnDTO[];
 }
 
 export class CreateHighlight {
