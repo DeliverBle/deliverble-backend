@@ -12,7 +12,7 @@ import {
 import { User } from './User';
 import {Memo} from "./Memo";
 import {Field} from "mysql2";
-import {maxLength} from "class-validator";
+import {ArrayMaxSize, maxLength} from "class-validator";
 
 @Entity()
 @Index(["scriptId", "startingIndex", "endingIndex"], { unique: true })
@@ -37,6 +37,7 @@ export class Highlight extends BaseEntity {
     eager: true
   })
   @JoinColumn()
+  @ArrayMaxSize(1)
   memo?: Promise<Memo[]>;
 
   @Column()
