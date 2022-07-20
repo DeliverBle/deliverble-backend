@@ -2,9 +2,9 @@ module.exports = {
     "type": "mysql",
     "host": process.env.HOST,
     "port": process.env.PORT,
-    "username": process.env.USERNAME,
+    "username": process.env.DB_USERNAME,
     "password": process.env.PASSWORD,
-    "database": "deliverble",
+    "database": "deliverble_new2",
     "synchronize": true,
     "logging": false,
     "entities": [
