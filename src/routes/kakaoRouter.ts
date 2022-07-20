@@ -22,7 +22,9 @@ router.get(
   },
 );
 
-router.post('/kakao/access-token/refresh', errorHandler(UserController.refreshAccessToken));
+router.get('/kakao/token', UserController.getAccessTokenAndUserIdByCode);
+
+// router.post('/kakao/access-token/refresh', errorHandler(UserController.refreshAccessToken));
 
 router.post('/login', errorHandler(UserController.loginUserWithKakao));
 
