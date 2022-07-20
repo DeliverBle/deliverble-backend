@@ -3,6 +3,7 @@ import { getConnection } from "typeorm";
 import { Spacing } from "../entity/Spacing";
 import AccessTokenExpiredError from "../error/AccessTokenExpiredError";
 import CustomError from "../error/CustomError";
+import ResourceNotFoundError from "../error/ResourceNotFoundError";
 import message from "../modules/responseMessage";
 import statusCode from "../modules/statusCode";
 import { SpacingCommandRepository } from "../repository/SpacingCommandRepository";
@@ -36,17 +37,10 @@ const getSpacingByKakaoIdAndNewsId = async (getSpacing: GetSpacing): Promise<Spa
   const userId = user.id;	
 
 	const spacingOfAllUserId = await spacingQueryRepository.findAllSpacingByUserId(userId);
-  log.debug('newsId', newsId);
 	const scriptIdsOfNewsId = await NewsService.findScriptIdsByNewsId(newsId.toString());
-
-	log.debug('spacingOfAllUserId', spacingOfAllUserId);
-	log.debug('scriptIdsOfNewsId', scriptIdsOfNewsId);
-	
-	
 	const spacingByKakaoIdAndNewsId = spacingOfAllUserId.filter((spacing) =>
 		scriptIdsOfNewsId.includes(spacing.scriptId),
 	)
-	log.debug('spacingByKakaoIdAndNewsId', spacingByKakaoIdAndNewsId);
   
   return new SpacingReturnCollectionDTO(
     spacingByKakaoIdAndNewsId.map((spacing) => new SpacingReturnDTO(spacing)),
@@ -106,13 +100,20 @@ const removeSpacing = async (removeSpacing: RemoveSpacing): Promise<SpacingRetur
 	try {
 		// save highlight
 		const removedSpacing = await spacingCommandRepository.removeSpacingBySpacingId(spacingId);
-		log.debug('removedHighlight ', removedSpacing);
+		log.debug('removedSpacing ', removedSpacing);
+    if (removedSpacing === false) {
+      throw new CustomError(statusCode.BAD_REQUEST, message.NOT_FOUND_SPACING);
+    }
 		const getSpacing = new GetSpacing(accessToken, kakaoId, newsId);
 		return await getSpacingByKakaoIdAndNewsId(getSpacing);
+
 	} catch (error) {
 		log.error('error', error);
 		// TODO: make new custom error
-		throw new CustomError(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
+    if (error === undefined) {
+      throw new CustomError(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
+    }
+    throw error;
 	}
 };
 

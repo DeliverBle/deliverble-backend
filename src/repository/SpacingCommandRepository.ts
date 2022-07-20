@@ -1,6 +1,7 @@
 import { Logger } from "tslog";
-import {EntityRepository, Repository} from "typeorm";
+import {DeleteResult, EntityRepository, Repository} from "typeorm";
 import { Spacing } from "../entity/Spacing";
+import { SpacingReturnDTO } from "../types";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -13,8 +14,10 @@ export class SpacingCommandRepository extends Repository<Spacing> {
 
   async removeSpacingBySpacingId(spacingId: number): Promise<boolean> {
     try {
-      await this.delete({id: spacingId});
-      return true;
+      const removedSpacing = await this.delete({id: spacingId});
+      const booleanRemovedOrNot: boolean = Boolean(removedSpacing['affected'])
+      log.debug('boolean result of removed or not', booleanRemovedOrNot);
+      return booleanRemovedOrNot
     } catch (err) {
       log.error(err);
       return false;
