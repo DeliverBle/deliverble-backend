@@ -10,8 +10,9 @@ import { Tag } from './entity/Tag';
 import { Channel } from './shared/common/Channel';
 import { User } from './entity/User';
 import { Logger } from 'tslog';
-import { IsNotEmpty } from 'class-validator';
+import {IS_DEFINED, IsDefined, IsNotEmpty} from 'class-validator';
 import { Highlight } from './entity/Highlight';
+import {Memo} from "./entity/Memo";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -315,4 +316,44 @@ export class HighlightReturnDTO {
   startingIndex: number;
   endingIndex: number;
   highlightId: number;
+}
+
+export class AddMemoDTO {
+    constructor(
+        _accessToken: string,
+        _kakaoId: string,
+        _highlightId: number,
+        _keyword: string,
+        _content: string,
+    ) {
+        this.accessToken = _accessToken;
+        this.kakaoId = _kakaoId;
+        this.highlightId = _highlightId;
+        this.keyword = _keyword;
+        this.content = _content;
+    }
+
+    @IsNotEmpty()
+    @IsDefined()
+    accessToken: string;
+
+    @IsNotEmpty()
+    @IsDefined()
+    kakaoId: string;
+
+    @IsNotEmpty()
+    @IsDefined()
+    highlightId: number;
+
+    @IsNotEmpty()
+    @IsDefined()
+    keyword: string;
+
+    @IsNotEmpty()
+    @IsDefined()
+    content: string;
+
+    toEntity(): Memo {
+      return new Memo(this.keyword, this.content);
+    }
 }
