@@ -251,10 +251,10 @@ export const getAccessTokenByCode = async (_code: string) => {
     },
   };
 
-  const data = await axios.post(OAUTH_TOKEN, payload, config);
-  log.debug('getAccessTokenByCode ', data);
+  const  { data: access_token } = await axios.post(OAUTH_TOKEN, payload, config);
+  log.debug('getAccessTokenByCode ', access_token);
 
-  return data;
+  return access_token;
 };
 
 export const getKakaoRawInfo = async (
