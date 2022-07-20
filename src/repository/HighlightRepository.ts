@@ -1,6 +1,11 @@
-import { EntityRepository, Repository } from 'typeorm';
+import {EntityRepository, getConnection, Repository} from 'typeorm';
 import { Highlight } from '../entity/Highlight';
 import { CreateHighlight, HighlightInfo, SearchCondition } from '../types';
+import {User} from "../entity/User";
+import CustomError from "../error/CustomError";
+import {Logger} from "tslog";
+
+const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 @EntityRepository(Highlight)
 export class HighlightQueryRepository extends Repository<Highlight> {
@@ -25,4 +30,19 @@ export class HighlightQueryRepository extends Repository<Highlight> {
       .where('highlight.id = :highlight_id', { highlight_id })
       .getOneOrFail();
   };
+
+  async findByHighlightByHighlightIdInActiveRecordManner(highlightId: number) {
+    const highlightRepository = await getConnection().getRepository(Highlight);
+    log.debug("highlightId: ", highlightId);
+    try {
+      return await highlightRepository.findOneOrFail({
+        where: {
+          id: highlightId.toString(),
+        },
+        relations: ['memo'],
+      });
+    } catch (err) {
+      throw new CustomError(404, "Highlight Not Found")
+    }
+  }
 }
