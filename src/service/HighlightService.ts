@@ -1,7 +1,12 @@
 import { getConnection } from 'typeorm';
 
 import { Logger } from 'tslog';
-import { CreateHighlight, HighlightReturnCollectionDTO, HighlightReturnDTO } from '../types';
+import {
+  AddMemoDTO,
+  CreateHighlight,
+  HighlightReturnCollectionDTO,
+  HighlightReturnDTO,
+} from '../types';
 import { HighlightQueryRepository } from '../repository/HighlightRepository';
 import UserService, { doesAccessTokenExpire, findUserByKakaoId } from './UserService';
 import { HighlightCommandRepository } from '../repository/HighlightCommandRepository';
@@ -13,6 +18,8 @@ import NewsService from './NewsService';
 import { ScriptQueryRepository } from '../repository/ScriptQueryRepository';
 import DuplicateStartingIndexAndEndingIndex from '../error/DuplicateStartingIndexAndEndingIndex';
 import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
+import { is } from 'shallow-equal-object';
+import ResourceNotFoundError from "../error/ResourceNotFoundError";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -111,8 +118,32 @@ const removeHighlightByHighlightId = async (
   return await getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId);
 };
 
+const addMemoOfHighlight = async (addMemoDTO: AddMemoDTO): Promise<HighlightReturnDTO> => {
+  const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
+  const highlightCommandRepository = await getConnectionToHighlightCommandRepository();
+  let highlight;
+
+  try {
+    highlight = await highlightQueryRepository.findHighlightByHighlightId(addMemoDTO.highlightId);
+  } catch (err) {
+    throw new ResourceNotFoundError();
+  }
+
+  const scriptId = highlight.scriptId;
+
+  const memo = addMemoDTO.toEntity();
+  const addedMemoHighlight = await highlight.addNewMemo(memo);
+  const isHighlightUpdated = await highlightCommandRepository.updateHighlight(addedMemoHighlight);
+  log.debug(' HIGHLIGHT UPDATED ', isHighlightUpdated);
+
+  const newsId = await findNewsIdOfScriptId(scriptId);
+
+  return await getHighlightByKakaoIdAndNewsId(addMemoDTO.accessToken, addMemoDTO.kakaoId, newsId);
+};
+
 export default {
   createHighlight,
   getHighlightByKakaoIdAndNewsId,
-  removeHighlightByHighlightId
+  removeHighlightByHighlightId,
+  addMemoOfHighlight,
 };
