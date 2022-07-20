@@ -23,13 +23,17 @@ const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 const getAccessTokenByCode = async (req: Request, res: Response) => {
   const code = req.query.code;
-  let data;
+  let tokenInfo;
+  let userInfo;
   try {
-    data = await UserService.getAccessTokenByCode(code.toString());
+    tokenInfo = await UserService.getAccessTokenByCode(code.toString());
+    const access_token = tokenInfo.access_token;
+    userInfo = await UserService.getKakaoRawInfo(access_token, "");
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: {
-        data
+        tokenInfo,
+        userInfo
       }
     });
   } catch (err) {

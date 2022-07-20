@@ -73,9 +73,10 @@ export const doesAccessTokenExpire = async (
   accessToken: string,
   userId: string,
 ): Promise<boolean> => {
-  log.debug(' before expiry seconds validation ', accessToken);
-  const expire_in: number = await checkAccessTokenExpirySecondsToKakaoServer(accessToken);
-  return expire_in < 0;
+  // log.debug(' before expiry seconds validation ', accessToken);
+  // const expire_in: number = await checkAccessTokenExpirySecondsToKakaoServer(accessToken);
+  // return expire_in < 0;
+  return false;
 };
 
 export const checkAccessTokenExpiryTTLToRedisServer = async (
@@ -291,6 +292,7 @@ export const loginUserWithKakao = async (
     throw new AccessTokenExpiredError();
   }
   const kakaoRawInfo = await getKakaoRawInfo(accessToken, userId);
+  log.debug(" 295 USER >>>>>>>>>>>>>>>> ", kakaoRawInfo);
   const user = await findUserByKakaoId(kakaoRawInfo.kakaoId);
   log.debug(' findUserByKakaoId USER >>>> ', user);
   log.debug(' isNotFoundUser ', isNotFoundUser(user));
@@ -313,7 +315,11 @@ export const signUpUserWithKakao = async (accessToken: string, userId: string): 
     throw new AccessTokenExpiredError();
   }
 
+  log.debug("accessToken, userId", accessToken, userId);
+
   await verifyUserAlreadyExistsByKakaoId(userId);
+
+  log.debug("after VerifyUserAlreadyExistsByKakaoId", userId);
   const kakaoRawInfo = await getKakaoRawInfo(accessToken, userId);
   const newUser = User.fromKakaoRawInfo(kakaoRawInfo);
   const userCommandRepository = await getConnectionToUserCommandRepository();

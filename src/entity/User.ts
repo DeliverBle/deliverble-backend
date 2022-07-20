@@ -8,12 +8,12 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { determineGenderByGivenString, Gender } from '../shared/common/Gender';
-import { News } from './News';
-import { KakaoRawInfo } from '../types';
-import { Logger } from 'tslog';
-import { IsEmail, Length } from 'class-validator';
-import { Highlight } from './Highlight';
+import {determineGenderByGivenString, Gender} from '../shared/common/Gender';
+import {News} from './News';
+import {KakaoRawInfo} from '../types';
+import {Logger} from 'tslog';
+import {IsEmail, Length} from 'class-validator';
+import {Highlight} from './Highlight';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -43,6 +43,7 @@ export class User extends BaseEntity {
   @IsEmail()
   @Column({
     unique: true,
+    default: "NO_EMAIL"
   })
   email: string;
 
@@ -76,6 +77,9 @@ export class User extends BaseEntity {
     if (!this.email) {
       log.info('User denied to provide email information');
       this.email = NO_EMAIL;
+    }
+    if (!this.gender) {
+      this.gender = Gender.UNSPECIFIED;
     }
   }
 
