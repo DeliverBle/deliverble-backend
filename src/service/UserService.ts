@@ -164,7 +164,7 @@ const checkAccessTokenExpirySecondsToKakaoServer = async (accessToken: string): 
 //   const {
 //     data: { access_token, expires_in, refresh_token, refresh_token_expires_in },
 //   } = await axios.post(OAUTH_TOKEN, payload, config);
-//
+
 //   const updatedAccessTokenDTO = new UpdatedAccessTokenDTO(
 //     access_token,
 //     expires_in,
@@ -184,49 +184,42 @@ const checkAccessTokenExpirySecondsToKakaoServer = async (accessToken: string): 
 //   };
 // };
 
-export const getAccessTokenAndUserIdByCode = async (code: string): Promise<{ accessToken: string; userId: string }> => {
-  const ACCESS_TOKEN = "AT " + code;
-  const USER_ID = "UD " + code;
+export const getAccessTokenAndUserIdByCode = async (
+  code: string,
+): Promise<{ accessToken: string; userId: string }> => {
+  const ACCESS_TOKEN = 'AT ' + code;
+  const USER_ID = 'UD ' + code;
 
   const getAsync = promisify(redisClient.get).bind(redisClient);
   const ACCESS_TOKEN_KEY_ON_REDIS = await getAsync(ACCESS_TOKEN);
-  log.debug("ACCESS_TOKEN_KEY_ON_REDIS ", ACCESS_TOKEN_KEY_ON_REDIS);
+  log.debug('ACCESS_TOKEN_KEY_ON_REDIS ', ACCESS_TOKEN_KEY_ON_REDIS);
 
   const USER_ID_ON_REDIS = await getAsync(USER_ID);
-  log.debug("USER_ID_ON_REDIS ", USER_ID_ON_REDIS);
+  log.debug('USER_ID_ON_REDIS ', USER_ID_ON_REDIS);
 
   return {
     accessToken: ACCESS_TOKEN_KEY_ON_REDIS,
     userId: USER_ID_ON_REDIS,
-  }
-}
-
+  };
+};
 
 export const saveTokensAtRedisWithUserId = async (
   userId: string,
   accessToken: string,
   refreshToken: string,
-  code: any
+  code: any,
 ): Promise<void> => {
   // const ACCESS_TOKEN = ACCESS_TOKEN_PREFIX;
   // const REFRESH_TOKEN = REFRESH_TOKEN_PREFIX;
-  const ACCESS_TOKEN = "AT " + code;
-  const USER_ID = "UD " + code;
+  const ACCESS_TOKEN = 'AT ' + code;
+  const USER_ID = 'UD ' + code;
   promisify(redisClient.get).bind(redisClient);
   // TODO: move validation logic to other class
   if (accessToken !== 'NONE') {
-    await redisClient.setex(
-      ACCESS_TOKEN,
-      DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
-      accessToken,
-    );
+    await redisClient.setex(ACCESS_TOKEN, DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS, accessToken);
   }
   if (userId !== 'NONE') {
-    await redisClient.setex(
-      USER_ID,
-      DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
-      userId,
-    );
+    await redisClient.setex(USER_ID, DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS, userId);
   }
   return;
 };
@@ -243,19 +236,26 @@ export const saveTokensAtRedisWithUserId = async (
 //   return;
 // };
 
-export const getAccessTokenByCode = async (
-    _code: string
-) => {
+export const getAccessTokenByCode = async (_code: string) => {
   log.debug('getAccessTokenByCode ', _code);
-  const data = await axios.post(OAUTH_TOKEN, {
-    grant_type: 'authorization_code',
-    client_id: process.env.KAKAO_CLIENT_ID,
-    redirect_uri: process.env.KAKAO_REDIRECT_URI,
-    code: _code,
-  });
+
+  const payload = new URLSearchParams();
+  payload.append('grant_type', 'authorization_code');
+  payload.append('client_id', process.env.KAKAO_CLIENT_ID);
+  payload.append('redirect_uri', process.env.KAKAO_REDIRECT_URI);
+  payload.append('code', _code);
+
+  const config = {
+    headers: {
+      'Content-Type': CONTENT_TYPE,
+    },
+  };
+
+  const data = await axios.post(OAUTH_TOKEN, payload, config);
   log.debug('getAccessTokenByCode ', data);
+
   return data;
-}
+};
 
 export const getKakaoRawInfo = async (
   _accessToken: string,
@@ -447,5 +447,5 @@ export default {
   searchByUserId: searchByKakaoId,
   updateExistingUser,
   getAccessTokenAndUserIdByCode,
-  getAccessTokenByCode
+  getAccessTokenByCode,
 };
