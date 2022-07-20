@@ -388,10 +388,12 @@ export class RemoveExistingMemoDTO {
 
 export class MemoReturnDto {
   constructor(memo: Memo[]) {
+    this.id = memo[0].id;
     this.keyword = memo[0].keyword.replace(/[\b]/, '')
     this.content = memo[0].content;
   }
 
+  id: number;
   keyword: string;
   content: string;
 }
