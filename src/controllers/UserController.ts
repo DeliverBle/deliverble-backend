@@ -40,20 +40,20 @@ const getAccessTokenByCode = async (req: Request, res: Response) => {
     // TODO: Error 지금 서로 규격이 다른데 어떻게 해야 표준화가 가능할까를 고민해보자.
     if (err.response !== undefined) {
       // log.error(err.response.status);
-      res.status(err.response.status).send({
-        status: err.response.status,
-        message: {
-          refresh: 'fail',
-          message: err.message,
-        },
+      res.status(StatusCode.OK).send({
+        status: StatusCode.OK,
+        // message: {
+        //   refresh: 'fail',
+        //   message: err.message,
+        // },
       });
     }
     res.status(err.code).send({
-      status: err.code,
-      message: {
-        refresh: 'fail',
-        message: err.message,
-      },
+      status: StatusCode.OK,
+      // message: {
+      //   refresh: 'fail',
+      //   message: err.message,
+      // },
     });
   }
 }
