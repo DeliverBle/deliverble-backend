@@ -26,7 +26,8 @@ export const createHighlight = async (req: Request, res: Response): Promise<void
   );
 
   try {
-    const data = await HighlightService.createHighlight(createHighlight);
+    const data = (await HighlightService.createHighlight(createHighlight))
+      .highlightReturnCollection;
     res
       .status(statusCode.CREATED)
       .send(util.success(statusCode.OK, message.CREATE_HIGHLIGHT_SUCCESS, data));
@@ -63,15 +64,13 @@ export const getHighlightByKakaoIdAndNewsId = async (
   log.debug('hello', kakaoId, newsId);
 
   try {
-    const data = await HighlightService.getHighlightByKakaoIdAndNewsId(
-      accessToken,
-      kakaoId,
-      newsId,
-    );
+    const data = (
+      await HighlightService.getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId)
+    ).highlightReturnCollection;
     res
       .status(statusCode.OK)
       .send(
-        util.success(statusCode.OK, message.GET_HIGHLIGHT_SUCCESS, data.highlightReturnCollection),
+        util.success(statusCode.OK, message.GET_HIGHLIGHT_SUCCESS, data),
       );
   } catch (err) {
     log.error(err);
@@ -113,7 +112,13 @@ export const removeHighlightByKakaoIdAndHighlightId = async (
     );
     res
       .status(statusCode.OK)
-      .send(util.success(statusCode.OK, message.REMOVE_HIGHLIGHT_SUCCESS, data));
+      .send(
+        util.success(
+          statusCode.OK,
+          message.REMOVE_HIGHLIGHT_SUCCESS,
+          data.highlightReturnCollection,
+        ),
+      );
   } catch (err) {
     log.error(err);
     if (err.response !== undefined) {
@@ -149,9 +154,9 @@ export const addNewMemoOfHighlight = async (
   log.debug('hello', kakaoId, highlightId, keyword, content);
 
   try {
-    const data = await HighlightService.addMemoOfHighlight(
-      new AddMemoDTO(accessToken, kakaoId, highlightId, keyword, content),
-    );
+    const data = (await HighlightService.addMemoOfHighlight(
+        new AddMemoDTO(accessToken, kakaoId, highlightId, keyword, content),
+    )).highlightReturnCollection;
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.ADD_MEMO_SUCCESS, data));
   } catch (err) {
     log.error(err);
