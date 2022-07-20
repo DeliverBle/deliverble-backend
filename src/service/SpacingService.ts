@@ -7,7 +7,7 @@ import message from "../modules/responseMessage";
 import statusCode from "../modules/statusCode";
 import { SpacingCommandRepository } from "../repository/SpacingCommandRepository";
 import { SpacingQueryRepository } from "../repository/SpacingQueryRepository";
-import { CreateSpacing, GetSpacing, SpacingInfo, SpacingReturnDto } from "../types";
+import { CreateSpacing, GetSpacing, SpacingInfo, SpacingReturnCollectionDTO, SpacingReturnDTO } from "../types";
 import NewsService from "./NewsService";
 import UserService, { doesAccessTokenExpire } from "./UserService";
 
@@ -23,7 +23,7 @@ const getConnectionToSpacingCommandRepository = async () => {
   return connection.getCustomRepository(SpacingCommandRepository);
 };
 
-const getSpacingByKakaoIdAndNewsId = async (getSpacing: GetSpacing): Promise<SpacingReturnDto[]> => {
+const getSpacingByKakaoIdAndNewsId = async (getSpacing: GetSpacing): Promise<SpacingReturnCollectionDTO> => {
   const spacingQueryRepository = await getConnectionToSpacingQueryRepository();
 	const accessToken = getSpacing.accessToken;
 	const kakaoId = getSpacing.kakaoId;
@@ -47,12 +47,13 @@ const getSpacingByKakaoIdAndNewsId = async (getSpacing: GetSpacing): Promise<Spa
 		scriptIdsOfNewsId.includes(spacing.scriptId),
 	)
 	log.debug('spacingByKakaoIdAndNewsId', spacingByKakaoIdAndNewsId);
-  return spacingByKakaoIdAndNewsId.map
-    ((spacing) => new SpacingReturnDto(spacing)
+  
+  return new SpacingReturnCollectionDTO(
+    spacingByKakaoIdAndNewsId.map((spacing) => new SpacingReturnDTO(spacing)),
   );
 }
 
-const createSpacing = async (createSpacing: CreateSpacing): Promise<SpacingReturnDto[]> => {
+const createSpacing = async (createSpacing: CreateSpacing): Promise<SpacingReturnCollectionDTO> => {
 	// const spacingQueryRepository = await getConnectionToSpacingQueryRepository();
 	const accessToken = createSpacing.accessToken;
 	const kakaoId = createSpacing.kakaoId;
@@ -78,7 +79,7 @@ const createSpacing = async (createSpacing: CreateSpacing): Promise<SpacingRetur
 	}
 };
 
-const getSpacing = async (getSpacing: GetSpacing): Promise<SpacingReturnDto[]> => {
+const getSpacing = async (getSpacing: GetSpacing): Promise<SpacingReturnCollectionDTO> => {
   const accessToken = getSpacing.accessToken;
 	const kakaoId = getSpacing.kakaoId;
 	const newsId = getSpacing.newsId;
