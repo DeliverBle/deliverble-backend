@@ -24,7 +24,6 @@ export class User extends BaseEntity {
     this.kakaoId = _kakaoId;
     this.nickname = _nickname;
     this.email = _email;
-    log.info(_gender);
     this.gender = determineGenderByGivenString(_gender);
   }
 
