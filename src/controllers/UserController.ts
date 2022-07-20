@@ -25,7 +25,7 @@ const getAccessTokenByCode = async (req: Request, res: Response) => {
   const code = req.query.code;
   let data;
   try {
-    data = UserService.getAccessTokenByCode(code.toString());
+    data = await UserService.getAccessTokenByCode(code.toString());
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: {
