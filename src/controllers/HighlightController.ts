@@ -231,15 +231,15 @@ export const updateExistingMemoOfHighlight = async (
   const accessToken = req.body['access_token'];
   let kakaoId = req.body['user_id'];
   kakaoId = kakaoId.replace(/['"]+/g, '');
-  const highlightId = req.body['highlight_id'];
+  const memoId = req.body['memo_id'];
   const keyword = req.body['keyword'];
   const content = req.body['content'];
-  log.debug('updateMemoOfHighlight >>>>>>>>>>>>> ', kakaoId, highlightId, keyword, content);
+  log.debug('updateMemoOfHighlight >>>>>>>>>>>>> ', kakaoId, memoId, keyword, content);
 
   try {
     const data = (
       await HighlightService.updateMemoOfHighlight(
-        new UpdateExistingMemoDTO(accessToken, kakaoId, highlightId, keyword, content),
+        new UpdateExistingMemoDTO(accessToken, kakaoId, memoId, keyword, content),
       )
     ).highlightReturnCollection;
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.UPDATE_MEMO_SUCCESS, data));

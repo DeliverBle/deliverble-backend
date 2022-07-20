@@ -217,12 +217,21 @@ const updateMemoOfHighlight = async (
   // TODO: memo_id만 주어졌을 때, highlight DB를 뒤져서 memo_id에 해당하는 highlight_id를 반환해야 한다.
   const memoQueryRepository = await getConnectionToMemoQueryRepository();
   const memoCommandRepository = await getConnectionToMemoCommandRepository();
+  let toBeUpdatedMemo;
 
-  const toBeUpdatedMemo = await memoQueryRepository.findMemoById(updateMemoDTO.memoId);
+  try {
+    toBeUpdatedMemo = await memoQueryRepository.findMemoById(updateMemoDTO.memoId);
+  } catch (err) {
+    log.error('err', err);
+    throw new ResourceNotFoundError();
+  }
+
+  toBeUpdatedMemo = toBeUpdatedMemo.updateMemo(updateMemoDTO);
+
   const toUpdateMemo = await memoCommandRepository.updateExistingMemo(toBeUpdatedMemo);
   log.debug(' MEMO UPDATED ', toUpdateMemo);
 
-  const highlightId = toUpdateMemo.highlight.id;
+  const highlightId = toUpdateMemo.highlightId;
 
   let highlight: Highlight;
 

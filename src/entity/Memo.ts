@@ -8,6 +8,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Highlight } from './Highlight';
+import {UpdateExistingMemoDTO} from "../types";
 
 @Entity()
 export class Memo extends BaseEntity {
@@ -31,4 +32,13 @@ export class Memo extends BaseEntity {
   })
   @JoinColumn()
   highlight!: Highlight;
+
+  @Column({ name: 'highlightId', nullable: true })
+  highlightId: number;
+
+  public updateMemo(updateMemoDTO: UpdateExistingMemoDTO): Memo {
+    this.keyword = updateMemoDTO.keyword;
+    this.content = updateMemoDTO.content;
+    return this;
+  }
 }
