@@ -10,7 +10,7 @@ import {
   UpdateExistingMemoDTO,
 } from '../types';
 import { HighlightQueryRepository } from '../repository/HighlightRepository';
-import UserService, { doesAccessTokenExpire, findUserByKakaoId } from './UserService';
+import UserService, { doesAccessTokenExpire } from './UserService';
 import { HighlightCommandRepository } from '../repository/HighlightCommandRepository';
 import CustomError from '../error/CustomError';
 import statusCode from '../modules/statusCode';
@@ -20,7 +20,6 @@ import NewsService from './NewsService';
 import { ScriptQueryRepository } from '../repository/ScriptQueryRepository';
 import DuplicateStartingIndexAndEndingIndex from '../error/DuplicateStartingIndexAndEndingIndex';
 import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
-import { is } from 'shallow-equal-object';
 import ResourceNotFoundError from '../error/ResourceNotFoundError';
 import { MemoCommandRepository, MemoQueryRepository } from '../repository/MemoRepository';
 
@@ -217,38 +216,37 @@ const updateMemoOfHighlight = async (
   // TODO: memo_id만 주어졌을 때, highlight DB를 뒤져서 memo_id에 해당하는 highlight_id를 반환해야 한다.
   const memoQueryRepository = await getConnectionToMemoQueryRepository();
   const memoCommandRepository = await getConnectionToMemoCommandRepository();
-  let toBeUpdatedMemo;
+
+  let toBeUpdatedHighlight: Highlight;
 
   try {
-    toBeUpdatedMemo = await memoQueryRepository.findMemoById(updateMemoDTO.memoId);
+    toBeUpdatedHighlight =
+      await highlightQueryRepository.findByHighlightByHighlightIdInActiveRecordManner(
+        updateMemoDTO.highlightId,
+      );
   } catch (err) {
     log.error('err', err);
     throw new ResourceNotFoundError();
   }
 
-  toBeUpdatedMemo = toBeUpdatedMemo.updateMemo(updateMemoDTO);
-
-  const toUpdateMemo = await memoCommandRepository.updateExistingMemo(toBeUpdatedMemo);
-  log.debug(' MEMO UPDATED ', toUpdateMemo);
-
-  const highlightId = toUpdateMemo.highlightId;
-
-  let highlight: Highlight;
+  let toBeUpdatedMemo;
 
   try {
-    highlight = await highlightQueryRepository.findByHighlightByHighlightIdInActiveRecordManner(
-      highlightId,
-    );
-  } catch (err) {
+    // TODO: how to wrap this?
+    toBeUpdatedMemo = (await toBeUpdatedHighlight.getMemo())[0];
+  } catch {
     throw new ResourceNotFoundError();
   }
 
-  const scriptId = highlight.scriptId;
+  const toUpdateMemo = toBeUpdatedMemo.updateMemo(updateMemoDTO);
+  const afterUpdateMemo = await memoCommandRepository.updateExistingMemo(toUpdateMemo);
+  log.debug(' MEMO UPDATED ', afterUpdateMemo);
 
-  const updatedMemoHighlight = await highlight.updateExistingMemo(toUpdateMemo);
-  const isHighlightUpdated = await highlightCommandRepository.updateHighlight(updatedMemoHighlight);
+  toBeUpdatedHighlight = await toBeUpdatedHighlight.updateExistingMemo(afterUpdateMemo);
+  const isHighlightUpdated = await highlightCommandRepository.updateHighlight(toBeUpdatedHighlight);
   log.debug(' HIGHLIGHT MEMO UPDATED ', isHighlightUpdated);
 
+  const scriptId = toBeUpdatedHighlight.scriptId;
   const newsId = await findNewsIdOfScriptId(scriptId);
 
   return await getHighlightByKakaoIdAndNewsId(
@@ -264,5 +262,5 @@ export default {
   removeHighlightByHighlightId,
   addMemoOfHighlight,
   removeExistingMemoOfHighlight,
-  updateMemoOfHighlight
+  updateMemoOfHighlight,
 };

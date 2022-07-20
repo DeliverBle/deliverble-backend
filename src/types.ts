@@ -425,13 +425,13 @@ export class UpdateExistingMemoDTO {
   constructor(
     _accessToken: string,
     _kakaoId: string,
-    _memoId: number,
+    _highlightId: number,
     _keyword: string,
     _content: string,
   ) {
     this.accessToken = _accessToken;
     this.kakaoId = _kakaoId;
-    this.memoId = _memoId;
+    this.highlightId = _highlightId;
     this.keyword = _keyword;
     this.content = _content;
   }
@@ -446,7 +446,7 @@ export class UpdateExistingMemoDTO {
 
   @IsNotEmpty()
   @IsDefined()
-  memoId: number;
+  highlightId: number;
 
   @IsNotEmpty()
   @IsDefined()
