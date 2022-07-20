@@ -342,3 +342,35 @@ export class CreateSpacing {
     return new Spacing(user, this.scriptId, this.index);
   }
 }
+
+export class GetSpacing {
+  constructor(
+    _accessToken: string,
+    _kakaoId: string,
+    _newsId: number,
+    ) {
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
+    this.newsId = _newsId;
+  }    
+  accessToken: string;
+  kakaoId: string;
+  newsId: number;
+}
+
+export interface SpacingInfo {
+  id: number,
+  scriptId: number,
+  index: number,
+}
+
+export class SpacingReturnDto {
+  constructor(spacing: Spacing) {
+    this.spacingId = spacing.id;
+    this.scriptId = spacing.scriptId;
+    this.index = spacing.index;
+  }
+  spacingId: number;
+  scriptId: number;
+  index: number;
+}

@@ -44,8 +44,8 @@ const log: Logger = new Logger({ name: "딜리버블 백엔드 짱짱" });
 
 createConnection().then(async (connection) => {
   // await insertScriptData(connection);
-  const user = await MockUserToFavorite(connection);
-  await insertNewsData(connection);
+  // const user = await MockUserToFavorite(connection);
+  // await insertNewsData(connection);
 
   app.listen(8080, () => {
     log.info('Server is running on port 8080');

@@ -7,7 +7,7 @@ import message from "../modules/responseMessage";
 import statusCode from "../modules/statusCode";
 import { SpacingCommandRepository } from "../repository/SpacingCommandRepository";
 import { SpacingQueryRepository } from "../repository/SpacingQueryRepository";
-import { CreateSpacing } from "../types";
+import { CreateSpacing, GetSpacing, SpacingInfo, SpacingReturnDto } from "../types";
 import NewsService from "./NewsService";
 import UserService, { doesAccessTokenExpire } from "./UserService";
 
@@ -23,8 +23,14 @@ const getConnectionToSpacingCommandRepository = async () => {
   return connection.getCustomRepository(SpacingCommandRepository);
 };
 
-const getSpacingByKakaoIdAndNewsId = async (kakaoId: number, newsId: number): Promise<any> => {
+const getSpacingByKakaoIdAndNewsId = async (getSpacing: GetSpacing): Promise<SpacingReturnDto[]> => {
   const spacingQueryRepository = await getConnectionToSpacingQueryRepository();
+	const accessToken = getSpacing.accessToken;
+	const kakaoId = getSpacing.kakaoId;
+	const newsId = getSpacing.newsId;
+  if (await doesAccessTokenExpire(accessToken, kakaoId)) {
+    throw new AccessTokenExpiredError();
+  }
 
   const user = await UserService.findUserByKakaoId(kakaoId.toString());
   const userId = user.id;	
@@ -41,13 +47,16 @@ const getSpacingByKakaoIdAndNewsId = async (kakaoId: number, newsId: number): Pr
 		scriptIdsOfNewsId.includes(spacing.scriptId),
 	)
 	log.debug('spacingByKakaoIdAndNewsId', spacingByKakaoIdAndNewsId);
-	return spacingByKakaoIdAndNewsId;
+  return spacingByKakaoIdAndNewsId.map
+    ((spacing) => new SpacingReturnDto(spacing)
+  );
 }
 
-const createSpacing = async (createSpacing: CreateSpacing): Promise<Spacing> => {
+const createSpacing = async (createSpacing: CreateSpacing): Promise<SpacingReturnDto[]> => {
 	// const spacingQueryRepository = await getConnectionToSpacingQueryRepository();
 	const accessToken = createSpacing.accessToken;
 	const kakaoId = createSpacing.kakaoId;
+	const newsId = createSpacing.newsId;
 	if (await doesAccessTokenExpire(accessToken, kakaoId)) {
     throw new AccessTokenExpiredError();
   }
@@ -60,14 +69,26 @@ const createSpacing = async (createSpacing: CreateSpacing): Promise<Spacing> => 
 		// save highlight
 		const savedSpacing = await spacingCommandRepository.saveNewSpacing(spacing);
 		log.debug('savedHighlight ', savedSpacing);
-		return await getSpacingByKakaoIdAndNewsId(Number(createSpacing.kakaoId), createSpacing.newsId);
+		const getSpacing = new GetSpacing(accessToken, kakaoId, newsId);
+		return await getSpacingByKakaoIdAndNewsId(getSpacing);
 	} catch (error) {
 		log.error('error', error);
 		// TODO: make new custom error
 		throw new CustomError(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR);
 	}
 };
-  
-  export default {
-    createSpacing,
-  };
+
+const getSpacing = async (getSpacing: GetSpacing): Promise<SpacingReturnDto[]> => {
+  const accessToken = getSpacing.accessToken;
+	const kakaoId = getSpacing.kakaoId;
+	const newsId = getSpacing.newsId;
+  if (await doesAccessTokenExpire(accessToken, kakaoId)) {
+    throw new AccessTokenExpiredError();
+  }
+  return await getSpacingByKakaoIdAndNewsId(getSpacing)
+}
+
+export default {
+  createSpacing,
+  getSpacing,
+};
