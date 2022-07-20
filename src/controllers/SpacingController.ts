@@ -3,7 +3,7 @@ import statusCode from '../modules/statusCode';
 import UserController from './UserController';
 
 import { Logger } from 'tslog';
-import { CreateHighlight, CreateSpacing, GetSpacing, SpacingInfo } from '../types';
+import { CreateHighlight, CreateSpacing, GetSpacing, RemoveSpacing, SpacingInfo } from '../types';
 import message from '../modules/responseMessage';
 import SpacingService from '../service/SpacingService';
 import util from '../modules/util';
@@ -80,8 +80,45 @@ export const getSpacing = async (req: Request, res: Response): Promise<void | Re
   }
 };
 
+export const removeSpacing = async (req: Request, res: Response): Promise<void | Response> => {
+  log.debug('req.query', req.query);
+  const tokensAndUserId = await UserController.getTokensParsedFromBody(req.body);
+  const accessToken = tokensAndUserId.accessToken;
+  const kakaoId = String(req.query.user_id);
+  const newsId = Number(req.query.news_id);
+  const spacingId = req.body.spacing_id;
+  const removeSpacing = new RemoveSpacing(accessToken, kakaoId, newsId, spacingId);
+
+  try {
+    const data = await SpacingService.removeSpacing(removeSpacing);
+    res
+      .status(statusCode.CREATED)
+      .send(util.success(statusCode.OK, message.REMOVE_SPACING_SUCCESS, data));
+  } catch (err) {
+    log.error(err);
+    if (err.response !== undefined) {
+      log.error(err.response.status);
+      res.status(err.response.status).send({
+        status: err.response.status,
+        message: {
+          refresh: 'fail',
+          message: err.message,
+        },
+      });
+    }
+    res.status(err.code).send({
+      status: err.code,
+      message: {
+        refresh: 'fail',
+        message: err.message,
+      },
+    });
+  }
+};
+
 export default {
     createSpacing,
     getSpacing,
+    removeSpacing,
   };
   
