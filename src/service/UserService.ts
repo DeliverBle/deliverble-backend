@@ -247,7 +247,7 @@ export const getAccessTokenByCode = async (
     _code: string
 ) => {
   log.debug('getAccessTokenByCode ', _code);
-  const { data } = await axios.post(OAUTH_TOKEN, {
+  const data = await axios.post(OAUTH_TOKEN, {
     grant_type: 'authorization_code',
     client_id: process.env.KAKAO_CLIENT_ID,
     redirect_uri: process.env.KAKAO_REDIRECT_URI,
