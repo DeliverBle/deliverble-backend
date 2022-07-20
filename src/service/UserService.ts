@@ -251,7 +251,8 @@ export const getAccessTokenByCode = async (_code: string) => {
     },
   };
 
-  const  { data: access_token } = await axios.post(OAUTH_TOKEN, payload, config);
+  const { data: access_token } = await axios.post(OAUTH_TOKEN, payload);
+  console.log( " >>>>>>>>>>>>>>>>>>>>>>>>>>>>> ", access_token)
   log.debug('getAccessTokenByCode ', access_token);
 
   return access_token;
