@@ -1,11 +1,12 @@
-import {User} from '../entity/User';
-import {getConnection} from 'typeorm';
-import {UserQueryRepository} from '../repository/UserQueryRepository';
-import {isNotFoundUser, NotFoundUser} from '../entity/NotFoundUser';
-import {UserCommandRepository} from '../repository/UserCommandRepository';
+import { User } from '../entity/User';
+import { getConnection } from 'typeorm';
+import { UserQueryRepository } from '../repository/UserQueryRepository';
+import { isNotFoundUser, NotFoundUser } from '../entity/NotFoundUser';
+import { UserCommandRepository } from '../repository/UserCommandRepository';
 import UserNotFoundError from '../error/UserNotFoundError';
 import {
-  KakaoRawInfo, NewsReturnDTO,
+  KakaoRawInfo,
+  NewsReturnDTO,
   NewsReturnDTOCollection,
   UpdatedAccessTokenDTO,
   UserFavoriteNewsReturnDTO,
@@ -24,8 +25,8 @@ import {
   USER_LOGOUT_LINK,
 } from '../shared/AuthLink';
 import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
-import {promisify} from 'util';
-import {Logger} from 'tslog';
+import { promisify } from 'util';
+import { Logger } from 'tslog';
 import AlreadyLoggedOutError from '../error/AlreadyLoggedOutError';
 import AlreadySignedUpError from '../error/AlreadySignedUpError';
 import NewsService from './NewsService';
@@ -325,8 +326,10 @@ export const getAllFavoriteNewsList = async (
   const userQueryRepository = await getConnectionToUserQueryRepository();
   const toBeUpdatedUser = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
   const favoriteNews = await toBeUpdatedUser.getFavoriteNews();
+  const favoriteNewsTagList = await NewsService.searchTagsByNewsIds(favoriteNews);
   const returnWrappedCollectionOfFavoriteNews = new NewsReturnDTOCollection(
     favoriteNews,
+    favoriteNewsTagList,
   ).toNewsReturnDTOList();
 
   return {
@@ -367,11 +370,9 @@ export const addNewFavoriteNews = async (
 
   await toBeUpdatedUser.addFavoriteNews(pendingFavoriteNews);
   const favoriteNews = await toBeUpdatedUser.getFavoriteNews();
+  const favoriteNewsTagList = await NewsService.searchTagsByNewsIds(favoriteNews);
 
-  return new NewsReturnDTOCollection(
-      favoriteNews,
-  ).toNewsReturnDTOList();
-  // return await updateExistingUser(toBeUpdatedUser);
+  return new NewsReturnDTOCollection(favoriteNews, favoriteNewsTagList).toNewsReturnDTOList();
 };
 
 export const removeFavoriteNews = async (kakaoId: string, newsId: string): Promise<UserInfo> => {
