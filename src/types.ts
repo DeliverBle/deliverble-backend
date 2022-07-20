@@ -1,14 +1,18 @@
-import {Category} from './shared/common/Category';
-import {convertGenderEnglishToKorean, convertKoreanToGenderObject, Gender,} from './shared/common/Gender';
-import {Time} from './vo/Time';
-import {Suitability} from './shared/common/Suitability';
-import {Tag} from './entity/Tag';
-import {Channel} from './shared/common/Channel';
-import {User} from './entity/User';
-import {Logger} from 'tslog';
-import {IsDefined, IsNotEmpty} from 'class-validator';
-import {Highlight} from './entity/Highlight';
-import {Memo} from './entity/Memo';
+import { Category } from './shared/common/Category';
+import {
+  convertGenderEnglishToKorean,
+  convertKoreanToGenderObject,
+  Gender,
+} from './shared/common/Gender';
+import { Time } from './vo/Time';
+import { Suitability } from './shared/common/Suitability';
+import { Tag } from './entity/Tag';
+import { Channel } from './shared/common/Channel';
+import { User } from './entity/User';
+import { Logger } from 'tslog';
+import { IsDefined, IsNotEmpty } from 'class-validator';
+import { Highlight } from './entity/Highlight';
+import { Memo } from './entity/Memo';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -389,7 +393,7 @@ export class RemoveExistingMemoDTO {
 export class MemoReturnDto {
   constructor(memo: Memo[]) {
     this.id = memo[0].id;
-    this.keyword = memo[0].keyword.replace(/[\b]/, '')
+    this.keyword = memo[0].keyword.replace(/[\b]/, '');
     this.content = memo[0].content;
   }
 
