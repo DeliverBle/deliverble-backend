@@ -13,6 +13,7 @@ import { Logger } from 'tslog';
 import { IsDefined, IsNotEmpty } from 'class-validator';
 import { Highlight } from './entity/Highlight';
 import { Memo } from './entity/Memo';
+import {createMemoArrayWrappedObject, MemoReturnDto} from "./vo/MemoArrayWrappedObject";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -325,7 +326,10 @@ export class HighlightReturnDTO {
 
   static async createHighlightReturnDTOWithMemo(highlight: Highlight): Promise<HighlightReturnDTO> {
     const newHighlight = new HighlightReturnDTO(highlight);
-    newHighlight.memo = new MemoReturnDto(await highlight.getMemo());
+    const toReturnMemo = await highlight.getMemo();
+    const toWrappedMemo = createMemoArrayWrappedObject(await highlight.getMemo());
+    log.debug("toWrappedMemo >>>>>>>>>>>>>>>> ", toWrappedMemo);
+    newHighlight.memo = toWrappedMemo;
     return newHighlight;
   }
 }
@@ -390,14 +394,43 @@ export class RemoveExistingMemoDTO {
   highlightId: number;
 }
 
-export class MemoReturnDto {
-  constructor(memo: Memo[]) {
-    this.id = memo[0].id;
-    this.keyword = memo[0].keyword.replace(/[\b]/, '');
-    this.content = memo[0].content;
+export class UpdateExistingMemoDTO {
+  constructor(
+    _accessToken: string,
+    _kakaoId: string,
+    _memoId: number,
+    _keyword: string,
+    _content: string,
+  ) {
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
+    this.memoId = _memoId;
+    this.keyword = _keyword;
+    this.content = _content;
   }
 
-  id: number;
+  @IsNotEmpty()
+  @IsDefined()
+  accessToken: string;
+
+  @IsNotEmpty()
+  @IsDefined()
+  kakaoId: string;
+
+  @IsNotEmpty()
+  @IsDefined()
+  memoId: number;
+
+  @IsNotEmpty()
+  @IsDefined()
   keyword: string;
+
+  @IsNotEmpty()
+  @IsDefined()
   content: string;
+
+  toEntity(): Memo {
+    return new Memo(this.keyword, this.content);
+  }
 }
+
