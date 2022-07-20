@@ -1,4 +1,5 @@
-import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from "typeorm";
+import {BaseEntity, Column, Entity, JoinColumn, ManyToOne, OneToOne, PrimaryGeneratedColumn} from "typeorm";
+import { Highlight } from "./Highlight";
 
 @Entity()
 export class Memo extends BaseEntity {
@@ -15,4 +16,11 @@ export class Memo extends BaseEntity {
 
     @Column({type: 'varchar', length: 100})
     content!: string;
+
+    @ManyToOne((type) => Highlight, (highlight) => highlight.memo, {
+        onDelete: 'CASCADE',
+        orphanedRowAction: 'delete'
+    })
+    @JoinColumn()
+    highlight!: Highlight;
 }
