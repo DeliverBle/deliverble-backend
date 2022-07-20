@@ -13,7 +13,7 @@ import { Logger } from 'tslog';
 import { IsDefined, IsNotEmpty } from 'class-validator';
 import { Highlight } from './entity/Highlight';
 import { Memo } from './entity/Memo';
-import {createMemoArrayWrappedObject, MemoReturnDto} from "./vo/MemoArrayWrappedObject";
+import { createMemoArrayWrappedObject, MemoReturnDto } from './vo/MemoArrayWrappedObject';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -57,13 +57,25 @@ export interface NewsInfo {
 }
 
 export class NewsReturnDTOCollection {
-  constructor(newsInfoList: NewsInfo[]) {
+  constructor(newsInfoList: NewsInfo[], favoriteNewsTagList: TagOfNewsReturnDtoCollection) {
     this.newsInfoList = newsInfoList;
+    this.favoriteNewsTagList = favoriteNewsTagList;
   }
+
   newsInfoList: NewsInfo[] | [];
+  favoriteNewsTagList: TagOfNewsReturnDtoCollection | [];
+
   toNewsReturnDTOList(): NewsReturnDTO[] {
-    return this.newsInfoList.map((newsInfo: NewsInfo) => {
-      return new NewsReturnDTO(newsInfo);
+    return this.newsInfoList.map((acc: NewsInfo, cur, idx) => {
+      const nowReturnNewsDto = new NewsReturnDTO(acc);
+      log.debug('get set 막 쓰고 있네 망했다~~: ', nowReturnNewsDto, this.favoriteNewsTagList, cur);
+
+      // TODO: ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ
+      if (this.favoriteNewsTagList instanceof TagOfNewsReturnDtoCollection) {
+        const nowTagOfEachNewsDto = this.favoriteNewsTagList.getCollectionById(cur).getTags();
+        nowReturnNewsDto.setTag(nowTagOfEachNewsDto);
+      }
+      return nowReturnNewsDto;
     });
   }
 }
@@ -97,6 +109,10 @@ export class NewsReturnDTO {
   startTime: number;
   endTime: number;
   tags: Tag[];
+
+  setTag(tagOfEachNewsReturnDto: Tag[]) {
+    this.tags = tagOfEachNewsReturnDto;
+  }
 }
 
 export class NewsScriptReturnDTO {
@@ -340,7 +356,6 @@ export class HighlightReturnDTO {
     const newHighlight = new HighlightReturnDTO(highlight);
     const toReturnMemo = await highlight.getMemo();
     const toWrappedMemo = createMemoArrayWrappedObject(await highlight.getMemo());
-    log.debug("toWrappedMemo >>>>>>>>>>>>>>>> ", toWrappedMemo);
     newHighlight.memo = toWrappedMemo;
     return newHighlight;
   }
@@ -446,3 +461,24 @@ export class UpdateExistingMemoDTO {
   }
 }
 
+export class TagOfNewsReturnDtoCollection {
+  constructor(_tagOfNewsReturnDtoCollection: TagOfEachNewsReturnDto[]) {
+    this.tagDataOfEachNewsCollection = _tagOfNewsReturnDtoCollection;
+  }
+  tagDataOfEachNewsCollection: TagOfEachNewsReturnDto[];
+
+  getCollectionById(id: number): TagOfEachNewsReturnDto {
+    return this.tagDataOfEachNewsCollection[id];
+  }
+}
+
+export class TagOfEachNewsReturnDto {
+  constructor(tags: Tag[]) {
+    this.tags = tags;
+  }
+  tags: Tag[];
+
+  getTags(): Tag[] {
+    return this.tags;
+  }
+}
