@@ -1,6 +1,8 @@
 import {EntityRepository, Repository} from "typeorm";
 import {Highlight} from "../entity/Highlight";
 import {Logger} from "tslog";
+import {Memo} from "../entity/Memo";
+import {User} from "../entity/User";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -28,6 +30,21 @@ export class HighlightCommandRepository extends Repository<Highlight> {
     } catch (err) {
       log.error(err);
       return false;
+    }
+  }
+
+  async registerOrSaveHighlight(highlight: Highlight): Promise<Highlight> {
+    const newHighlight = this.create(highlight);
+    return this.save(newHighlight);
+  }
+
+  updateHighlight = async (highlight: Highlight): Promise<Highlight> => {
+    try {
+      await this.save(highlight);
+      return highlight;
+    } catch (err) {
+      log.error(err);
+      throw err;
     }
   }
 }

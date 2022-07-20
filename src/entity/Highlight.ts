@@ -1,5 +1,18 @@
-import {BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index} from 'typeorm';
+import {
+  BaseEntity,
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  ManyToOne,
+  JoinColumn,
+  Index,
+  OneToOne,
+  OneToMany
+} from 'typeorm';
 import { User } from './User';
+import {Memo} from "./Memo";
+import {Field} from "mysql2";
+import {ArrayMaxSize, maxLength} from "class-validator";
 
 @Entity()
 @Index(["scriptId", "startingIndex", "endingIndex"], { unique: true })
@@ -20,6 +33,13 @@ export class Highlight extends BaseEntity {
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user!: User;
 
+  @OneToMany((type) => Memo, memo => memo.highlight, {
+    eager: true
+  })
+  @JoinColumn()
+  @ArrayMaxSize(1)
+  memo?: Promise<Memo[]>;
+
   @Column()
   scriptId: number;
 
@@ -28,4 +48,26 @@ export class Highlight extends BaseEntity {
 
   @Column()
   endingIndex: number;
+
+  public async addNewMemo(memo: Memo): Promise<Highlight> {
+    const nowMemo = await this.memo;
+    this.memo = Promise.resolve([memo]);
+    return this;
+  }
+
+  public async updateExistingMemo(memo: Memo): Promise<Highlight> {
+    const nowMemo = await this.memo;
+    this.memo = Promise.resolve([memo]);
+    return this;
+  }
+
+  public async removeExistingMemo(): Promise<Highlight> {
+    const nowMemo = await this.memo;
+    this.memo = Promise.resolve([]);
+    return this;
+  }
+
+  public getMemo(): Promise<Memo[]> {
+    return this.memo;
+  }
 }
