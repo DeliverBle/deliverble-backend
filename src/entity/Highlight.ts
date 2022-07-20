@@ -1,5 +1,6 @@
-import {BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index} from 'typeorm';
+import {BaseEntity, Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Index, OneToOne} from 'typeorm';
 import { User } from './User';
+import {Memo} from "./Memo";
 
 @Entity()
 @Index(["scriptId", "startingIndex", "endingIndex"], { unique: true })
@@ -19,6 +20,12 @@ export class Highlight extends BaseEntity {
   })
   @JoinColumn({ name: 'user_id', referencedColumnName: 'id' })
   user!: User;
+
+  @OneToOne((type) => Memo, {
+    onDelete: 'CASCADE',
+  })
+  @JoinColumn()
+  Memo?: Memo;
 
   @Column()
   scriptId: number;
