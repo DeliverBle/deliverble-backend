@@ -23,9 +23,10 @@ export class Highlight extends BaseEntity {
 
   @OneToOne((type) => Memo, {
     onDelete: 'CASCADE',
+    cascade: true,
   })
   @JoinColumn()
-  Memo?: Memo;
+  memo?: Memo;
 
   @Column()
   scriptId: number;
@@ -35,4 +36,9 @@ export class Highlight extends BaseEntity {
 
   @Column()
   endingIndex: number;
+
+  public addNewMemo(memo: Memo): Highlight {
+    this.memo = memo;
+    return this;
+  }
 }

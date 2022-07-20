@@ -2,6 +2,11 @@ import {BaseEntity, Column, Entity, PrimaryGeneratedColumn} from "typeorm";
 
 @Entity()
 export class Memo extends BaseEntity {
+    constructor(_keyword: string, _content: string) {
+        super();
+        this.keyword = _keyword;
+        this.content = _content;
+    }
     @PrimaryGeneratedColumn()
     id!: number;
 
