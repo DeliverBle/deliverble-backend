@@ -1,18 +1,14 @@
-import { Category } from './shared/common/Category';
-import {
-  convertGenderEnglishToKorean,
-  convertKoreanToGenderObject,
-  Gender,
-} from './shared/common/Gender';
-import { Time } from './vo/Time';
-import { Suitability } from './shared/common/Suitability';
-import { Tag } from './entity/Tag';
-import { Channel } from './shared/common/Channel';
-import { User } from './entity/User';
-import { Logger } from 'tslog';
-import {IS_DEFINED, IsDefined, IsNotEmpty} from 'class-validator';
-import { Highlight } from './entity/Highlight';
-import {Memo} from "./entity/Memo";
+import {Category} from './shared/common/Category';
+import {convertGenderEnglishToKorean, convertKoreanToGenderObject, Gender,} from './shared/common/Gender';
+import {Time} from './vo/Time';
+import {Suitability} from './shared/common/Suitability';
+import {Tag} from './entity/Tag';
+import {Channel} from './shared/common/Channel';
+import {User} from './entity/User';
+import {Logger} from 'tslog';
+import {IsDefined, IsNotEmpty} from 'class-validator';
+import {Highlight} from './entity/Highlight';
+import {Memo} from './entity/Memo';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -289,10 +285,15 @@ export interface HighlightInfo {
 }
 
 export class HighlightReturnCollectionDTO {
+  static createCollection(_highlightReturnCollection: HighlightReturnDTO[]) {
+    return new HighlightReturnCollectionDTO(_highlightReturnCollection);
+  }
+
   constructor(_highlightReturnCollection: HighlightReturnDTO[]) {
     this.highlightReturnCollection = _highlightReturnCollection;
     this.sortByScriptIdFirstAndStartingIndexWhenScriptIdEquals();
   }
+
   highlightReturnCollection: HighlightReturnDTO[];
   sortByScriptIdFirstAndStartingIndexWhenScriptIdEquals(): HighlightReturnCollectionDTO {
     this.highlightReturnCollection = this.highlightReturnCollection.sort((a, b) => {
@@ -316,44 +317,81 @@ export class HighlightReturnDTO {
   startingIndex: number;
   endingIndex: number;
   highlightId: number;
+  memo: MemoReturnDto;
+
+  static async createHighlightReturnDTOWithMemo(highlight: Highlight): Promise<HighlightReturnDTO> {
+    const newHighlight = new HighlightReturnDTO(highlight);
+    newHighlight.memo = new MemoReturnDto(await highlight.getMemo());
+    return newHighlight;
+  }
 }
 
 export class AddMemoDTO {
-    constructor(
-        _accessToken: string,
-        _kakaoId: string,
-        _highlightId: number,
-        _keyword: string,
-        _content: string,
-    ) {
-        this.accessToken = _accessToken;
-        this.kakaoId = _kakaoId;
-        this.highlightId = _highlightId;
-        this.keyword = _keyword;
-        this.content = _content;
-    }
+  constructor(
+    _accessToken: string,
+    _kakaoId: string,
+    _highlightId: number,
+    _keyword: string,
+    _content: string,
+  ) {
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
+    this.highlightId = _highlightId;
+    this.keyword = _keyword;
+    this.content = _content;
+  }
 
-    @IsNotEmpty()
-    @IsDefined()
-    accessToken: string;
+  @IsNotEmpty()
+  @IsDefined()
+  accessToken: string;
 
-    @IsNotEmpty()
-    @IsDefined()
-    kakaoId: string;
+  @IsNotEmpty()
+  @IsDefined()
+  kakaoId: string;
 
-    @IsNotEmpty()
-    @IsDefined()
-    highlightId: number;
+  @IsNotEmpty()
+  @IsDefined()
+  highlightId: number;
 
-    @IsNotEmpty()
-    @IsDefined()
-    keyword: string;
+  @IsNotEmpty()
+  @IsDefined()
+  keyword: string;
 
-    @IsNotEmpty()
-    @IsDefined()
-    content: string;
+  @IsNotEmpty()
+  @IsDefined()
+  content: string;
 
-    toEntity(): Memo {
-      return new Memo(this.keyword, this.content);
-    }
+  toEntity(): Memo {
+    return new Memo(this.keyword, this.content);
+  }
+}
+
+export class RemoveExistingMemoDTO {
+  constructor(_accessToken: string, _kakaoId: string, _highlightId: number) {
+    this.accessToken = _accessToken;
+    this.kakaoId = _kakaoId;
+    this.highlightId = _highlightId;
+  }
+
+  @IsNotEmpty()
+  @IsDefined()
+  accessToken: string;
+
+  @IsNotEmpty()
+  @IsDefined()
+  kakaoId: string;
+
+  @IsNotEmpty()
+  @IsDefined()
+  highlightId: number;
+}
+
+export class MemoReturnDto {
+  constructor(memo: Memo[]) {
+    this.keyword = memo[0].keyword.replace(/[\b]/, '')
+    this.content = memo[0].content;
+  }
+
+  keyword: string;
+  content: string;
 }
