@@ -34,21 +34,22 @@ const searchNews = async (req: Request, res: Response): Promise<void | Response>
   try {
     if (conditionList) {
       [data, paginationInfo] = await NewsService.searchByConditions(conditionList, searchCondition);
+      console.log(" conditionList heeeeeey");
     } else {
       [data, paginationInfo] = await NewsService.searchAllNews();
     }
-
-    res
+    console.log(">>>>>>>>>> VVVVV")
+    return res
       .status(statusCode.OK)
       .send(util.success(statusCode.OK, message.SEARCH_NEWS_SUCCESS, data, paginationInfo));
   } catch (error) {
     console.log(error);
     if (error.message === message.EXCEED_PAGE_INDEX) {
-      res
+      return res
         .status(statusCode.NOT_FOUND)
         .send(util.fail(statusCode.NOT_FOUND, message.EXCEED_PAGE_INDEX));
     }
-    res
+    return res
       .status(statusCode.INTERNAL_SERVER_ERROR)
       .send(util.fail(statusCode.INTERNAL_SERVER_ERROR, message.INTERNAL_SERVER_ERROR));
   }

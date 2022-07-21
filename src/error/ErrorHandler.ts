@@ -8,10 +8,11 @@ export const errorHandler = (fn) => (req, res, next) => {
   Promise.resolve(fn(req, res, next)).catch((err) => {
     if (err instanceof CustomError || RangeError) {
       log.debug(" >>>>>>>>>>>>>>>>>> ", err)
-      res.status(err.code).send({
+      return res.status(err.code).send({
         msg: err.message
       });
     }
+    console.log("AFTER HANDLING ERROR")
     next();
   });
 };
