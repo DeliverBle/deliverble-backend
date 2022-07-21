@@ -48,11 +48,13 @@ export const createSpacing = async (req: Request, res: Response): Promise<void |
 };
 
 export const getSpacing = async (req: Request, res: Response): Promise<void | Response> => {
-  const tokensAndUserId = await UserController.getTokensParsedFromBody(req.body);
-  const accessToken = tokensAndUserId.accessToken;
-  let kakaoId = tokensAndUserId.userId;
-  kakaoId = kakaoId.replace(/['"]+/g, '');
-  const newsId = req.body.news_id;
+  // const tokensAndUserId = await UserController.getTokensParsedFromBody(req.body);
+  // const accessToken = tokensAndUserId.accessToken;
+  // let kakaoId = tokensAndUserId.userId;
+  // kakaoId = kakaoId.replace(/['"]+/g, '');
+  const accessToken = req.header("access_token");
+  const kakaoId = req.header("user_id");
+  const newsId: number = Number(req.query.news_id);
   const getSpacing = new GetSpacing(accessToken, kakaoId, newsId);
 
   try {

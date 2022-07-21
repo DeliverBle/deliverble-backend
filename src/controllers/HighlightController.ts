@@ -62,10 +62,13 @@ export const getHighlightByKakaoIdAndNewsId = async (
   req: Request,
   res: Response,
 ): Promise<void | Response> => {
-  const accessToken = req.body['access_token'];
-  let kakaoId = req.body['user_id'];
-  kakaoId = kakaoId.replace(/['"]+/g, '');
-  const newsId = req.body['news_id'];
+  // const accessToken = req.body['access_token'];
+  // let kakaoId = req.body['user_id'];
+  // kakaoId = kakaoId.replace(/['"]+/g, '');
+  // const newsId = req.body['news_id'];
+  const accessToken = req.header("access_token");
+  const kakaoId = req.header("user_id");
+  const newsId: number = Number(req.query.news_id);
   log.debug('hello', kakaoId, newsId);
 
   try {
