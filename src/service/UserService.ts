@@ -367,6 +367,7 @@ export const getAllFavoriteNewsList = async (
   const userQueryRepository = await getConnectionToUserQueryRepository();
   const toBeUpdatedUser = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
   const favoriteNews = await toBeUpdatedUser.getFavoriteNews();
+  log.debug("favoriteNews >>>>>>>>>>>>> ", favoriteNews)
   const favoriteNewsTagList = await NewsService.searchTagsByNewsIds(favoriteNews);
   const returnWrappedCollectionOfFavoriteNews = new NewsReturnDTOCollection(
     favoriteNews,
@@ -407,9 +408,14 @@ export const addNewFavoriteNews = async (
   }
   const userQueryRepository = await getConnectionToUserQueryRepository();
   const pendingFavoriteNews = await NewsService.searchByNewsId(newsId);
+  log.debug(pendingFavoriteNews, pendingFavoriteNews)
   const toBeUpdatedUser = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
+  log.debug(toBeUpdatedUser)
 
   await toBeUpdatedUser.addFavoriteNews(pendingFavoriteNews);
+  const userCommandRepository = await getConnectionToUserCommandRepository();
+  await userCommandRepository.registerOrSaveUser(toBeUpdatedUser);
+
   const favoriteNews = await toBeUpdatedUser.getFavoriteNews();
   const favoriteNewsTagList = await NewsService.searchTagsByNewsIds(favoriteNews);
 
