@@ -67,13 +67,25 @@ export const getHighlightByKakaoIdAndNewsId = async (
   // kakaoId = kakaoId.replace(/['"]+/g, '');
   // const newsId = req.body['news_id'];
   // const accessToken = req.header("access_token");
-  const accessToken = req.headers["access_token"].toString();
-  // const kakaoId = req.header("user_id").replace(/['"]+/g, '');
-  let kakaoId = req.headers["user_id"].toString().replace(/['"]+/g, '');
-  const newsId: number = Number(req.query.news_id);
-  log.debug('hello', kakaoId, newsId);
+  // const accessToken = req.headers["access_token"].toString();
+  // // const kakaoId = req.header("user_id").replace(/['"]+/g, '');
+  // let kakaoId = req.headers["user_id"].toString().replace(/['"]+/g, '');
+  // const newsId: number = Number(req.query.news_id);
+  // log.debug('hello', kakaoId, newsId);
 
   try {
+    const newsId: number = Number(req.query.news_id);
+    const authorization = req.headers["authorization"].toString().split(" ");
+    log.debug("authorization", authorization);
+
+    const accessToken = authorization[0];
+    log.debug('req.headers["access_token"]', accessToken);
+    // @ts-ignore
+    let kakaoId = authorization[1].replace(/['"]+/g, '');
+
+    log.debug('type of accessToken', typeof accessToken);
+    log.debug('type of kakaoId', typeof kakaoId);
+
     const data = (
       await HighlightService.getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId)
     ).highlightReturnCollection;
@@ -83,20 +95,19 @@ export const getHighlightByKakaoIdAndNewsId = async (
   } catch (err) {
     log.error(err);
     if (err.response !== undefined) {
-      log.error(err.response.status);
-      return res.status(err.response.status).send({
-        status: err.response.status,
+      return res.status(statusCode.INTERNAL_SERVER_ERROR).send({
+        status: statusCode.BAD_REQUEST,
         message: {
           refresh: 'fail',
-          message: err.message,
+          message: message.BAD_REQUEST,
         },
       });
     }
-    return res.status(err.code).send({
-      status: err.code,
+    return res.status(statusCode.INTERNAL_SERVER_ERROR).send({
+      status: statusCode.BAD_REQUEST,
       message: {
         refresh: 'fail',
-        message: err.message,
+        message: message.BAD_REQUEST,
       },
     });
   }
