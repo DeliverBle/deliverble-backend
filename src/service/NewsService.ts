@@ -96,7 +96,6 @@ const filterNewsDataByCategory = (newsData: any, searchCondition: SearchConditio
   }
   const filteredNewsData = newsData.filter((news) => {
     if (searchCondition.categories.includes(news.category)) {
-      console.log(news);
       return news;
     }
   });
@@ -187,7 +186,6 @@ const findNewsDetail = async (newsId: number): Promise<NewsScriptReturnDTO> => {
   // console.log( newsScriptData['scripts']);
   let scriptList: ScriptReturnDto[] = [];
   for (let i in newsData['scripts']) {
-    console.log(newsData['scripts'][i]);
     let script = new ScriptReturnDto(newsData['scripts'][i]);
     scriptList.push(script);
   }
@@ -200,7 +198,6 @@ const searchByNewsId = async (newsId: string) => {
   try {
     return await newsRepository.findByNewsId(newsId);
   } catch {
-    log.debug('meow');
     // TODO: need an another handler for this error
     throw new CustomError(404, 'News Not Found');
   }

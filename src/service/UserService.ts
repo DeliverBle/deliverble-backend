@@ -49,7 +49,6 @@ const getConnectionToUserCommandRepository = async () => {
 };
 
 export const findUserByKakaoId = async (kakaoId: string): Promise<User> => {
-  log.debug('kakao id toString', kakaoId);
   const userQueryRepository = await getConnectionToUserQueryRepository();
   try {
     return await userQueryRepository.findByKakaoId(kakaoId);
@@ -62,7 +61,6 @@ export const findUserByEmail = async (email: string): Promise<User> => {
   const userRepository = await getConnectionToUserQueryRepository();
   try {
     const foundUser = await userRepository.findByEmail(email);
-    log.debug(' >>>>>>>> foundUser ', foundUser);
     return foundUser;
   } catch (error) {
     return new NotFoundUser();
@@ -85,9 +83,7 @@ export const checkAccessTokenExpiryTTLToRedisServer = async (
   userId: string,
 ): Promise<number> => {
   // TODO: validate this logic in controller or additional DTO type class
-  log.debug(' HELLO ');
   if (!accessToken || !userId) {
-    log.debug(accessToken, userId);
     throw new ResourceNotFoundError();
   }
   const KEY = ACCESS_TOKEN_PREFIX + userId;
@@ -285,7 +281,6 @@ export const getKakaoRawInfo = async (
     });
 
   const kakaoRawInfo = KakaoRawInfo.toKakaoRawInfo(userInfo);
-  log.debug(kakaoRawInfo);
   return kakaoRawInfo;
 };
 
@@ -294,14 +289,10 @@ export const loginUserWithKakao = async (
   userId: string,
 ): Promise<UserInfo> => {
   if (await doesAccessTokenExpire(accessToken, userId)) {
-    log.debug('acc, us', accessToken, userId);
     throw new AccessTokenExpiredError();
   }
   const kakaoRawInfo = await getKakaoRawInfo(accessToken, userId);
-  log.debug(" 295 USER >>>>>>>>>>>>>>>> ", kakaoRawInfo);
   const user = await findUserByKakaoId(kakaoRawInfo.kakaoId);
-  log.debug(' findUserByKakaoId USER >>>> ', user);
-  log.debug(' isNotFoundUser ', isNotFoundUser(user));
   if (isNotFoundUser(user)) {
     log.warn('NOT FOUND USER ', user);
     throw new UserNotFoundError();
@@ -373,7 +364,6 @@ export const getAllFavoriteNewsList = async (
   const userQueryRepository = await getConnectionToUserQueryRepository();
   const toBeUpdatedUser = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
   const favoriteNews = await toBeUpdatedUser.getFavoriteNews();
-  log.debug("favoriteNews >>>>>>>>>>>>> ", favoriteNews)
   const favoriteNewsTagList = await NewsService.searchTagsByNewsIds(favoriteNews);
   const returnWrappedCollectionOfFavoriteNews = new NewsReturnDTOCollection(
     favoriteNews,
@@ -414,9 +404,7 @@ export const addNewFavoriteNews = async (
   }
   const userQueryRepository = await getConnectionToUserQueryRepository();
   const pendingFavoriteNews = await NewsService.searchByNewsId(newsId);
-  log.debug(pendingFavoriteNews, pendingFavoriteNews)
   const toBeUpdatedUser = await userQueryRepository.findByKakaoIdActiveRecordManner(kakaoId);
-  log.debug(toBeUpdatedUser)
 
   await toBeUpdatedUser.addFavoriteNews(pendingFavoriteNews);
   const userCommandRepository = await getConnectionToUserCommandRepository();
@@ -442,7 +430,6 @@ const searchByKakaoId = async (kakaoId: string) => {
   try {
     return await userQueryRepository.findByKakaoId(kakaoId);
   } catch {
-    log.debug('meow');
     // TODO: need an another handler for this error
     throw new CustomError(404, 'User Not Found');
   }

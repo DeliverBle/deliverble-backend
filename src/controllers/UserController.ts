@@ -425,7 +425,6 @@ export const removeFavoriteNews = async (req: Request, res: Response) => {
   const newsId = ids.newsId;
   try {
     const favoriteNewsListWithUserId = await UserService.removeFavoriteNews(userId, newsId);
-    log.debug(favoriteNewsListWithUserId);
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: favoriteNewsListWithUserId,
