@@ -4,10 +4,12 @@ import { Logger } from 'tslog';
 import {
   AddMemoDTO,
   CreateHighlight,
+  HighlightInfo,
   HighlightReturnCollectionDTO,
   HighlightReturnDTO,
   RemoveExistingMemoDTO,
   UpdateExistingMemoDTO,
+  UserInfo,
 } from '../types';
 import { HighlightQueryRepository } from '../repository/HighlightRepository';
 import UserService, { doesAccessTokenExpire } from './UserService';
@@ -22,6 +24,7 @@ import DuplicateStartingIndexAndEndingIndex from '../error/DuplicateStartingInde
 import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
 import ResourceNotFoundError from '../error/ResourceNotFoundError';
 import { MemoCommandRepository, MemoQueryRepository } from '../repository/MemoRepository';
+import { User } from '../entity/User';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 

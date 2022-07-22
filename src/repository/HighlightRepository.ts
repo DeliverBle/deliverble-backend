@@ -45,4 +45,5 @@ export class HighlightQueryRepository extends Repository<Highlight> {
       throw new CustomError(404, "Highlight Not Found")
     }
   }
+  
 }

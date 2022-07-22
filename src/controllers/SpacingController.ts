@@ -95,7 +95,7 @@ export const removeSpacing = async (req: Request, res: Response): Promise<void |
   try {
     const data = await SpacingService.removeSpacing(removeSpacing);
     res
-      .status(statusCode.CREATED)
+      .status(statusCode.OK)
       .send(util.success(statusCode.OK, message.REMOVE_SPACING_SUCCESS, data));
   } catch (err) {
     log.error(err);

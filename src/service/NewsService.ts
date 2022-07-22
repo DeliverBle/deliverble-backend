@@ -22,6 +22,7 @@ import message from '../modules/responseMessage';
 import CustomError from '../error/CustomError';
 import { getLastPage } from '../util/pagination';
 import { Tag } from '../entity/Tag';
+import statusCode from '../modules/statusCode';
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
@@ -119,7 +120,8 @@ const filterNewsDataByAnnouncerGender = (newsData: any, searchCondition: SearchC
 
 const validateNewsDataLength = (offset: number, newsData: NewsInfo[]) => {
   if (offset > newsData.length) {
-    throw new Error(message.EXCEED_PAGE_INDEX);
+    log.debug('error point check');
+    throw new CustomError(statusCode.BAD_REQUEST, message.EXCEED_PAGE_INDEX);
   }
 };
 
@@ -128,8 +130,12 @@ const paginateWithOffsetAndLimit = (searchCondition: SearchCondition, newsData: 
   const limit = searchCondition.getLimit();
   const endIndex = offset + limit;
 
-  validateNewsDataLength(offset, newsData);
-  return newsData.slice(offset, endIndex);
+  try {
+    validateNewsDataLength(offset, newsData);
+    return newsData.slice(offset, endIndex);
+  } catch (error) {
+    throw new CustomError(statusCode.BAD_REQUEST, message.EXCEED_PAGE_INDEX)
+  }
 };
 
 const searchByConditions = async (
@@ -156,7 +162,12 @@ const searchByConditions = async (
 
   // TODO: wrapping newsData with first collection so that avoiding any mistakes
   newsData = sortByDateAndTitle([newsData]);
-  newsData = paginateWithOffsetAndLimit(searchCondition, newsData);
+  try {
+    newsData = paginateWithOffsetAndLimit(searchCondition, newsData);
+  } catch (error) {
+    log.debug("error", error)
+    throw new CustomError(statusCode.BAD_REQUEST, message.EXCEED_PAGE_INDEX)
+  }
   let newsDataReturn: NewsReturnDTO[] = [];
   for (let i in newsData) {
     let news = new NewsReturnDTO(newsData[i]);
