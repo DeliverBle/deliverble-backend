@@ -1,110 +1,242 @@
-// import { assert, expect } from 'chai';
-// import { News } from '../entity/News';
-// import { Script } from '../entity/Script';
-// import { Tag } from '../entity/Tag';
-// import { User } from '../entity/User';
-// import { Category } from '../shared/common/Category';
-// import { Channel } from '../shared/common/Channel';
-// import { Gender } from '../shared/common/Gender';
-// import { Suitability } from '../shared/common/Suitability';
-// import { Time } from '../vo/Time';
-// import Sinon from 'sinon';
+// import { expect } from "chai"
+// import express from "express";
+// import request from "supertest";
+// import { 
+// 	SCRIPT_ID_TO_CREATE_HIGHLIGHT,
+// 	HIGHLIGHT_ENDING_INDEX,
+// 	HIGHLIGHT_STARTING_INDEX, 
+// 	NEWS_ID, 
+// 	REMOVE_HIGHLIGHT_ID,
+// 	HIGHLIGHT_ID_FOR_MEMO, 
+// } from "../shared/common/TestNumber";
+// require("dotenv").config();
 
-// import { TestFactory } from './factory';
-// import { Repository } from 'typeorm';
-// import { doesNotMatch } from 'assert';
+// const app = express();
+// const newsID = NEWS_ID;
+// const scriptIdToCreateHighlight = SCRIPT_ID_TO_CREATE_HIGHLIGHT;
+// const stringIndex = HIGHLIGHT_STARTING_INDEX;
+// const endingIndex = HIGHLIGHT_ENDING_INDEX;
+// const removeHighlightId = REMOVE_HIGHLIGHT_ID;
+// const highlightIdForMemo = HIGHLIGHT_ID_FOR_MEMO;
 
-
-// const userInfo = {
-// 	nickname: 'pobi',
-// 	email: 'javajigi@gmail.com',
-// 	gender: '남자',
-// };
-// let userMock1 = new User("2323", userInfo.nickname, userInfo.email, userInfo.gender);
-
-// let tagTest1_1 = new Tag();
-// tagTest1_1.name = '경제';
-// let tagTest1_2 = new Tag();
-// tagTest1_2.name = '비트코인';
-// let tagTest1_3 = new Tag();
-// tagTest1_3.name = '폭락';
-
-// let scriptTest1_1 = new Script();
-// scriptTest1_1.startTime = new Time(0, 0);
-// scriptTest1_1.endTime = new Time(7, 7);
-// scriptTest1_1.text = '비트코인 가격이 1만 8천 달러선으로 폭락하면서 2020년 이후 최대치를 나타내고 있습니다.';
-// let scriptTest1_2 = new Script();
-// scriptTest1_2.startTime = new Time(7, 7);
-// scriptTest1_2.endTime = new Time(14, 78);
-// scriptTest1_2.text = '가상화폐 정보 사이트 코인게코에 따르면 비트코인 가격은 오늘 오전 한때 1만 7,800달러까지 하락하기도 했습니다.';
-// let scriptTest1_3 = new Script();
-// scriptTest1_3.startTime = new Time(14, 78);
-// scriptTest1_3.endTime = new Time(20, 55);
-// scriptTest1_3.text = '비트코인은 물가 상승 압력에 따른 세계적인 금리 인상 등의 여파로 12일 연속 하락했습니다.';
-// let scriptTest1_4 = new Script();
-// scriptTest1_4.startTime = new Time(20, 55);
-// scriptTest1_4.endTime = new Time(26, 55);
-// scriptTest1_4.text = '시가총액 2위 이더리움의 가격은 1천 달러가 무너지는 등 다른 코인의 가격도 동반 하락했습니다.';
-// let scriptTest1_5 = new Script();
-// scriptTest1_5.startTime = new Time(26, 85);
-// scriptTest1_5.endTime = new Time(35, 4);
-// scriptTest1_5.text = '가격이 폭락하면서 한때 3조 달러가 넘었던 전 세계 가상화폐 시장의 시가총액은 8천억 달러 선으로 하락했습니다.';
-
-// const newsInfo = {
-// 	title: '비트코인, 한때 1만 8천 달러 붕괴',
-// 	category: Category.ECONOMY,
-// 	tags: [tagTest1_1, tagTest1_2, tagTest1_3],
-// 	scripts: [scriptTest1_1, scriptTest1_2, scriptTest1_3, scriptTest1_4, scriptTest1_5],
-// 	announcerGender: Gender.MEN,
-// 	channel: Channel.SBS,
-// 	link: 'S_gtbu2VRlI',
-// 	thumbnail: 'https://img.youtube.com/vi/S_gtbu2VRlI/hqdefault.jpg',
-// 	startTime: new Time(0, 0),
-// 	endTime: new Time(35, 4),
-// 	suitability: Suitability.HIGH,
-// 	isEmbeddable: true,
-// 	reportDate: new Date('2022-06-19'),
-// };
-
-
-
-// describe('Testing user component', () => {
-// 	const factory: TestFactory = new TestFactory();
-
-// 	// init testUser
-// 	const testUser: User = userMock1;
-
-// 	// init mockNews
-// 	const mockNews = new News();
-// 	mockNews.title = newsInfo.title;
-// 	mockNews.category = newsInfo.category;
-// 	mockNews.tags = newsInfo.tags;
-// 	mockNews.scripts = newsInfo.scripts;
-// 	mockNews.announcerGender = newsInfo.announcerGender;
-// 	mockNews.channel = newsInfo.channel;
-// 	mockNews.link = newsInfo.link;
-// 	mockNews.thumbnail = newsInfo.thumbnail;
-// 	mockNews.startTime = newsInfo.startTime;
-// 	mockNews.endTime = newsInfo.endTime;
-// 	mockNews.suitability = newsInfo.suitability;
-// 	mockNews.isEmbeddable = newsInfo.isEmbeddable;
-// 	mockNews.reportDate = newsInfo.reportDate;
-
-// 	let userRepository;
-
-// 	beforeEach(async (done) => {
-// 		await factory.init().then(done);
-// 		console.log(factory.connection)
-// 		userRepository = await factory.connection.getRepository(User);
-// 		console.log("userRepository", userRepository);
+// describe('GET /v2/highlight', () => {
+// 	it('하이라이트 조회 성공', done => {
+// 		request('http://127.0.0.1:8080')
+// 			.get('/v2/highlight')  // api 요청
+// 			.set('Content-Type', 'application/json')
+// 			.send({
+// 				"access_token": process.env.ACCESS_TOKEN,
+// 				"user_id": process.env.KAKAO_ID,
+// 				"news_id": newsID
+// 			}) // request body
+// 			.expect(200) // 예측 상태 코드
+// 			.expect('Content-Type', /json/) // 예측 content-type
+// 			.then(res => {
+// 				done();
+// 			})
+// 			.catch(err => {
+// 				console.error("######Error >>", err);
+// 				done(err);
+// 			});
 // 	});
+// 	it('하이라이트 조회 실패 - 잘못된 토큰', done => {
+// 		request('http://127.0.0.1:8080')
+// 			.get('/v2/highlight')  // api 요청
+// 			.set('Content-Type', 'application/json')
+// 			.send({
+// 				"access_token": "abcdefg",
+// 				"user_id": process.env.KAKAO_ID,
+// 				"news_id": newsID
+// 		}) // request body
+// 			.expect(403) // 예측 상태 코드
+// 			.expect('Content-Type', /json/) // 예측 content-type
+// 			.then(res => {
+// 					done();
+// 			})
+// 			.catch(err => {
+// 					console.error("######Error >>", err);
+// 					done(err);
+// 			})
+// 	});
+// });
 
-// 	it('should return user1 when calling repository', async() => {
-// 		//
-// 	})
+// describe('POST /v2/highlight/create', () => {
+// 	it('하이라이트 생성 성공', done => {
+// 		request('http://127.0.0.1:8080')
+// 			.post('/v2/highlight/create')  // api 요청
+// 			.set('Content-Type', 'application/json')
+// 			.send({
+// 				"access_token": process.env.ACCESS_TOKEN,
+// 				"user_id": process.env.KAKAO_ID,
+// 				"script_id": scriptIdToCreateHighlight,
+// 				"starting_index": stringIndex,
+// 				"ending_index": endingIndex
+// 			}) // request body
+// 			.expect(201) // 예측 상태 코드
+// 			.expect('Content-Type', /json/) // 예측 content-type
+// 			.then(res => {
+// 				expect(res.body.data[0].scriptId).to.equal(scriptIdToCreateHighlight);
+// 				done();
+// 			})
+// 			.catch(err => {
+// 				console.error("######Error >>", err);
+// 				done(err);
+// 			});
+// 	});
+// 	it('하이라이트 생성 실패 - 잘못된 토큰', done => {
+// 		request('http://127.0.0.1:8080')
+// 			.post('/v2/highlight/create')  // api 요청
+// 			.set('Content-Type', 'application/json')
+// 			.send({
+// 				"access_token": "abcdefg",
+// 				"user_id": process.env.KAKAO_ID,
+// 				"script_id": scriptIdToCreateHighlight,
+// 				"starting_index": stringIndex,
+// 				"ending_index": endingIndex
+// 			}) // request body
+// 			.expect(403) // 예측 상태 코드
+// 			.expect('Content-Type', /json/) // 예측 content-type
+// 			.then(res => {
+// 				done();
+// 			})
+// 			.catch(err => {
+// 				console.error("######Error >>", err);
+// 				done(err);
+// 			});
+// 	});	
+// });
 
 
-// 	after((done) => {
-// 		factory.close().then(done);
+// describe('POST /v2/highlight/remove', () => {
+// 	it('하이라이트 삭제 성공', done => {
+// 		request('http://127.0.0.1:8080')
+// 			.post('/v2/highlight/remove')  // api 요청
+// 			.set('Content-Type', 'application/json')
+// 			.send({
+// 				"access_token": process.env.ACCESS_TOKEN,
+// 				"user_id": process.env.KAKAO_ID,
+// 				"highlight_id": removeHighlightId
+// 			}) // request body
+// 			.expect(200) // 예측 상태 코드
+// 			.expect('Content-Type', /json/) // 예측 content-type
+// 			.then(res => {
+// 				done();
+// 			})
+// 			.catch(err => {
+// 				console.error("######Error >>", err);
+// 				done(err);
+// 			});
+// 	});
+// });
+
+// describe('POST /v2/highlight/memo/add', () => {
+// 	it('메모 추가 성공', done => {
+// 		request('http://127.0.0.1:8080')
+// 			.post('/v2/highlight/memo/add')  // api 요청
+// 			.set('Content-Type', 'application/json')
+// 			.send({
+// 				"access_token": process.env.ACCESS_TOKEN,
+// 				"user_id": process.env.KAKAO_ID,
+// 				"highlight_id": highlightIdForMemo,
+// 				"keyword": "코로나 19가 확산하면서",
+// 				"content": "숨 쉬지 말고 읽기"
+// 			}) // request body
+// 			.expect(200) // 예측 상태 코드
+// 			.expect('Content-Type', /json/) // 예측 content-type
+// 			.then(res => {
+// 				done();
+// 			})
+// 			.catch(err => {
+// 				console.error("######Error >>", err);
+// 				done(err);
+// 			});
+// 	});
+// 	it('메모 추가 실패 - 잘못된 토큰', done => {
+// 		request('http://127.0.0.1:8080')
+// 			.post('/v2/highlight/memo/add')  // api 요청
+// 			.set('Content-Type', 'application/json')
+// 			.send({
+// 				"access_token": "abcdefg",
+// 				"user_id": process.env.KAKAO_ID,
+// 				"highlight_id": highlightIdForMemo,
+// 				"keyword": "코로나 19가 확산하면서",
+// 				"content": "숨 쉬지 말고 읽기"
+// 		}) // request body
+// 			.expect(403) // 예측 상태 코드
+// 			.expect('Content-Type', /json/) // 예측 content-type
+// 			.then(res => {
+// 					done();
+// 			})
+// 			.catch(err => {
+// 					console.error("######Error >>", err);
+// 					done(err);
+// 			})
+// 	});
+// });
+
+// describe('POST /v2/highlight/memo/update', () => {
+// 	it('메모 수정 성공', done => {
+// 		request('http://127.0.0.1:8080')
+// 			.post('/v2/highlight/memo/update')  // api 요청
+// 			.set('Content-Type', 'application/json')
+// 			.send({
+// 				"access_token": process.env.ACCESS_TOKEN,
+// 				"user_id": process.env.KAKAO_ID,
+// 				"highlight_id": highlightIdForMemo,
+// 				"keyword": "코로나 19가 확산하면서",
+// 				"content": "숨 쉬지 말고 읽기"
+// 			}) // request body
+// 			.expect(200) // 예측 상태 코드
+// 			.expect('Content-Type', /json/) // 예측 content-type
+// 			.then(res => {
+// 				done();
+// 			})
+// 			.catch(err => {
+// 				console.error("######Error >>", err);
+// 				done(err);
+// 			});
+// 	});
+// 	it('메모 수정 실패 - 잘못된 토큰', done => {
+// 		request('http://127.0.0.1:8080')
+// 			.post('/v2/highlight/memo/update')  // api 요청
+// 			.set('Content-Type', 'application/json')
+// 			.send({
+// 				"access_token": "abcdefg",
+// 				"user_id": process.env.KAKAO_ID,
+// 				"highlight_id": highlightIdForMemo,
+// 				"keyword": "코로나 19가 확산하면서",
+// 				"content": "숨 쉬지 말고 읽기"
+// 		}) // request body
+// 			.expect(403) // 예측 상태 코드
+// 			.expect('Content-Type', /json/) // 예측 content-type
+// 			.then(res => {
+// 					done();
+// 			})
+// 			.catch(err => {
+// 					console.error("######Error >>", err);
+// 					done(err);
+// 			})
+// 	});
+// });
+
+// describe('POST /v2/highlight/memo/remove', () => {
+// 	it('메모 삭제 성공', done => {
+// 		request('http://127.0.0.1:8080')
+// 			.post('/v2/highlight/memo/remove')  // api 요청
+// 			.set('Content-Type', 'application/json')
+// 			.send({
+// 				"access_token": process.env.ACCESS_TOKEN,
+// 				"user_id": process.env.KAKAO_ID,
+// 				"highlight_id": highlightIdForMemo
+// 			}) // request body
+// 			.expect(200) // 예측 상태 코드
+// 			.expect('Content-Type', /json/) // 예측 content-type
+// 			.then(res => {
+// 				done();
+// 			})
+// 			.catch(err => {
+// 				console.error("######Error >>", err);
+// 				done(err);
+// 			});
 // 	});
 // });
