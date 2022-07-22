@@ -2,7 +2,7 @@
   "scripts": {
     "start": "nodemon --exec ts-node src/index.ts",
     "test": "mocha src/test/**/*.ts -r ts-node/register",
-    "prepare": "husky install .config/husky/husky-config"
+    "prepare": "husky install"
   },
   "main": "index.js",
   "dependencies": {
