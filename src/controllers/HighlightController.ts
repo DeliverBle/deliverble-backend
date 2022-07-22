@@ -86,9 +86,12 @@ export const getHighlightByKakaoIdAndNewsId = async (
     log.debug('type of accessToken', typeof accessToken);
     log.debug('type of kakaoId', typeof kakaoId);
 
-    const data = (
+    const innerData = (
       await HighlightService.getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId)
     ).highlightReturnCollection;
+    const data: object = {
+      innerData
+    }
     return res
       .status(statusCode.OK)
       .send(util.success(statusCode.OK, message.GET_HIGHLIGHT_SUCCESS, data));
