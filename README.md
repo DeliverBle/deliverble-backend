@@ -435,4 +435,4 @@ e.g) woojin/issue-14
 * [Mock API 명세서](https://airy-fang-202.notion.site/Mock-API-8c64a502f6e34b868fa002cf4587ec02) 구현 완료
 * [API v1 명세서](https://airy-fang-202.notion.site/v1-16120d6874b84ab5813fde13eae7982e) 구현 완료
 * [API v2 명세서](https://www.notion.so/v2-d6e2e35ad67e47a188fb7d096a3d3148) 구현 완료
-* [앱잼 서버 최종 과제 보고서](https://airy-fang-202.notion.site/2d07311e74d3400abfacea527e6e60dd) 작성 진행 중
+* [앱잼 서버 최종 과제 보고서](https://airy-fang-202.notion.site/2d07311e74d3400abfacea527e6e60dd) 작성 
