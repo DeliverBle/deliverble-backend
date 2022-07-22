@@ -7530,7 +7530,7 @@ export const insertNewsData = async (connection) => {
         announcerGender: Gender.MEN,
         channel: Channel.SBS,
         link: 'YSdbKJczfJY',
-        thumbnail: 'https://youtu.be/YSdbKJczfJY',
+        thumbnail: 'https://img.youtube.com/vi/YSdbKJczfJY/hqdefault.jpg',
         startTime: new Time(0, 0),
         endTime: new Time(37, 23),
         suitability: Suitability.HIGH,
