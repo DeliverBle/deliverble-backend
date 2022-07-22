@@ -55,29 +55,34 @@ const getHighlightByKakaoIdAndNewsId = async (
   kakaoId: string,
   newsId: number,
 ): Promise<HighlightReturnCollectionDTO> => {
+  log.debug("kakaoId in getHighlight, ", kakaoId)
   const highlightQueryRepository = await getConnectionToHighlightQueryRepository();
   log.debug('accessToken', accessToken);
   if (await doesAccessTokenExpire(accessToken, kakaoId)) {
     throw new AccessTokenExpiredError();
   }
-  const user = await UserService.findUserByKakaoId(kakaoId.toString());
-  log.debug('user >>> ', user);
-  const userId = user.id;
+  try {
+    const user = await UserService.findUserByKakaoId(kakaoId.toString());
+    log.debug('user >>> ', user);
+    const userId = user.id;
 
-  log.debug('userId', userId);
+    log.debug('userId', userId);
 
-  const highlightOfAllUserId = await highlightQueryRepository.findAllHighlightByUserId(userId);
-  const scriptIdsOfNewsId = await NewsService.findScriptIdsByNewsId(newsId.toString());
+    const highlightOfAllUserId = await highlightQueryRepository.findAllHighlightByUserId(userId);
+    const scriptIdsOfNewsId = await NewsService.findScriptIdsByNewsId(newsId.toString());
 
-  const returnHighlights = highlightOfAllUserId.filter((highlight) =>
-    scriptIdsOfNewsId.includes(highlight.scriptId),
-  );
+    const returnHighlights = highlightOfAllUserId.filter((highlight) =>
+        scriptIdsOfNewsId.includes(highlight.scriptId),
+    );
 
-  const highlightReturnDTOArray = returnHighlights.map(
-    async (highlight) => await HighlightReturnDTO.createHighlightReturnDTOWithMemo(highlight),
-  );
+    const highlightReturnDTOArray = returnHighlights.map(
+        async (highlight) => await HighlightReturnDTO.createHighlightReturnDTOWithMemo(highlight),
+    );
 
-  return HighlightReturnCollectionDTO.createCollection(await Promise.all(highlightReturnDTOArray));
+    return HighlightReturnCollectionDTO.createCollection(await Promise.all(highlightReturnDTOArray));
+  } catch (error) {
+    throw new ResourceNotFoundError();
+  }
 };
 
 const findNewsIdOfScriptId = async (scriptId: number): Promise<number> => {

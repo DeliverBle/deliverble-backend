@@ -66,8 +66,10 @@ export const getHighlightByKakaoIdAndNewsId = async (
   // let kakaoId = req.body['user_id'];
   // kakaoId = kakaoId.replace(/['"]+/g, '');
   // const newsId = req.body['news_id'];
-  const accessToken = req.header("access_token");
-  const kakaoId = req.header("user_id");
+  // const accessToken = req.header("access_token");
+  const accessToken = req.headers["access_token"].toString();
+  // const kakaoId = req.header("user_id").replace(/['"]+/g, '');
+  let kakaoId = req.headers["user_id"].toString().replace(/['"]+/g, '');
   const newsId: number = Number(req.query.news_id);
   log.debug('hello', kakaoId, newsId);
 
@@ -75,14 +77,14 @@ export const getHighlightByKakaoIdAndNewsId = async (
     const data = (
       await HighlightService.getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId)
     ).highlightReturnCollection;
-    res
+    return res
       .status(statusCode.OK)
       .send(util.success(statusCode.OK, message.GET_HIGHLIGHT_SUCCESS, data));
   } catch (err) {
     log.error(err);
     if (err.response !== undefined) {
       log.error(err.response.status);
-      res.status(err.response.status).send({
+      return res.status(err.response.status).send({
         status: err.response.status,
         message: {
           refresh: 'fail',
@@ -90,7 +92,7 @@ export const getHighlightByKakaoIdAndNewsId = async (
         },
       });
     }
-    res.status(err.code).send({
+    return res.status(err.code).send({
       status: err.code,
       message: {
         refresh: 'fail',
