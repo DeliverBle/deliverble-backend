@@ -251,7 +251,7 @@ const signUpUserWithKakao = async (req: Request, res: Response) => {
 const getAccessTokenAndUserIdByCode = async (req: Request, res: Response) => {
   const code = req.query.code.toString();
   log.debug(' code : ', code);
-
+  
   try {
     const tokensAndUserId = await UserService.getAccessTokenAndUserIdByCode(code);
     const accessToken = tokensAndUserId.accessToken;
@@ -294,15 +294,15 @@ const refreshAccessToken = async (req: Request, res: Response) => {
   userId = userId.replace(/['"]+/g, '');
 
   try {
-    const retrievedAccessToken = await UserService.updateAccessTokenByRefreshToken(
-      userId,
-      accessToken,
-    );
+    const tokensAndUserId = await UserService.getAccessTokenAndUserIdByCode(code);
+    const accessToken = tokensAndUserId.accessToken;
+    const userId = tokensAndUserId.userId;
+
     res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: {
-        refresh: 'success',
-        retrievedAccessToken,
+        accessToken: accessToken,
+        expired_in: 21600,
         userId,
       },
     });
