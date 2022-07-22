@@ -287,46 +287,46 @@ const getAccessTokenAndUserIdByCode = async (req: Request, res: Response) => {
   }
 };
 
-// const refreshAccessToken = async (req: Request, res: Response) => {
-//   const accessToken = (await getTokensAndUserIdParsedFromBody(req.body)).accessToken;
-//   let userId = getUserIdParsedFromBody(req.body);
-//   log.debug("userId >>>>>>>>>>>>>>>>>> ", userId);
-//   userId = userId.replace(/['"]+/g, '');
-//
-//   try {
-//     const retrievedAccessToken = await UserService.updateAccessTokenByRefreshToken(
-//       userId,
-//       accessToken,
-//     );
-//     res.status(StatusCode.OK).send({
-//       status: StatusCode.OK,
-//       message: {
-//         refresh: 'success',
-//         retrievedAccessToken,
-//         userId,
-//       },
-//     });
-//   } catch (err) {
-//     // TODO: Error 지금 서로 규격이 다른데 어떻게 해야 표준화가 가능할까를 고민해보자.
-//     if (err.response !== undefined) {
-//       log.error(err.response.status);
-//       res.status(err.response.status).send({
-//         status: err.response.status,
-//         message: {
-//           refresh: 'fail',
-//           message: err.message,
-//         },
-//       });
-//     }
-//     res.status(err.code).send({
-//       status: err.code,
-//       message: {
-//         refresh: 'fail',
-//         message: err.message,
-//       },
-//     });
-//   }
-// };
+const refreshAccessToken = async (req: Request, res: Response) => {
+  const accessToken = (await getTokensAndUserIdParsedFromBody(req.body)).accessToken;
+  let userId = getUserIdParsedFromBody(req.body);
+  log.debug("userId >>>>>>>>>>>>>>>>>> ", userId);
+  userId = userId.replace(/['"]+/g, '');
+
+  try {
+    const retrievedAccessToken = await UserService.updateAccessTokenByRefreshToken(
+      userId,
+      accessToken,
+    );
+    res.status(StatusCode.OK).send({
+      status: StatusCode.OK,
+      message: {
+        refresh: 'success',
+        retrievedAccessToken,
+        userId,
+      },
+    });
+  } catch (err) {
+    // TODO: Error 지금 서로 규격이 다른데 어떻게 해야 표준화가 가능할까를 고민해보자.
+    if (err.response !== undefined) {
+      log.error(err.response.status);
+      res.status(err.response.status).send({
+        status: err.response.status,
+        message: {
+          refresh: 'fail',
+          message: err.message,
+        },
+      });
+    }
+    res.status(err.code).send({
+      status: err.code,
+      message: {
+        refresh: 'fail',
+        message: err.message,
+      },
+    });
+  }
+};
 
 export const getAllFavoriteNewsList = async (req: Request, res: Response) => {
   log.debug(req.header('access_token'));
@@ -443,7 +443,7 @@ export default {
   logOutUserWithKakao,
   callbackKakao,
   getAccessTokenAndUserIdByCode,
-  // refreshAccessToken,
+  refreshAccessToken,
   getAllFavoriteNewsList,
   addFavoriteNews,
   removeFavoriteNews,
