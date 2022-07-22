@@ -7,5 +7,5 @@ export enum Category {
   SCIENCE = '과학',
   HEALTH = '건강',
   TECHNOLOGY = '기술',
-  UNSPECIFIED = '분류안됨',
+  UNSPECIFIED = '기타',
 }
