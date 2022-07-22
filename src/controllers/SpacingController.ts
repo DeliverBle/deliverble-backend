@@ -3,10 +3,14 @@ import statusCode from '../modules/statusCode';
 import UserController from './UserController';
 
 import { Logger } from 'tslog';
-import { CreateHighlight, CreateSpacing, GetSpacing, RemoveSpacing, SpacingInfo } from '../types';
 import message from '../modules/responseMessage';
 import SpacingService from '../service/SpacingService';
 import util from '../modules/util';
+import {CreateHighlight} from "../entity/Highlight/types/CreateHighlight";
+import {CreateSpacing} from "../entity/Spacing/types/CreateSpacing";
+import {GetSpacing} from "../entity/Spacing/types/GetSpacing";
+import {SpacingInfo} from "../entity/Spacing/types/SpacingInfo";
+import {RemoveSpacing} from "../entity/Spacing/RemoveSpacing";
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 export const createSpacing = async (req: Request, res: Response): Promise<void | Response> => {

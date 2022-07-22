@@ -1,5 +1,5 @@
 import { EntityRepository, Repository } from 'typeorm';
-import { User } from '../entity/User';
+import { User } from '../entity/User/User';
 import { Logger } from 'tslog';
 import UserNotFoundError from '../error/UserNotFoundError';
 

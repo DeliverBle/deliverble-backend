@@ -3,15 +3,13 @@ import statusCode from '../modules/statusCode';
 import UserController from './UserController';
 
 import { Logger } from 'tslog';
-import {
-  AddMemoDTO,
-  CreateHighlight,
-  RemoveExistingMemoDTO,
-  UpdateExistingMemoDTO,
-} from '../types';
 import message from '../modules/responseMessage';
 import HighlightService from '../service/HighlightService';
 import util from '../modules/util';
+import {CreateHighlight} from "../entity/Highlight/types/CreateHighlight";
+import {AddMemoDTO} from "../entity/Memo/types/AddMemoDTO";
+import {RemoveExistingMemoDTO} from "../entity/Memo/types/RemoveExistingMemo";
+import {UpdateExistingMemoDTO} from "../entity/Memo/types/UpdateExistingMemoDTO";
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 
 export const createHighlight = async (req: Request, res: Response): Promise<void | Response> => {

@@ -3,8 +3,9 @@ import NewsService from '../service/NewsService';
 import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
 import util from '../modules/util';
-import { PaginationInfo, SearchCondition } from '../types';
 import { validateConditions } from '../shared/common/utils';
+import {SearchCondition} from "../types/SearchCondition/SearchCondition";
+import {PaginationInfo} from "../types/PaginationInterface/PaginationInfo";
 
 /**
  * @route get /search

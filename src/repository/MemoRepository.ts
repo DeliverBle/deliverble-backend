@@ -1,6 +1,6 @@
 import { EntityRepository, Repository } from 'typeorm';
-import { Memo } from '../entity/Memo';
-import { Highlight } from '../entity/Highlight';
+import { Memo } from '../entity/Memo/Memo';
+import { Highlight } from '../entity/Highlight/Highlight';
 
 @EntityRepository(Memo)
 export class MemoQueryRepository extends Repository<Memo> {

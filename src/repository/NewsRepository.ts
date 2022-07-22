@@ -1,8 +1,8 @@
 // src/repository/MotivationRepository/index.ts
 
 import { EntityRepository, Repository } from 'typeorm';
-import { News } from '../entity/News';
-import { SearchCondition } from '../types';
+import { News } from '../entity/News/News';
+import {SearchCondition} from "../types/SearchCondition/SearchCondition";
 
 @EntityRepository(News)
 export class NewsQueryRepository extends Repository<News> {

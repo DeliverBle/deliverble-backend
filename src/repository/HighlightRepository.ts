@@ -1,9 +1,11 @@
 import {EntityRepository, getConnection, Repository} from 'typeorm';
-import { Highlight } from '../entity/Highlight';
-import { CreateHighlight, HighlightInfo, SearchCondition } from '../types';
-import {User} from "../entity/User";
+import { Highlight } from '../entity/Highlight/Highlight';
+import {User} from "../entity/User/User";
 import CustomError from "../error/CustomError";
 import {Logger} from "tslog";
+import {SearchCondition} from "../types/SearchCondition/SearchCondition";
+import {CreateHighlight} from "../entity/Highlight/types/CreateHighlight";
+import {HighlightInfo} from "../entity/Highlight/types/HighlightInfo";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 

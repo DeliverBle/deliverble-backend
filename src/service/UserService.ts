@@ -1,17 +1,9 @@
-import { User } from '../entity/User';
+import { User } from '../entity/User/User';
 import { getConnection } from 'typeorm';
 import { UserQueryRepository } from '../repository/UserQueryRepository';
-import { isNotFoundUser, NotFoundUser } from '../entity/NotFoundUser';
+import { isNotFoundUser, NotFoundUser } from '../entity/User/NotFoundUser';
 import { UserCommandRepository } from '../repository/UserCommandRepository';
 import UserNotFoundError from '../error/UserNotFoundError';
-import {
-  KakaoRawInfo,
-  NewsReturnDTO,
-  NewsReturnDTOCollection,
-  UpdatedAccessTokenDTO,
-  UserFavoriteNewsReturnDTO,
-  UserInfo,
-} from '../types';
 import axios from 'axios';
 import {
   ACCESS_TOKEN_INFO,
@@ -32,6 +24,12 @@ import AlreadySignedUpError from '../error/AlreadySignedUpError';
 import NewsService from './NewsService';
 import ResourceNotFoundError from '../error/ResourceNotFoundError';
 import CustomError from '../error/CustomError';
+import {NewsReturnDTOCollection} from "../entity/News/types/NewsReturnDTOCollection";
+import {NewsReturnDTO} from "../entity/News/types/newsReturnDTO";
+import {KakaoRawInfo} from "../types/auth/KakaoRawInfo";
+import {UpdatedAccessTokenDTO} from "../types/auth/UpdatedAccessTokenDTO";
+import {UserInfo} from "../entity/User/types/UserInfo";
+import {UserFavoriteNewsReturnDTO} from "../entity/User/types/UserFavoriteNewsReturnDTO";
 
 const redisClient = require('../util/redis');
 

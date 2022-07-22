@@ -1,5 +1,5 @@
-import { News } from "../entity/News";
-import { Script } from "../entity/Script";
+import { News } from "../entity/News/News";
+import { Script } from "../entity/Script/Script";
 import { Time } from "../vo/Time";
 import {Logger} from "tslog";
 
