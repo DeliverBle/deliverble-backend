@@ -1,7 +1,7 @@
 import { Logger } from "tslog";
 import {DeleteResult, EntityRepository, Repository} from "typeorm";
-import { Spacing } from "../entity/Spacing";
-import { SpacingReturnDTO } from "../types";
+import { Spacing } from "../entity/Spacing/Spacing";
+import {SpacingReturnDTO} from "../entity/Spacing/types/SpacingReturnDTO";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 

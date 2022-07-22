@@ -1,5 +1,5 @@
 import { EntityRepository, Repository } from 'typeorm';
-import { Script } from '../entity/Script';
+import { Script } from '../entity/Script/Script';
 
 @EntityRepository(Script)
 export class ScriptQueryRepository extends Repository<Script> {

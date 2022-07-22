@@ -1,8 +1,8 @@
 import {EntityRepository, Repository} from "typeorm";
-import {Highlight} from "../entity/Highlight";
+import {Highlight} from "../entity/Highlight/Highlight";
 import {Logger} from "tslog";
-import {Memo} from "../entity/Memo";
-import {User} from "../entity/User";
+import {Memo} from "../entity/Memo/Memo";
+import {User} from "../entity/User/User";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 

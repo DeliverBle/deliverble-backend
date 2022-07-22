@@ -1,6 +1,6 @@
 import { Logger } from "tslog";
 import { getConnection } from "typeorm";
-import { Spacing } from "../entity/Spacing";
+import { Spacing } from "../entity/Spacing/Spacing";
 import AccessTokenExpiredError from "../error/AccessTokenExpiredError";
 import CustomError from "../error/CustomError";
 import ResourceNotFoundError from "../error/ResourceNotFoundError";
@@ -8,9 +8,14 @@ import message from "../modules/responseMessage";
 import statusCode from "../modules/statusCode";
 import { SpacingCommandRepository } from "../repository/SpacingCommandRepository";
 import { SpacingQueryRepository } from "../repository/SpacingQueryRepository";
-import { CreateSpacing, GetSpacing, RemoveSpacing, SpacingInfo, SpacingReturnCollectionDTO, SpacingReturnDTO } from "../types";
 import NewsService from "./NewsService";
 import UserService, { doesAccessTokenExpire } from "./UserService";
+import {CreateSpacing} from "../entity/Spacing/types/CreateSpacing";
+import {GetSpacing} from "../entity/Spacing/types/GetSpacing";
+import {SpacingInfo} from "../entity/Spacing/types/SpacingInfo";
+import {SpacingReturnDTO} from "../entity/Spacing/types/SpacingReturnDTO";
+import {SpacingReturnCollectionDTO} from "../entity/Spacing/types/SpacingReturnCollectionDTO";
+import {RemoveSpacing} from "../entity/Spacing/RemoveSpacing";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 

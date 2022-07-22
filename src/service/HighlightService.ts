@@ -1,30 +1,28 @@
 import { getConnection } from 'typeorm';
 
 import { Logger } from 'tslog';
-import {
-  AddMemoDTO,
-  CreateHighlight,
-  HighlightInfo,
-  HighlightReturnCollectionDTO,
-  HighlightReturnDTO,
-  RemoveExistingMemoDTO,
-  UpdateExistingMemoDTO,
-  UserInfo,
-} from '../types';
 import { HighlightQueryRepository } from '../repository/HighlightRepository';
 import UserService, { doesAccessTokenExpire } from './UserService';
 import { HighlightCommandRepository } from '../repository/HighlightCommandRepository';
 import CustomError from '../error/CustomError';
 import statusCode from '../modules/statusCode';
 import message from '../modules/responseMessage';
-import { Highlight } from '../entity/Highlight';
+import { Highlight } from '../entity/Highlight/Highlight';
 import NewsService from './NewsService';
 import { ScriptQueryRepository } from '../repository/ScriptQueryRepository';
 import DuplicateStartingIndexAndEndingIndex from '../error/DuplicateStartingIndexAndEndingIndex';
 import AccessTokenExpiredError from '../error/AccessTokenExpiredError';
 import ResourceNotFoundError from '../error/ResourceNotFoundError';
 import { MemoCommandRepository, MemoQueryRepository } from '../repository/MemoRepository';
-import { User } from '../entity/User';
+import { User } from '../entity/User/User';
+import {UserInfo} from "../entity/User/types/UserInfo";
+import {CreateHighlight} from "../entity/Highlight/types/CreateHighlight";
+import {HighlightInfo} from "../entity/Highlight/types/HighlightInfo";
+import {HighlightReturnCollectionDTO} from "../entity/Highlight/types/HighlightReturnCollectionDTO";
+import {HighlightReturnDTO} from "../entity/Highlight/types/HighlightReturnDTO";
+import {AddMemoDTO} from "../entity/Memo/types/AddMemoDTO";
+import {RemoveExistingMemoDTO} from "../entity/Memo/types/RemoveExistingMemo";
+import {UpdateExistingMemoDTO} from "../entity/Memo/types/UpdateExistingMemoDTO";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 

@@ -1,13 +1,13 @@
 import { createConnection, getConnection, QueryRunner } from 'typeorm';
-import { News } from '../entity/News';
-import { Script } from '../entity/Script';
-import { Tag } from '../entity/Tag';
+import { News } from '../entity/News/News';
+import { Script } from '../entity/Script/Script';
+import { Tag } from '../entity/Tag/Tag';
 import { Category } from '../shared/common/Category';
 import { Channel } from '../shared/common/Channel';
 import { Gender } from '../shared/common/Gender';
 import { Suitability } from '../shared/common/Suitability';
-import { NewsInfo } from '../types';
 import { Time } from '../vo/Time';
+import {NewsInfo} from "../entity/News/types/newsInfo";
 
 // 추천 태그 생성
 let tagTestRecommend = new Tag();

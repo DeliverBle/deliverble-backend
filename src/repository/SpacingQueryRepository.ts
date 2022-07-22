@@ -1,5 +1,5 @@
 import { EntityRepository, Repository } from 'typeorm';
-import { Spacing } from '../entity/Spacing';
+import { Spacing } from '../entity/Spacing/Spacing';
 
 @EntityRepository(Spacing)
 export class SpacingQueryRepository extends Repository<Spacing> {

@@ -1,4 +1,5 @@
-import { ConditionList, SearchCondition } from '../../types';
+import {ConditionList} from "../../types/SearchCondition/ConditionList";
+import {SearchCondition} from "../../types/SearchCondition/SearchCondition";
 
 const sortByDateAndTitle = (newsData) => {
   console.log(">>>>>>>> newsData", newsData[0])

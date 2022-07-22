@@ -1,28 +1,26 @@
 import { getConnection } from 'typeorm';
 import { NewsQueryRepository } from '../repository/NewsRepository';
 import { sortByDateAndTitle } from '../shared/common/utils';
-import {
-  ConditionList,
-  hasAnnouncerGender,
-  hasCategories,
-  hasChannels,
-  hasFindAll,
-  NewsInfo,
-  NewsReturnDTO,
-  NewsScriptReturnDTO,
-  PaginationInfo,
-  ScriptReturnDto,
-  SearchCondition,
-  TagOfEachNewsReturnDto,
-  TagOfNewsReturnDtoCollection,
-} from '../types';
-import { News } from '../entity/News';
+import { News } from '../entity/News/News';
 import { Logger } from 'tslog';
 import message from '../modules/responseMessage';
 import CustomError from '../error/CustomError';
 import { getLastPage } from '../util/pagination';
-import { Tag } from '../entity/Tag';
+import { Tag } from '../entity/Tag/Tag';
 import statusCode from '../modules/statusCode';
+import {ConditionList} from "../types/SearchCondition/ConditionList";
+import {hasCategories} from "../types/SearchCondition/hasCategories";
+import {hasChannels} from "../types/SearchCondition/hasChannels";
+import {hasAnnouncerGender} from "../types/SearchCondition/hasAnnouncerGender";
+import {hasFindAll} from "../types/SearchCondition/hasFindAll";
+import {NewsInfo} from "../entity/News/types/newsInfo";
+import {NewsReturnDTO} from "../entity/News/types/newsReturnDTO";
+import {NewsScriptReturnDTO} from "../entity/News/types/NewsScriptReturnDTO";
+import {SearchCondition} from "../types/SearchCondition/SearchCondition";
+import {ScriptReturnDto} from "../entity/Script/ScriptReturnDto";
+import {PaginationInfo} from "../types/PaginationInterface/PaginationInfo";
+import {TagOfNewsReturnDtoCollection} from "../entity/Tag/types/TagOfNewsReturnDtoCollection";
+import {TagOfEachNewsReturnDto} from "../entity/Tag/types/TagOfEachNewsReturnDto";
 
 const log: Logger = new Logger({ name: '딜리버블 백엔드 짱짱' });
 

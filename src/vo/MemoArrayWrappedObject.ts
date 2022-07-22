@@ -1,4 +1,4 @@
-import {Memo} from "../entity/Memo";
+import {Memo} from "../entity/Memo/Memo";
 
 interface Func<T> {
     (arg: T): T;

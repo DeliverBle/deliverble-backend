@@ -1,6 +1,6 @@
-import { User } from '../entity/User';
-import { Tag } from '../entity/Tag';
-import { News } from '../entity/News';
+import { User } from '../entity/User/User';
+import { Tag } from '../entity/Tag/Tag';
+import { News } from '../entity/News/News';
 import { Suitability } from '../shared/common/Suitability';
 import { Category } from '../shared/common/Category';
 import { Gender } from '../shared/common/Gender';

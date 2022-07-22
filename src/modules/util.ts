@@ -1,4 +1,4 @@
-import { PaginationInfo } from "../types";
+import {PaginationInfo} from "../types/PaginationInterface/PaginationInfo";
 
 const util = {
   success: (status: number, message: string, data?: any, paginationInfo?: PaginationInfo) => {
