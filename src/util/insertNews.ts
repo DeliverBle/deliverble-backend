@@ -5534,7 +5534,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '"청나라 말기 같다"‥\'日 선진국 탈락\' 잇단 경고',
         category: Category.WORLD,
-        tags: [tag11_1, tag11_2, tag11_3, tagRecommend],
+        tags: [tag11_1, tag11_2, tag11_3],
         scripts: [script11_1, script11_2, script11_3, script11_4, script11_5],
         announcerGender: Gender.WOMEN,
         channel: Channel.MBC,
@@ -5582,7 +5582,7 @@ export const insertNewsData = async (connection) => {
       { 
         title: '누리호 2차 발사 성공.."우주시대 도약"',
         category: Category.SOCIETY,
-        tags: [tag14_1, tag14_2, tag14_3, tagRecommend],
+        tags: [tag14_1, tag14_2, tag14_3],
         scripts: [script14_1, script14_2, script14_3, script14_4, script14_5],
         announcerGender: Gender.WOMEN,
         channel: Channel.KBS,
