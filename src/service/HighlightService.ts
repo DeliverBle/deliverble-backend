@@ -203,6 +203,7 @@ const removeExistingMemoOfHighlight = async (
   log.debug(' HIGHLIGHT MEMO DELETED ', isHighlightUpdated);
 
   const newsId = await findNewsIdOfScriptId(scriptId);
+  log.debug('news id !!!!!', newsId);
 
   return await getHighlightByKakaoIdAndNewsId(
     removeExistingMemoDTO.accessToken,

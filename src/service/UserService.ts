@@ -49,6 +49,7 @@ const getConnectionToUserCommandRepository = async () => {
 };
 
 export const findUserByKakaoId = async (kakaoId: string): Promise<User> => {
+  log.debug('kakao id toString', kakaoId);
   const userQueryRepository = await getConnectionToUserQueryRepository();
   try {
     return await userQueryRepository.findByKakaoId(kakaoId);

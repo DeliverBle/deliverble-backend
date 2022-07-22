@@ -52,9 +52,17 @@ export const getSpacing = async (req: Request, res: Response): Promise<void | Re
   // const accessToken = tokensAndUserId.accessToken;
   // let kakaoId = tokensAndUserId.userId;
   // kakaoId = kakaoId.replace(/['"]+/g, '');
-  const accessToken = req.header("access_token");
-  const kakaoId = req.header("user_id");
+  // const accessToken = req.header("access_token");
+  // const kakaoId = req.header("user_id");
+  // const newsId: number = Number(req.query.news_id);
   const newsId: number = Number(req.query.news_id);
+  const authorization = req.headers["authorization"].toString().split(" ");
+  log.debug("authorization", authorization);
+  
+  const accessToken = authorization[0];
+  log.debug('req.headers["access_token"]', accessToken);
+  // @ts-ignore
+  let kakaoId = authorization[1].replace(/['"]+/g, '');
   const getSpacing = new GetSpacing(accessToken, kakaoId, newsId);
 
   try {
