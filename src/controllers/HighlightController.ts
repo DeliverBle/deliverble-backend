@@ -31,8 +31,11 @@ export const createHighlight = async (req: Request, res: Response): Promise<void
   );
 
   try {
-    const data = (await HighlightService.createHighlight(createHighlight))
+    const highlightReturnCollection = (await HighlightService.createHighlight(createHighlight))
       .highlightReturnCollection;
+    const data: object = {
+      highlightReturnCollection
+    }  
     res
       .status(statusCode.CREATED)
       .send(util.success(statusCode.OK, message.CREATE_HIGHLIGHT_SUCCESS, data));
@@ -86,11 +89,11 @@ export const getHighlightByKakaoIdAndNewsId = async (
     log.debug('type of accessToken', typeof accessToken);
     log.debug('type of kakaoId', typeof kakaoId);
 
-    const innerData = (
+    const highlightReturnCollection = (
       await HighlightService.getHighlightByKakaoIdAndNewsId(accessToken, kakaoId, newsId)
     ).highlightReturnCollection;
     const data: object = {
-      innerData
+      highlightReturnCollection
     }
     return res
       .status(statusCode.OK)
@@ -138,7 +141,7 @@ export const removeHighlightByKakaoIdAndHighlightId = async (
         util.success(
           statusCode.OK,
           message.REMOVE_HIGHLIGHT_SUCCESS,
-          data.highlightReturnCollection,
+          data,
         ),
       );
   } catch (err) {
@@ -180,7 +183,7 @@ export const addNewMemoOfHighlight = async (
       await HighlightService.addMemoOfHighlight(
         new AddMemoDTO(accessToken, kakaoId, highlightId, keyword, content),
       )
-    ).highlightReturnCollection;
+    );
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.ADD_MEMO_SUCCESS, data));
   } catch (err) {
     log.error(err);
@@ -219,7 +222,7 @@ export const removeExistingMemoOfHighlight = async (
       await HighlightService.removeExistingMemoOfHighlight(
         new RemoveExistingMemoDTO(accessToken, kakaoId, highlightId),
       )
-    ).highlightReturnCollection;
+    );
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.REMOVE_MEMO_SUCCESS, data));
   } catch (err) {
     log.error(err);
@@ -260,7 +263,7 @@ export const updateExistingMemoOfHighlight = async (
       await HighlightService.updateMemoOfHighlight(
         new UpdateExistingMemoDTO(accessToken, kakaoId, highlightId, keyword, content),
       )
-    ).highlightReturnCollection;
+    );
     res.status(statusCode.OK).send(util.success(statusCode.OK, message.UPDATE_MEMO_SUCCESS, data));
   } catch (err) {
     log.error(err);
