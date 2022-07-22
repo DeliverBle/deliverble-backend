@@ -70,7 +70,7 @@ router.get(
   },
 );
 
-router.get('/kakao/token', UserController.getAccessTokenByCode);
+router.get('/kakao/token', errorHandler(UserController.getAccessTokenByCode));
 
 // router.post('/kakao/access-token/refresh', errorHandler(UserController.refreshAccessToken));
 

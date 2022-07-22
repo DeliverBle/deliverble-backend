@@ -40,20 +40,20 @@ const getAccessTokenByCode = async (req: Request, res: Response) => {
     // TODO: Error 지금 서로 규격이 다른데 어떻게 해야 표준화가 가능할까를 고민해보자.
     if (err.response !== undefined) {
       // log.error(err.response.status);
-      res.status(StatusCode.OK).send({
-        status: StatusCode.OK,
-        // message: {
-        //   refresh: 'fail',
-        //   message: err.message,
-        // },
+      res.status(err.response.status).send({
+        status: err.response.status,
+        message: {
+          refresh: 'fail',
+          message: err.response.message,
+        },
       });
     }
     res.status(err.code).send({
-      status: StatusCode.OK,
-      // message: {
-      //   refresh: 'fail',
-      //   message: err.message,
-      // },
+      status: err.code,
+      message: {
+        refresh: 'fail',
+        message: err.message,
+      },
     });
   }
 }
@@ -260,8 +260,9 @@ const getAccessTokenAndUserIdByCode = async (req: Request, res: Response) => {
     const tokensAndUserId = await UserService.getAccessTokenAndUserIdByCode(code);
     const accessToken = tokensAndUserId.accessToken;
     const userId = tokensAndUserId.userId;
+    log.debug(tokensAndUserId)
 
-    res.status(StatusCode.OK).send({
+    return res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: {
         accessToken: accessToken,
@@ -273,7 +274,7 @@ const getAccessTokenAndUserIdByCode = async (req: Request, res: Response) => {
     // TODO: Error 지금 서로 규격이 다른데 어떻게 해야 표준화가 가능할까를 고민해보자.
     if (err.response !== undefined) {
       log.error(err.response.status);
-      res.status(err.response.status).send({
+      return res.status(err.response.status).send({
         status: err.response.status,
         message: {
           refresh: 'fail',
@@ -281,7 +282,7 @@ const getAccessTokenAndUserIdByCode = async (req: Request, res: Response) => {
         },
       });
     }
-    res.status(err.code).send({
+    return res.status(err.code).send({
       status: err.code,
       message: {
         refresh: 'fail',
@@ -343,7 +344,7 @@ export const getAllFavoriteNewsList = async (req: Request, res: Response) => {
       accessToken,
       kakaoId,
     );
-    res.status(StatusCode.OK).send({
+    return res.status(StatusCode.OK).send({
       status: StatusCode.OK,
       message: favoriteNewsListWithUserId,
     });
@@ -351,7 +352,7 @@ export const getAllFavoriteNewsList = async (req: Request, res: Response) => {
     // TODO: Error 지금 서로 규격이 다른데 어떻게 해야 표준화가 가능할까를 고민해보자.
     if (err.response !== undefined) {
       log.error(err.response.status);
-      res.status(err.response.status).send({
+      return res.status(err.response.status).send({
         status: err.response.status,
         message: {
           refresh: 'fail',
