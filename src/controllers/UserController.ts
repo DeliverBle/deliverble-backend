@@ -334,11 +334,15 @@ const getAccessTokenAndUserIdByCode = async (req: Request, res: Response) => {
 // };
 
 export const getAllFavoriteNewsList = async (req: Request, res: Response) => {
-  log.debug(req.header('access_token'));
-  const tokensAndId = await getTokensAndUserIdParsedFromBody(req.body);
-  log.debug(tokensAndId);
-  const accessToken = tokensAndId.accessToken;
-  const kakaoId = tokensAndId.userId;
+  // const tokensAndId = await getTokensAndUserIdParsedFromBody(req.body);
+  // log.debug(tokensAndId);
+  // const accessToken = tokensAndId.accessToken;
+  log.debug('***** header *****', req.header);
+  log.debug('access token in header', req.header("access_token"));
+  const accessToken = req.header("access_token");
+  const kakaoId = req.header("user_id");
+  log.debug('type of accessToken', typeof accessToken);
+  log.debug('type of kakaoId', typeof kakaoId);
   try {
     const favoriteNewsListWithUserId = await UserService.getAllFavoriteNewsList(
       accessToken,

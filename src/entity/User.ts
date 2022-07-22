@@ -86,6 +86,7 @@ export class User extends BaseEntity {
   public addFavoriteNews = async (news: News) => {
     const favoriteNewsList = await this.favoriteNews;
     favoriteNewsList.push(news);
+    log.debug(favoriteNewsList)
     return this;
   };
 
