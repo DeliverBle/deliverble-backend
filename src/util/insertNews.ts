@@ -5374,7 +5374,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '비트코인, 한때 1만 8천 달러 붕괴',
         category: Category.ECONOMY,
-        tags: [tag1_1, tag1_2, tag1_3, tagRecommend],
+        tags: [tag1_1, tag1_2, tag1_3],
         scripts: [script1_1, script1_2, script1_3, script1_4, script1_5],
         announcerGender: Gender.MEN,
         channel: Channel.SBS,
@@ -5406,7 +5406,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '제주, 초중고교 무상급식 예산 46억 원 증액 ',
         category: Category.SOCIETY,
-        tags: [tag3_1, tag3_2, tag3_3, tagRecommend],
+        tags: [tag3_1, tag3_2, tag3_3],
         scripts: [script3_1, script3_2, script3_3, script3_4, script3_5, script3_6],
         announcerGender: Gender.WOMEN,
         channel: Channel.SBS,
@@ -5422,7 +5422,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '안동시 공무원, 동료 직원 흉기에 찔려 사망',
         category: Category.SOCIETY,
-        tags: [tag4_1, tag4_2, tag4_3, tagRecommend],
+        tags: [tag4_1, tag4_2, tag4_3],
         scripts: [script4_1, script4_2, script4_3, script4_4],
         announcerGender: Gender.WOMEN,
         channel: Channel.SBS,
@@ -5486,7 +5486,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '우크라이나 재건회의 \'루가노 선언\' 채택',
         category: Category.WORLD,
-        tags: [tag8_1, tag8_2, tag8_3, tagRecommend],
+        tags: [tag8_1, tag8_2, tag8_3],
         scripts: [script8_1, script8_2, script8_3, script8_4, script8_5, script8_6],
         announcerGender: Gender.WOMEN,
         channel: Channel.MBC,
@@ -5502,7 +5502,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '원숭이두창 치료제 504명분 이번 주 도입',
         category: Category.SOCIETY,
-        tags: [tag9_1, tag9_2, tag9_3, tagRecommend],
+        tags: [tag9_1, tag9_2, tag9_3],
         scripts: [script9_1, script9_2, script9_3],
         announcerGender: Gender.WOMEN,
         channel: Channel.MBC,
@@ -5518,7 +5518,7 @@ export const insertNewsData = async (connection) => {
       {
         title: 'WHO "여름철 원숭이두창 추가 확산 가능성"',
         category: Category.SOCIETY,
-        tags: [tag10_1, tag10_2, tag10_3, tagRecommend],
+        tags: [tag10_1, tag10_2, tag10_3],
         scripts: [script10_1, script10_2, script10_3],
         announcerGender: Gender.MEN,
         channel: Channel.MBC,
@@ -5550,7 +5550,7 @@ export const insertNewsData = async (connection) => {
       {
         title: '손님들이 건넨 술 마시고 사망…함께 있던 남성은 사고사',
         category: Category.SOCIETY,
-        tags: [tag12_1, tag12_2, tag12_3, tagRecommend],
+        tags: [tag12_1, tag12_2, tag12_3],
         scripts: [script12_1, script12_2, script12_3, script12_4, script12_5, script12_6, script12_7, script12_8],
         announcerGender: Gender.WOMEN,
         channel: Channel.SBS,
@@ -5710,7 +5710,7 @@ export const insertNewsData = async (connection) => {
       { 
         title: '"2년을 기다렸어요"‥보라색으로 물든 LA \'BTS 특수\'',
         category: Category.ENTERTAINMENT,
-        tags: [tag22_1, tag22_2, tag22_3],
+        tags: [tag22_1, tag22_2, tag22_3, tagRecommend],
         scripts: [script22_1, script22_2, script22_3, script22_4, script22_5, script22_6, script22_7, script22_8, script22_9],
         announcerGender: Gender.WOMEN,
         channel: Channel.MBC,
@@ -5854,7 +5854,7 @@ export const insertNewsData = async (connection) => {
       { 
         title: '미 시위대 5600여 명 체포·부상자 속출…전쟁터 방불',
         category: Category.WORLD,
-        tags: [tag31_1, tag31_2, tag31_3],
+        tags: [tag31_1, tag31_2, tag31_3, tagRecommend],
         scripts: [script31_1, script31_2, script31_3, script31_4, script31_5],
         announcerGender: Gender.MEN,
         channel: Channel.ETC,
@@ -5886,7 +5886,7 @@ export const insertNewsData = async (connection) => {
       { 
         title: '마르코스·이멜다 아들 ‘봉봉 마르코스’, 필리핀 대권 유력',
         category: Category.WORLD,
-        tags: [tag33_1, tag33_2, tag33_3],
+        tags: [tag33_1, tag33_2, tag33_3, tagRecommend],
         scripts: [script33_1, script33_2, script33_3, script33_4],
         announcerGender: Gender.WOMEN,
         channel: Channel.KBS,
@@ -5918,7 +5918,7 @@ export const insertNewsData = async (connection) => {
       { 
         title: '허준이 교수 \'수학계 노벨상\' 필즈상 한국계 최초 수상',
         category: Category.SOCIETY,
-        tags: [tag35_1, tag35_2, tag35_3],
+        tags: [tag35_1, tag35_2, tag35_3, tagRecommend],
         scripts: [script35_1, script35_2, script35_3, script35_4, script35_5],
         announcerGender: Gender.WOMEN,
         channel: Channel.MBC,
@@ -6014,7 +6014,7 @@ export const insertNewsData = async (connection) => {
       { 
         title: '\'국가부도\' 스리랑카 대통령 결국 사임‥\'도미노\' 우려',
         category: Category.SOCIETY,
-        tags: [tag41_1, tag41_2, tag41_3],
+        tags: [tag41_1, tag41_2, tag41_3, tagRecommend],
         scripts: [script41_1, script41_2, script41_3, script41_4, script41_5],
         announcerGender: Gender.WOMEN,
         channel: Channel.MBC,
@@ -6030,7 +6030,7 @@ export const insertNewsData = async (connection) => {
       { 
         title: '부모보다 가난한 첫 세대…“잘 배웠지만, 희망 없어”',
         category: Category.POLITICS,
-        tags: [tag42_1, tag42_2, tag42_3],
+        tags: [tag42_1, tag42_2, tag42_3, tagRecommend],
         scripts: [script42_1, script42_2, script42_3, script42_4, script42_5],
         announcerGender: Gender.WOMEN,
         channel: Channel.KBS,
@@ -6797,7 +6797,7 @@ export const insertNewsData = async (connection) => {
       // 90번 뉴스
       { 
         title: '뉴욕타임즈, \'문화계 신성\'에 오징어게임 이정재 선정',
-        category: Category.UNSPECIFIED,
+        category: Category.ENTERTAINMENT,
         tags: [tag90_1, tag90_2, tag90_3],
         scripts: [script90_1, script90_2, script90_3],
         announcerGender: Gender.MEN,
@@ -6862,7 +6862,7 @@ export const insertNewsData = async (connection) => {
       { 
         title: '\'빅스텝\' 밟자마자 예적금 금리도 재빠르게 인상',
         category: Category.ECONOMY,
-        tags: [tag94_1, tag94_2, tag94_3],
+        tags: [tag94_1, tag94_2, tag94_3, tagRecommend],
         scripts: [script94_1, script94_2, script94_3, script94_4, script94_5, script94_6, script94_7],
         announcerGender: Gender.WOMEN,
         channel: Channel.MBC,
