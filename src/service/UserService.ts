@@ -362,8 +362,8 @@ export const logOutUserWithKakao = async (
 };
 
 export const getAllFavoriteNewsList = async (
-  accessToken: string,
-  kakaoId: string,
+  accessToken: any,
+  kakaoId: any,
 ): Promise<UserFavoriteNewsReturnDTO> => {
   if (await doesAccessTokenExpire(accessToken, kakaoId)) {
     throw new AccessTokenExpiredError();

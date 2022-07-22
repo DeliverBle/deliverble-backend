@@ -339,8 +339,8 @@ export const getAllFavoriteNewsList = async (req: Request, res: Response) => {
   // const accessToken = tokensAndId.accessToken;
   log.debug('***** header *****', req.header);
   log.debug('access token in header', req.header("access_token"));
-  const accessToken = req.header("access_token");
-  const kakaoId = req.header("user_id");
+  const accessToken = req.headers["access_token"];
+  const kakaoId = req.headers["user_id"];
   log.debug('type of accessToken', typeof accessToken);
   log.debug('type of kakaoId', typeof kakaoId);
   try {
