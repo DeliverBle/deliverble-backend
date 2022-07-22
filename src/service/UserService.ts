@@ -260,6 +260,7 @@ export const getAccessTokenByCode = async (_code: string) => {
 
     return access_token;
   } catch (err) {
+    log.debug(err);
     throw new ResourceNotFoundError()
   }
 };
