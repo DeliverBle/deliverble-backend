@@ -33,46 +33,13 @@ router.get(
     failureRedirect: '/', session: false
   }),
   async (req, res) => {
-      const code = req.query.code;
-      const accessToken = req['user'][0];
-      const refreshToken = req['user'][1];
-      const userId = req['user'][2].toString();
-      console.log("accessToken: " + accessToken);
-      console.log("userId: " + userId);
-      // TODO: initial callback to save refreshToken at Redis with userId
-      // await UserService.saveTokensAtRedisWithUserId(userId, accessToken, refreshToken, code);
-      const ACCESS_TOKEN = "AT " + code;
-      const USER_ID = "UD " + code;
-      promisify(redisClient.get).bind(redisClient);
-      // TODO: move validation logic to other class
-      console.log("82 >>>>> ", ACCESS_TOKEN, USER_ID);
-      await redisClient.setex(
-          ACCESS_TOKEN,
-          DEFAULT_ACCESS_TOKEN_EXPIRATION_SECONDS,
-          accessToken,
-      );
-      console.log("88 >>>>> ", ACCESS_TOKEN, USER_ID);
-      await redisClient.setex(
-          USER_ID,
-          DEFAULT_REFRESH_TOKEN_EXPIRATION_SECONDS,
-          userId,
-      );
-      console.log("94 >>>>> ", ACCESS_TOKEN, USER_ID);
-      res.status(StatusCode.OK).send({
-          status: StatusCode.OK,
-          message: {
-              accessToken: accessToken,
-              expired_in: 21600,
-              userId,
-          },
-      });
-      // await UserController.callbackKakao(req, res).then((v) => console.log('kakao login succeeded'));
+      await UserController.callbackKakao(req, res).then((v) => console.log('kakao login succeeded'));
   },
 );
 
-router.get('/kakao/token', UserController.getAccessTokenAndUserIdByCode);
+router.get('/kakao/token', UserController.getAccessTokenByCode);
 
-// router.post('/kakao/access-token/refresh', errorHandler(UserController.refreshAccessToken));
+router.post('/kakao/access-token/refresh', errorHandler(UserController.refreshAccessToken));
 
 router.post('/login', errorHandler(UserController.loginUserWithKakao));
 
