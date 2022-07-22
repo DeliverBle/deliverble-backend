@@ -348,7 +348,6 @@ e.g) woojin/issue-14
 ├─ .prettierrc.js
 ├─ LICENSE
 ├─ README.md
-├─ dump.rdb
 ├─ nodemon.json
 ├─ ormconfig.ts
 ├─ package-lock.json
@@ -363,14 +362,51 @@ e.g) woojin/issue-14
 │  │  ├─ index.ts
 │  │  └─ kakao-login.ts
 │  ├─ entity
-│  │  ├─ Highlight.ts
-│  │  ├─ Memo.ts
-│  │  ├─ News.ts
-│  │  ├─ NotFoundUser.ts
-│  │  ├─ Script.ts
-│  │  ├─ Spacing.ts
-│  │  ├─ Tag.ts
-│  │  └─ User.ts
+│  │  ├─ Highlight
+│  │  │  ├─ Highlight.ts
+│  │  │  └─ types
+│  │  │     ├─ CreateHighlight.ts
+│  │  │     ├─ HighlightInfo.ts
+│  │  │     ├─ HighlightReturnCollectionDTO.ts
+│  │  │     └─ HighlightReturnDTO.ts
+│  │  ├─ Memo
+│  │  │  ├─ Memo.ts
+│  │  │  └─ types
+│  │  │     ├─ AddMemoDTO.ts
+│  │  │     ├─ RemoveExistingMemo.ts
+│  │  │     └─ UpdateExistingMemoDTO.ts
+│  │  ├─ News
+│  │  │  ├─ News.ts
+│  │  │  └─ types
+│  │  │     ├─ NewsReturnDTOCollection.ts
+│  │  │     ├─ NewsScriptReturnDTO.ts
+│  │  │     ├─ newsInfo.ts
+│  │  │     └─ newsReturnDTO.ts
+│  │  ├─ Script
+│  │  │  ├─ Script.ts
+│  │  │  ├─ ScriptReturnDto.ts
+│  │  │  └─ types
+│  │  │     └─ ScriptInterface.ts
+│  │  ├─ Spacing
+│  │  │  ├─ RemoveSpacing.ts
+│  │  │  ├─ Spacing.ts
+│  │  │  └─ types
+│  │  │     ├─ CreateSpacing.ts
+│  │  │     ├─ GetSpacing.ts
+│  │  │     ├─ SpacingInfo.ts
+│  │  │     ├─ SpacingReturnCollectionDTO.ts
+│  │  │     └─ SpacingReturnDTO.ts
+│  │  ├─ Tag
+│  │  │  ├─ Tag.ts
+│  │  │  └─ types
+│  │  │     ├─ TagOfEachNewsReturnDto.ts
+│  │  │     └─ TagOfNewsReturnDtoCollection.ts
+│  │  └─ User
+│  │     ├─ NotFoundUser.ts
+│  │     ├─ User.ts
+│  │     └─ types
+│  │        ├─ UserFavoriteNewsReturnDTO.ts
+│  │        └─ UserInfo.ts
 │  ├─ error
 │  │  ├─ AccessTokenExpiredError.ts
 │  │  ├─ AlreadyLoggedOutError.ts
@@ -416,8 +452,27 @@ e.g) woojin/issue-14
 │  │     ├─ Gender.ts
 │  │     ├─ Page.ts
 │  │     ├─ Suitability.ts
+│  │     ├─ TestNumber.ts
 │  │     └─ utils.ts
-│  ├─ types.ts
+│  ├─ test
+│  │  ├─ favorite.spec.ts
+│  │  ├─ highlight.spec.ts
+│  │  ├─ news.spec.ts
+│  │  ├─ spacing.spec.ts
+│  │  └─ user.spec.ts
+│  ├─ types
+│  │  ├─ PaginationInterface
+│  │  │  └─ PaginationInfo.ts
+│  │  ├─ SearchCondition
+│  │  │  ├─ ConditionList.ts
+│  │  │  ├─ SearchCondition.ts
+│  │  │  ├─ hasAnnouncerGender.ts
+│  │  │  ├─ hasCategories.ts
+│  │  │  ├─ hasChannels.ts
+│  │  │  └─ hasFindAll.ts
+│  │  └─ auth
+│  │     ├─ KakaoRawInfo.ts
+│  │     └─ UpdatedAccessTokenDTO.ts
 │  ├─ util
 │  │  ├─ MockUserToFavorite.ts
 │  │  ├─ insertNews.ts
